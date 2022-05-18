@@ -1,0 +1,18 @@
+{
+  "python.autoComplete.extraPaths": [
+    "backend/.venv/lib/python3.10/site-packages",
+    "backend/.venv/lib64/python3.10/site-packages"
+  ],
+  "python.analysis.extraPaths": [
+    "backend/.venv/lib/python3.10/site-packages",
+    "backend/.venv/lib64/python3.10/site-packages"
+  ],
+  "python.linting.flake8Enabled": true,
+  "python.linting.flake8Args": ["--max-line-length", "119"],
+  "python.formatting.provider": "autopep8",
+  "python.formatting.autopep8Args": [
+    "--max-line-length",
+    "119",
+    "--experimental"
+  ]
+}

@@ -1,0 +1,17 @@
+-r base.in
+
+# Tests
+factory-boy
+coverage
+
+# Debug
+django-silk
+
+# Linting and Auto-formatting
+flake8
+autopep8
+
+# Documentation
+pyyaml
+uritemplate
+drf-yasg
