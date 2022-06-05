@@ -15,3 +15,4 @@ django-rest-knox
 django-cors-headers
 psycopg2
 uWSGI
+django-typomatic

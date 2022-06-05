@@ -34,6 +34,7 @@ django==3.2.13
     #   django-guardian
     #   django-rest-knox
     #   django-silk
+    #   django-typomatic
     #   djangorestframework
     #   drf-nested-routers
     #   drf-yasg
@@ -49,10 +50,13 @@ django-rest-knox==4.2.0
     # via -r requirements/base.in
 django-silk==4.3.0
     # via -r requirements/dev.in
+django-typomatic==1.6.1
+    # via -r requirements/base.in
 djangorestframework==3.13.1
     # via
     #   -r requirements/base.in
     #   django-rest-knox
+    #   django-typomatic
     #   drf-nested-routers
     #   drf-yasg
 drf-nested-routers==0.93.4

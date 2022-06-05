@@ -14,6 +14,8 @@ SECRET_KEY = env('SECRET_KEY', default='secretkeyissecrete')
 DEBUG = env.bool('DEBUG', default=False)
 ENVIRONMENT = env('ENVIRONMENT', default='production')
 
+print(ENVIRONMENT)
+
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # NOTE: INSECURE
@@ -29,7 +31,12 @@ CORS_ALLOW_ALL_ORIGINS = True
 #     CORS_ALLOWED_ORIGINS.extend(CORS_ALLOWED_ORIGINS_ENV.split(","))
 
 
-INSTALLED_APPS = [
+LOCAL_INSTALLED_APPS = [
+    'accounts',
+    'shp',
+]
+ADITIONAL_APPS = env.list('ADITIONAL_APPS', default=[])
+INSTALLED_APPS = LOCAL_INSTALLED_APPS + ADITIONAL_APPS + [
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -40,8 +47,20 @@ INSTALLED_APPS = [
     'corsheaders',
     'rest_framework',
     'knox',
-    'accounts',
-    'api',
+]
+
+ADITIONAL_MIDDLEWARE_START = env.list('ADITIONAL_MIDDLEWARE_START', default=[])
+ADITIONAL_MIDDLEWARE_END = env.list('ADITIONAL_MIDDLEWARE_END', default=[])
+MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.security.SecurityMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
 REST_FRAMEWORK = {
@@ -59,25 +78,27 @@ REST_FRAMEWORK = {
         'anon': '20/min',
         'user': '600/min',
     },
+    'EXCEPTION_HANDLER': 'core.error_handling.custom_exception_handler',
     'TEST_REQUEST_DEFAULT_FORMAT': 'json',
 }
-
-MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',
-    'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.locale.LocaleMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
-]
 
 REST_KNOX = {
     'TOKEN_TTL': timedelta(hours=48),
     'AUTO_REFRESH': True,
-    'USER_SERIALIZER': 'api.serializers.UserProfileSerializer',
+    'USER_SERIALIZER': 'accounts.serializers.UserProfileSerializer',
+}
+
+SWAGGER_SETTINGS = {
+    'SECURITY_DEFINITIONS': {
+        'Basic': {
+            'type': 'basic'
+        },
+        'DRF Token': {
+            'type': 'apiKey',
+            'name': 'Authorization',
+            'in': 'header'
+        }
+    }
 }
 
 ROOT_URLCONF = 'core.urls'
@@ -142,8 +163,8 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
-STATIC_URL = "api/static/static/"
-MEDIA_URL = "api/media/"
+STATIC_URL = "/static/"
+MEDIA_URL = "/media/"
 
 STATIC_ROOT = "static/"
 MEDIA_ROOT = "media/"
