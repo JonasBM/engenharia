@@ -43,7 +43,7 @@ class FittingDiameterResponseSerializer(serializers.Serializer):
 
     def validate_material(self, attrs):
         """Check if the fitting and diameter has the same material"""
-        if attrs.get('fitting') != attrs.get('diameter'):
+        if not isinstance(attrs, int) and attrs.get('fitting') != attrs.get('diameter'):
             raise serializers.ValidationError("A conexão e o diâmetro devem ter o mesmo material")
 
     def validate(self, attrs):
@@ -63,7 +63,7 @@ class ReductionSerializer(serializers.ModelSerializer):
     def validate_material(self, attrs):
         """Check if the inlet_diameter and outlet_diameter has the same material"""
 
-        if attrs.get('inlet_diameter') != attrs.get('outlet_diameter'):
+        if not isinstance(attrs, int) and attrs.get('inlet_diameter') != attrs.get('outlet_diameter'):
             raise serializers.ValidationError("Os diâmetros devem ter o mesmo material")
 
     def validate(self, attrs):
@@ -83,6 +83,23 @@ class FixtureSerializer(serializers.ModelSerializer):
     class Meta:
         model = Fixture
         fields = '__all__'
+
+
+@ts_interface('shp')
+class FileInfoSerializer(serializers.Serializer):
+    type = serializers.CharField()
+    version = serializers.CharField()
+
+
+@ts_interface('shp')
+class MaterialFileSerializer(serializers.Serializer):
+
+    fileinfo = FileInfoSerializer(required=True)
+    material = MaterialSerializer(required=True)
+    reductions = ReductionSerializer(many=True)
+    diameters = DiameterSerializer(many=True)
+    fittings = FittingSerializer(many=True)
+    fittingdiameters = FittingDiameterResponseSerializer()
 
 
 generate_ts('./shpTypes.ts', 'shp')

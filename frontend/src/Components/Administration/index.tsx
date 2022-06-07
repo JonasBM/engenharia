@@ -47,8 +47,8 @@ const Administration = () => {
       <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
         <Tabs value={value} onChange={handleChange} centered>
           <Tab label="SHP" />
-          <Tab label="IGC" />
-          <Tab label="SPDA" />
+          {/* <Tab label="IGC" />
+          <Tab label="SPDA" /> */}
         </Tabs>
       </Box>
       <TabPanel value={value} index={0}>

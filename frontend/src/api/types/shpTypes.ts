@@ -75,3 +75,17 @@ export const fixtureTypes = [
   fixtureType.REGULAVEL,
   fixtureType.MANGOTINHO,
 ];
+
+export interface FileInfoSerializer {
+  type: string;
+  version: string;
+}
+
+export interface MaterialFileSerializer {
+  fileinfo: FileInfoSerializer;
+  material: MaterialSerializer;
+  reductions: ReductionSerializer[];
+  diameters: DiameterSerializer[];
+  fittings: FittingSerializer[];
+  fittingdiameters: FittingDiameterResponseSerializer;
+}

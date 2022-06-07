@@ -1,5 +1,7 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 
+import { FileInfoSerializer } from "api/types/shpTypes";
+
 export interface SHPCalcFixture {
   active: boolean;
   end: string;
@@ -17,13 +19,21 @@ export interface SHPCalcPath {
   diameter_id: number;
   length: number | string;
   equivalent_length: number | string;
+  extra_equivalent_length: number | string;
   total_length: number | string;
   level_difference: number | string;
   fittings_ids: number[];
 }
 
+export type SHPCalcType = "gravitacional" | "bomba";
+
+export const shpCalcTypes = ["gravitacional", "bomba"];
+
 export interface SHPCalcState {
+  fileinfo: FileInfoSerializer;
   name: string;
+  type: SHPCalcType;
+  pump_node: string;
   material_id: number;
   diameter_id: number;
   fixture_id: number;
@@ -67,8 +77,8 @@ const getNewStrings = (state: SHPCalcState): { start: string; end: string } => {
   const start = lastLetter ? lastLetter : "RES";
   const end = lastLetter ? nextString(lastLetter) : "A";
   return {
-    start: start,
-    end: end,
+    start: start.toUpperCase(),
+    end: end.toUpperCase(),
   };
 };
 
@@ -97,12 +107,23 @@ const getNewPath = (state: SHPCalcState): Partial<SHPCalcPath> => {
   };
 };
 
-const initialState = { name: "", paths: [] } as SHPCalcState;
+const initialState = {
+  name: "",
+  type: "gravitacional",
+  pump_node: "",
+  paths: [],
+} as SHPCalcState;
 
 const shpCalcSlice = createSlice({
   name: "shpcalc",
   initialState,
   reducers: {
+    setCalc(state, action: PayloadAction<SHPCalcState>) {
+      return action.payload;
+    },
+    setName(state, action: PayloadAction<string>) {
+      state.name = action.payload;
+    },
     setMaterial(state, action: PayloadAction<number>) {
       state.material_id = action.payload;
     },
@@ -112,11 +133,19 @@ const shpCalcSlice = createSlice({
     setCalcFixture(state, action: PayloadAction<number>) {
       state.fixture_id = action.payload;
     },
+    setType(state, action: PayloadAction<SHPCalcType>) {
+      state.type = action.payload;
+      state.pump_node = "";
+    },
+    setPumpNode(state, action: PayloadAction<string>) {
+      state.pump_node = action.payload;
+    },
     setPath(state, action: PayloadAction<[number, Partial<SHPCalcPath>]>) {
       const index =
         action.payload[0] > -1 ? action.payload[0] : state.paths.length;
       const path = action.payload[1] ? action.payload[1] : getNewPath(state);
-      state.paths[index] = { ...state.paths[index], ...path };
+      state.paths[index].length = action.payload[1].length;
+      // state.paths[index] = { ...state.paths[index], ...path };
     },
     setFixture(
       state,
@@ -135,13 +164,6 @@ const shpCalcSlice = createSlice({
     removePath(state, action: PayloadAction<number>) {
       state.paths.splice(action.payload, 1);
     },
-    // calcEquivalentLength(state, action: PayloadAction<number>) {
-    //   const newEquivalentLength = getNewEquivalentLength(state, action.payload);
-    //   state.paths[action.payload] = {
-    //     ...state.paths[action.payload],
-    //     equivalent_length: newEquivalentLength,
-    //   };
-    // },
     reset(state) {
       return initialState;
     },

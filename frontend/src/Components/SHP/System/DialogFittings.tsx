@@ -19,7 +19,7 @@ import {
   useMediaQuery,
   useTheme,
 } from "@mui/material";
-import { Close, Delete, DragIndicator, Send } from "@mui/icons-material";
+import { Close, Delete } from "@mui/icons-material";
 import React, { useEffect, useState } from "react";
 import { hideDialog, showDialog } from "redux/modal";
 import { useAppDispatch, useAppSelector } from "redux/utils";

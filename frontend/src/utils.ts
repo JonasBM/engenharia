@@ -1,4 +1,24 @@
+import { MaterialFileSerializer } from "api/types/shpTypes";
+import { SHPCalcState } from "redux/shp";
 import { UserProfileSerializer } from "./api/types/accountsTypes";
+import store from "redux/store";
+
+export const DecimalFormatter = (
+  value: string | number,
+  decimals: number = 2
+) => {
+  const clean = value
+    .toString()
+    .replace(/[^\d,]/g, "")
+    .replace(/(,.*?),(.*,)?/, "$1");
+  console.log(clean);
+  // const valueWithComma = value.toString().replace(".", ",");
+  // const commaIndex = clean.indexOf(",");
+  // console.log(teste[0]);
+  // console.log(teste[1]);
+  // valueWithComma.replace(/[^\d]/g, ""),
+  return clean;
+};
 
 export const getUserInitials = (
   user?: UserProfileSerializer | null
@@ -41,4 +61,55 @@ export const addServerErrors = <T>(
       message: errors[key as keyof T]!.join(". "),
     });
   });
+};
+
+export const saveFile = (
+  content: string,
+  fileName: string,
+  contentType: string
+) => {
+  var a = document.createElement("a");
+  var file = new Blob([content], { type: contentType });
+  a.href = URL.createObjectURL(file);
+  a.download = fileName;
+  a.click();
+};
+
+export const sanitizeFilename = (filename: string) => {
+  return filename.replace(/[/\\?%*:|"<>#$!`&@{}='+=]/g, "");
+};
+
+export const saveSHPMaterial = (_material_id: number) => {
+  const shpState = store.getState().shp;
+  const data: MaterialFileSerializer = {
+    fileinfo: {
+      type: "material_backup",
+      version: "1.0.0",
+    },
+    material: shpState.materials.find((m) => m.id === _material_id),
+    reductions: shpState.reductions.filter((r) => r.material === _material_id),
+    diameters: shpState.diameters.filter((d) => d.material === _material_id),
+    fittings: shpState.fittings.filter((f) => f.material === _material_id),
+    fittingdiameters: shpState.fittingDiameters.find(
+      (fd) => fd.material === _material_id
+    ),
+  };
+  const jsonData = JSON.stringify(data);
+  saveFile(jsonData, `${data.material.name}.shpmat`, "application/json");
+};
+
+export const saveSHPCalc = () => {
+  const data: SHPCalcState = {
+    ...store.getState().shpCalc,
+    fileinfo: {
+      type: "shp_calc",
+      version: "1.0.0",
+    },
+  };
+  const jsonData = JSON.stringify(data);
+  let fileName = sanitizeFilename(data.name);
+  if (!data.name) {
+    fileName = "Cálculo de SHP";
+  }
+  saveFile(jsonData, `${fileName}.shpcalc`, "application/json");
 };

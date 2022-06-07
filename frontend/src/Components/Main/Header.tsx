@@ -22,8 +22,8 @@ import { useAppSelector } from "redux/utils";
 
 const pages = [
   { path: "/shp/", title: "SHP" },
-  { path: "/igc/", title: "IGC" },
-  { path: "/spda/", title: "SPDA" },
+  // { path: "/igc/", title: "IGC" },
+  // { path: "/spda/", title: "SPDA" },
   { path: "/admin/", title: "Administração" },
 ];
 
@@ -61,6 +61,7 @@ const Header = () => {
     setAnchorElUser(event.currentTarget);
   };
   const handleCloseNavMenu = () => {
+    // page.title === "IGC" || page.title === "SPDA" ? true : false
     setAnchorElNav(null);
   };
   const handleCloseUserMenu = () => {

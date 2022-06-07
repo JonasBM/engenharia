@@ -13,14 +13,17 @@ import {
   orange,
   red,
 } from "@mui/material/colors";
+import { useAppDispatch, useAppSelector } from "redux/utils";
 
 import Alerts from "./Components/Alerts/Alerts";
 import AppRoutes from "./AppRoutes";
+import { Container } from "@mui/system";
 import DialogFittings from "Components/SHP/System/DialogFittings";
 import DiameterDialogForm from "Components/DialogForm/DiameterDialogForm";
 import FittingDialogForm from "Components/DialogForm/FittingDialogForm";
 import FixtureDialogForm from "Components/DialogForm/FixtureDialogForm";
 import Header from "./Components/Main/Header";
+import { LoadingIndicator } from "redux-simplified";
 import MaterialDialogForm from "./Components/DialogForm/MaterialDialogForm";
 import SnackbarCloseButton from "./Components/Alerts/SnackbarCloseButton";
 import { SnackbarProvider } from "notistack";
@@ -64,6 +67,7 @@ const theme = createTheme(
 );
 
 function App() {
+  const fetching = useAppSelector((state) => state.fetching);
   useEffect(() => {
     document.title = documentTitles.PORTAL;
   }, []);
@@ -87,7 +91,10 @@ function App() {
         <DiameterDialogForm />
         <FittingDialogForm />
         <FixtureDialogForm />
-        <AppRoutes />
+        <LoadingIndicator fetching={fetching} />
+        <Container maxWidth={false} sx={{ marginTop: 3, marginBottom: 5 }}>
+          <AppRoutes />
+        </Container>
       </ThemeProvider>
     </SnackbarProvider>
   );

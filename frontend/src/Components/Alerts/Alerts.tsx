@@ -1,8 +1,13 @@
-import React, { Fragment, useEffect } from "react";
+import {
+  OptionsObject,
+  SnackbarKey,
+  SnackbarMessage,
+  useSnackbar,
+} from "notistack";
+import React, { Fragment, useCallback, useEffect } from "react";
 
 import { useAppSelector } from "redux/utils";
 import { usePrevious } from "hooks";
-import { useSnackbar } from "notistack";
 
 const Alerts = () => {
   const { errors, messages } = useAppSelector((state) => state);
@@ -10,28 +15,39 @@ const Alerts = () => {
   const prevMessages = usePrevious(messages);
   const { enqueueSnackbar } = useSnackbar();
 
+  const cutEnqueueSnackbar = useCallback(
+    (message: SnackbarMessage, options: OptionsObject) => {
+      if (typeof message === "string") {
+        enqueueSnackbar(message.substring(0, 200), options);
+      } else {
+        enqueueSnackbar(message, options);
+      }
+    },
+    [enqueueSnackbar]
+  );
+
   useEffect(() => {
     if (errors !== prevErrors) {
       switch (errors.status) {
         case 404:
-          enqueueSnackbar("Pagina não encontrada!", { variant: "error" });
+          cutEnqueueSnackbar("Pagina não encontrada!", { variant: "error" });
           break;
         default:
           if (typeof errors.detail === "string") {
-            enqueueSnackbar(errors.detail, { variant: "error" });
+            cutEnqueueSnackbar(errors.detail, { variant: "error" });
           } else if (typeof errors.detail === "object") {
             if (errors.status && errors.status >= 400 && errors.status < 500) {
               for (const key in errors.detail) {
                 if (key === "detail") {
-                  enqueueSnackbar((errors.detail as any)[key], {
+                  cutEnqueueSnackbar((errors.detail as any)[key], {
                     variant: "error",
                   });
                 } else if (key === "non_field_errors") {
-                  enqueueSnackbar((errors.detail as any)[key].toString(), {
+                  cutEnqueueSnackbar((errors.detail as any)[key].toString(), {
                     variant: "error",
                   });
                 } else {
-                  enqueueSnackbar(key + ": " + (errors.detail as any)[key], {
+                  cutEnqueueSnackbar(key + ": " + (errors.detail as any)[key], {
                     variant: "error",
                   });
                 }
@@ -40,30 +56,34 @@ const Alerts = () => {
           }
       }
     }
-  }, [errors, prevErrors, enqueueSnackbar]);
+  }, [errors, prevErrors, cutEnqueueSnackbar]);
 
   useEffect(() => {
     if (messages !== prevMessages) {
       if (typeof messages.detail === "string") {
-        enqueueSnackbar(messages.detail, { variant: "info" });
+        cutEnqueueSnackbar(messages.detail, { variant: "info" });
       } else if (typeof messages.detail === "object") {
         if (messages.detail.CRUDCreate)
-          enqueueSnackbar(messages.detail.CRUDCreate, { variant: "success" });
+          cutEnqueueSnackbar(messages.detail.CRUDCreate, {
+            variant: "success",
+          });
         if (messages.detail.CRUDUpdate)
-          enqueueSnackbar(messages.detail.CRUDUpdate, { variant: "success" });
+          cutEnqueueSnackbar(messages.detail.CRUDUpdate, {
+            variant: "success",
+          });
         if (messages.detail.CRUDList)
-          enqueueSnackbar(messages.detail.CRUDList, { variant: "success" });
+          cutEnqueueSnackbar(messages.detail.CRUDList, { variant: "success" });
         if (messages.detail.ERROR)
-          enqueueSnackbar(messages.detail.ERROR, { variant: "error" });
+          cutEnqueueSnackbar(messages.detail.ERROR, { variant: "error" });
         if (messages.detail.INFO)
-          enqueueSnackbar(messages.detail.INFO, { variant: "info" });
+          cutEnqueueSnackbar(messages.detail.INFO, { variant: "info" });
         if (messages.detail.WARNING)
-          enqueueSnackbar(messages.detail.INFO, { variant: "warning" });
+          cutEnqueueSnackbar(messages.detail.INFO, { variant: "warning" });
         if (messages.detail.SUCCESS)
-          enqueueSnackbar(messages.detail.SUCCESS, { variant: "success" });
+          cutEnqueueSnackbar(messages.detail.SUCCESS, { variant: "success" });
       }
     }
-  }, [messages, prevMessages, enqueueSnackbar]);
+  }, [messages, prevMessages, cutEnqueueSnackbar]);
 
   return <Fragment />;
 };

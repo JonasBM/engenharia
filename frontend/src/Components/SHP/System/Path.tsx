@@ -17,9 +17,9 @@ import React, { useEffect, useState } from "react";
 import { actions, checkLetter } from "redux/shp";
 import { useAppDispatch, useAppSelector } from "redux/utils";
 
+import { DecimalFormatter } from "utils";
 import Fixture from "./Fixture";
 import { showDialogCalcFittings } from "./DialogFittings";
-import { showFittingDialog } from "Components/DialogForm/FittingDialogForm";
 
 const Path = ({ index }: { index: number }) => {
   const dispatch = useAppDispatch();
@@ -211,16 +211,24 @@ const Path = ({ index }: { index: number }) => {
             sx={{ width: "100px" }}
             variant="standard"
             inputProps={{
-              step: "0.01",
+              // step: "0.01",
               style: { textAlign: "center" },
+              inputMode: "numeric",
+              pattern: "[0-9]*",
             }}
             InputProps={{
-              endAdornment: <InputAdornment position="end">mc</InputAdornment>,
+              endAdornment: <InputAdornment position="end">m</InputAdornment>,
             }}
-            value={path.length || ""}
+            value={path.length ? DecimalFormatter(path.length) : ""}
             onChange={(event) => {
+              console.log(DecimalFormatter(event.target.value));
               dispatch(
-                actions.setPath([index, { length: event.target.value }])
+                actions.setPath([
+                  index,
+                  {
+                    length: DecimalFormatter(event.target.value),
+                  },
+                ])
               );
             }}
           />
@@ -234,7 +242,7 @@ const Path = ({ index }: { index: number }) => {
               style: { textAlign: "center" },
             }}
             InputProps={{
-              endAdornment: <InputAdornment position="end">md</InputAdornment>,
+              endAdornment: <InputAdornment position="end">m</InputAdornment>,
             }}
             value={path.level_difference || ""}
             onChange={(event) => {
