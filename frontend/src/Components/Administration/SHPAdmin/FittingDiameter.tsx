@@ -36,9 +36,9 @@ const FittingDiameter = ({ material }: { material: MaterialSerializer }) => {
     (state) => state.shp.fittingDiameters
   );
 
-  const [currentFitttings, setCurrentFitttings] = useState<FittingSerializer[]>(
-    []
-  );
+  // const [currentFitttings, setCurrentFitttings] = useState<FittingSerializer[]>(
+  //   []
+  // );
   const [currentDiameters, setCurrentDiameters] = useState<
     DiameterSerializer[]
   >([]);
@@ -59,13 +59,13 @@ const FittingDiameter = ({ material }: { material: MaterialSerializer }) => {
     }
   }, [fittingDiameters, material]);
 
-  useEffect(() => {
-    setCurrentFitttings(
-      fittings
-        .filter((f) => f.material === material.id)
-        .sort((a, b) => a.name.localeCompare(b.name))
-    );
-  }, [fittings, material]);
+  // useEffect(() => {
+  //   setCurrentFitttings(
+  //     fittings
+  //       .filter((f) => f.material === material.id)
+  //       .sort((a, b) => a.name.localeCompare(b.name))
+  //   );
+  // }, [fittings, material]);
 
   useEffect(() => {
     setCurrentDiameters(
@@ -156,9 +156,9 @@ const FittingDiameter = ({ material }: { material: MaterialSerializer }) => {
           </TableHead>
           <TableBody>
             {currentFittingdiameters &&
-              currentFitttings &&
+              fittings &&
               currentDiameters &&
-              currentFitttings.map((_fitting) => (
+              fittings.map((_fitting) => (
                 <TableRow key={_fitting.id}>
                   <TableCell component="th" scope="row">
                     <Button

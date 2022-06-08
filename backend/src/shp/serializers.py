@@ -41,15 +41,6 @@ class FittingDiameterResponseSerializer(serializers.Serializer):
     material = serializers.IntegerField()
     fitting_diameter_array = FittingDiameterSerializer(many=True)
 
-    def validate_material(self, attrs):
-        """Check if the fitting and diameter has the same material"""
-        if not isinstance(attrs, int) and attrs.get('fitting') != attrs.get('diameter'):
-            raise serializers.ValidationError("A conexão e o diâmetro devem ter o mesmo material")
-
-    def validate(self, attrs):
-        self.validate_material(attrs)
-        return super().validate(attrs)
-
 
 @ts_interface('shp')
 class ReductionSerializer(serializers.ModelSerializer):

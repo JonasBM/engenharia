@@ -86,25 +86,18 @@ const Path = ({
   }, [diameter_id, diameters, index, material_id, setValue]);
 
   useEffect(() => {
-    if (currentFittingDiameters?.length > 0) {
-      let newEquivalentLength = 0;
-      for (const _fitting_id of fittings_ids) {
-        const _fitting = currentFittingDiameters?.find(
-          (fd) => fd.diameter === diameter_id && fd.fitting === _fitting_id
+    let newEquivalentLength = 0;
+    for (const _fitting_id of fittings_ids) {
+      const _fitting = currentFittingDiameters?.find(
+        (fd) => fd.diameter === diameter_id && fd.fitting === _fitting_id
+      );
+      if (_fitting && _fitting.equivalent_length) {
+        newEquivalentLength += parseFloat(
+          _fitting.equivalent_length.toString()
         );
-        // if (!_fitting) {
-        //   setValue(`paths.${index}.fittings_ids`, [
-        //     ...fittings_ids.filter((id) => id !== _fitting_id),
-        //   ]);
-        // }
-        if (_fitting && _fitting.equivalent_length) {
-          newEquivalentLength += parseFloat(
-            _fitting.equivalent_length.toString()
-          );
-        }
       }
-      setValue(`paths.${index}.equivalent_length`, newEquivalentLength);
     }
+    setValue(`paths.${index}.equivalent_length`, newEquivalentLength);
   }, [currentFittingDiameters, diameter_id, fittings_ids, index, setValue]);
 
   return (

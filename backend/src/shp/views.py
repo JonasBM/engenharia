@@ -1,5 +1,7 @@
+import logging
+
 from django.db import IntegrityError, transaction
-from rest_framework import permissions, views, viewsets, status
+from rest_framework import permissions, status, views, viewsets
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 
@@ -16,6 +18,8 @@ from .serializers import (DiameterSerializer,
 TODO:
 create extras on diameters and fittings creation
 '''
+
+logger = logging.getLogger(__name__)
 
 
 class MaterialViewSet(viewsets.ModelViewSet):
@@ -155,61 +159,58 @@ class LoadMaterialBackup(views.APIView):
                     raise ValidationError({'detail': 'Já existe um material com este nome.'})
                 material.save()
 
-                print(material)
-
                 _diameters_ids_change = {}
                 for diameter in diameters:
-                    old_id = diameter.get('id')
-                    diameter = {**diameter, 'id': None, 'material': material}
-                    diameter = Diameter(**diameter)
+                    old_id = diameter.pop('id', None)
+                    diameter.pop('material', None)
+                    diameter = Diameter(**diameter, material=material)
                     diameter.save()
                     _diameters_ids_change[old_id] = diameter.id
 
                 _fittings_ids_change = {}
                 for fitting in fittings:
-                    old_id = fitting.get('id')
-                    fitting = {**fitting, 'id': None, 'material': material}
-                    fitting = Fitting(**fitting)
-                    fitting.save()
+                    old_id = fitting.pop('id', None)
+                    fitting, _ = Fitting.objects.get_or_create(**fitting)
                     _fittings_ids_change[old_id] = fitting.id
 
                 for fittingdiameter in fitting_diameter_array:
+                    fittingdiameter.pop('id', None)
                     fittingdiameter.pop('material', None)
                     old_fitting = fittingdiameter.pop('fitting', None)
                     old_diameter = fittingdiameter.pop('diameter', None)
-                    fittingdiameter = {
+                    fittingdiameter = FittingDiameter(
                         **fittingdiameter,
-                        'id': None,
-                        'fitting_id': _fittings_ids_change[old_fitting],
-                        'diameter_id': _diameters_ids_change[old_diameter]
-                    }
-                    fittingdiameter = FittingDiameter(**fittingdiameter)
+                        fitting_id=_fittings_ids_change[old_fitting],
+                        diameter_id=_diameters_ids_change[old_diameter]
+                    )
                     fittingdiameter.save()
 
                 for reduction in reductions:
+                    reduction.pop('id', None)
                     reduction.pop('material', None)
                     old_inlet_diameter = reduction.pop('inlet_diameter', None)
                     old_outlet_diameter = reduction.pop('outlet_diameter', None)
                     reduction = {
-                        **reduction,
-                        'id': None,
-                        'inlet_diameter_id': _diameters_ids_change[old_inlet_diameter],
-                        'outlet_diameter_id': _diameters_ids_change[old_outlet_diameter]
-                    }
-                    reduction = Reduction(**reduction)
-                    reduction.save()
 
-                print('_fittings_ids_change')
+                    }
+                    reduction = Reduction(
+                        **reduction,
+                        inlet_diameter_id=_diameters_ids_change[old_inlet_diameter],
+                        outlet_diameter_id=_diameters_ids_change[old_outlet_diameter]
+                    )
+                    reduction.save()
+                logger.info(f'imported material: {material.name}')
+
         except ValidationError as e:
-            print(f'ValidationError: {e}')
+            logger.error(f'ValidationError: {e}')
             return Response(e.detail, status=status.HTTP_400_BAD_REQUEST)
         except IntegrityError as e:
-            print(f'IntegrityError: {e}')
+            logger.error(f'IntegrityError: {e}')
             return Response(
                 {'detail': 'Não foi possivel criar o material no Banco de dados'},
                 status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
-            print(f'Exception: {e}')
+            logger.error(f'Exception: {e}')
             return Response({'detail': 'Não foi possivel criar o material'}, status=status.HTTP_400_BAD_REQUEST)
 
         return Response({'detail': 'Material carregado e salvo com sucesso!'})

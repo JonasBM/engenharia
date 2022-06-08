@@ -48,20 +48,15 @@ class Diameter(models.Model):
 
 class Fitting(models.Model):
 
-    material = models.ForeignKey(Material, related_name="fittings", on_delete=models.CASCADE, verbose_name="material")
-    name = models.CharField(max_length=255, verbose_name="nome")
+    name = models.CharField(max_length=255, unique=True, verbose_name="nome")
 
     class Meta:
         verbose_name = "conexão"
         verbose_name_plural = "conexões"
-        ordering = ['material', 'name']
-        indexes = [
-            models.Index(fields=['material']),
-        ]
-        unique_together = [['material', 'name']]
+        ordering = ['name']
 
     def __str__(self):
-        return (f'{self.id} - {self.material.name} - {self.name}')
+        return (f'{self.id} - {self.name}')
 
 
 class FittingDiameter(models.Model):

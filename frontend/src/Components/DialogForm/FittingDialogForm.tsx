@@ -1,8 +1,7 @@
 import * as yup from "yup";
 
-import { Controller, useForm } from "react-hook-form";
-import { MenuItem, TextField } from "@mui/material";
 import React, { useEffect } from "react";
+import { TextField, Typography } from "@mui/material";
 import { hideDialog, showDialog } from "redux/modal";
 import { useAppDispatch, useAppSelector } from "redux/utils";
 
@@ -11,12 +10,12 @@ import { FittingCRUDAction } from "api/shp";
 import { FittingSerializer } from "api/types/shpTypes";
 import { addServerErrors } from "utils";
 import store from "redux/store";
+import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 
 const _newFitting: Partial<FittingSerializer> = {
   id: 0,
   name: null,
-  material: "",
 };
 
 const _dialogName = "MODAL_FITTING";
@@ -52,13 +51,11 @@ const validationSchema = () =>
   yup
     .object({
       name: yup.string().max(40).required(),
-      material: yup.number().integer().min(1).required(),
     })
     .required();
 
 const FittingDialogForm = () => {
   const dispatch = useAppDispatch();
-  const materials = useAppSelector((state) => state.shp.materials);
   const { dialogName, dialogObject } = useAppSelector(
     (state) => state.modal
   ) as {
@@ -70,7 +67,6 @@ const FittingDialogForm = () => {
     handleSubmit,
     reset,
     setError,
-    control,
     formState: { errors },
   } = useForm<FittingSerializer>({
     resolver: yupResolver(validationSchema()),
@@ -133,36 +129,13 @@ const FittingDialogForm = () => {
       onReset={handleReset}
       onDelete={dialogObject.id ? handleDestroy : null}
     >
+      <Typography>A conexão criada vale para todos os materiais</Typography>
       <TextField
         label="Nome"
         error={errors.name ? true : false}
         helperText={errors.name?.message}
         {...register("name")}
       />
-      {materials && (
-        <Controller
-          control={control}
-          name="material"
-          render={({ field: { value, onChange } }) => (
-            <TextField
-              select
-              label="Material"
-              value={value}
-              onChange={(event) => {
-                onChange(event.target.value || "");
-              }}
-              error={errors.material ? true : false}
-              helperText={errors.material?.message}
-            >
-              {materials.map((_material) => (
-                <MenuItem key={_material.id} value={_material.id}>
-                  {_material.name}
-                </MenuItem>
-              ))}
-            </TextField>
-          )}
-        />
-      )}
     </BaseDialogForm>
   );
 };

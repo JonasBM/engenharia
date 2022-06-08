@@ -40,7 +40,7 @@ const PathToolbar = ({
   const { control, getValues, setValue } = useFormContext<SHPCalcState>();
   const materials = useAppSelector((state) => state.shp.materials);
   const diameters = useAppSelector((state) =>
-    state.shp.diameters.sort(
+    [...state.shp.diameters].sort(
       (a, b) => a.internal_diameter - b.internal_diameter
     )
   );

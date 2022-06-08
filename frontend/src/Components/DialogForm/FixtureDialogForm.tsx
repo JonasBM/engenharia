@@ -111,21 +111,21 @@ const FixtureDialogForm = () => {
   const material_id = useWatch({ control, name: "material" });
   const type = useWatch({ control, name: "type" });
 
-  const [currentFitttings, setCurrentFitttings] = useState<FittingSerializer[]>(
-    []
-  );
+  // const [currentFitttings, setCurrentFitttings] = useState<FittingSerializer[]>(
+  //   []
+  // );
 
   const [currentDiameters, setCurrentDiameters] = useState<
     DiameterSerializer[]
   >([]);
 
-  useEffect(() => {
-    setCurrentFitttings(
-      fittings
-        .filter((f) => f.material === material_id)
-        .sort((a, b) => a.name.localeCompare(b.name))
-    );
-  }, [fittings, material_id]);
+  // useEffect(() => {
+  //   setCurrentFitttings(
+  //     fittings
+  //       .filter((f) => f.material === material_id)
+  //       .sort((a, b) => a.name.localeCompare(b.name))
+  //   );
+  // }, [fittings, material_id]);
 
   useEffect(() => {
     setCurrentDiameters(
@@ -308,7 +308,7 @@ const FixtureDialogForm = () => {
         />
       )}
 
-      {currentFitttings.length > 0 && (
+      {fittings.length > 0 && (
         <Controller
           control={control}
           name="fittings"
@@ -324,9 +324,9 @@ const FixtureDialogForm = () => {
                 onChange(event.target.value || []);
               }}
               error={errors.fittings ? true : false}
-              // helperText={errors.fittings?.message}
+              helperText={errors.fittings?.join(", ")}
             >
-              {currentFitttings.map((_fitting) => (
+              {fittings.map((_fitting) => (
                 <MenuItem key={_fitting.id} value={_fitting.id}>
                   {_fitting.name}
                 </MenuItem>

@@ -122,35 +122,11 @@ const shpCalcSlice = createSlice({
     setCalc(state, action: PayloadAction<SHPCalcState>) {
       return action.payload;
     },
-    setMaterial(state, action: PayloadAction<number>) {
-      state.material_id = action.payload;
-    },
-    setDiameter(state, action: PayloadAction<number>) {
-      state.diameter_id = action.payload;
-    },
-    setFixture(state, action: PayloadAction<number>) {
-      state.fixture_id = action.payload;
-    },
-    setStarterPath(state) {
-      const { material_id, diameter_id } = state;
-      console.log("state: ", material_id, diameter_id);
-      if (material_id && diameter_id) {
-        console.log("sss: ", material_id, diameter_id);
-        state.paths = [getNewPath(state)];
-      }
-    },
     resetCalc(state) {
       return initialState;
     },
   },
 });
 
-export const {
-  setCalc,
-  // setMaterial,
-  // setDiameter,
-  // setFixture,
-  // setStarterPath,
-  resetCalc,
-} = shpCalcSlice.actions;
+export const { setCalc, resetCalc } = shpCalcSlice.actions;
 export default shpCalcSlice.reducer;

@@ -76,19 +76,19 @@ const MaterialDialogForm = () => {
     resolver: yupResolver(validationSchema()),
     defaultValues: dialogObject,
   });
-  const material_id = useWatch({ control, name: "id" });
+  // const material_id = useWatch({ control, name: "id" });
 
-  const [currentFitttings, setCurrentFitttings] = useState<FittingSerializer[]>(
-    []
-  );
+  // const [currentFitttings, setCurrentFitttings] = useState<FittingSerializer[]>(
+  //   []
+  // );
 
-  useEffect(() => {
-    setCurrentFitttings(
-      fittings
-        .filter((f) => f.material === material_id)
-        .sort((a, b) => a.name.localeCompare(b.name))
-    );
-  }, [fittings, material_id]);
+  // useEffect(() => {
+  //   setCurrentFitttings(
+  //     fittings
+  //       .filter((f) => f.material === material_id)
+  //       .sort((a, b) => a.name.localeCompare(b.name))
+  //   );
+  // }, [fittings, material_id]);
 
   useEffect(() => {
     reset(dialogObject);
@@ -159,7 +159,7 @@ const MaterialDialogForm = () => {
         helperText={errors.hazen_williams_coefficient?.message}
         {...register("hazen_williams_coefficient")}
       />
-      {currentFitttings.length > 0 && (
+      {fittings.length > 0 && (
         <Controller
           control={control}
           name="one_outlet_connection"
@@ -175,7 +175,7 @@ const MaterialDialogForm = () => {
               helperText={errors.one_outlet_connection?.message}
             >
               <MenuItem value={null}>Sem conexão</MenuItem>
-              {currentFitttings.map((_fitting) => (
+              {fittings.map((_fitting) => (
                 <MenuItem key={_fitting.id} value={_fitting.id}>
                   {_fitting.name}
                 </MenuItem>
@@ -184,7 +184,7 @@ const MaterialDialogForm = () => {
           )}
         />
       )}
-      {currentFitttings.length > 0 && (
+      {fittings.length > 0 && (
         <Controller
           control={control}
           name="two_outlet_connection"
@@ -200,7 +200,7 @@ const MaterialDialogForm = () => {
               helperText={errors.two_outlet_connection?.message}
             >
               <MenuItem value={""}>Sem conexão</MenuItem>
-              {currentFitttings.map((_fitting) => (
+              {fittings.map((_fitting) => (
                 <MenuItem key={_fitting.id} value={_fitting.id}>
                   {_fitting.name}
                 </MenuItem>
@@ -209,7 +209,7 @@ const MaterialDialogForm = () => {
           )}
         />
       )}
-      {currentFitttings.length > 0 && (
+      {fittings.length > 0 && (
         <Controller
           control={control}
           name="three_outlet_connection"
@@ -225,7 +225,7 @@ const MaterialDialogForm = () => {
               helperText={errors.three_outlet_connection?.message}
             >
               <MenuItem value={""}>Sem conexão</MenuItem>
-              {currentFitttings.map((_fitting) => (
+              {fittings.map((_fitting) => (
                 <MenuItem key={_fitting.id} value={_fitting.id}>
                   {_fitting.name}
                 </MenuItem>

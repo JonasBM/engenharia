@@ -20,8 +20,8 @@ class DiameterAdmin(admin.ModelAdmin):
 @admin.register(Fitting)
 class FittingAdmin(admin.ModelAdmin):
     model = Fitting
-    list_display = ['id', 'material', 'name']
-    search_fields = ['id', 'material__name', 'name']
+    list_display = ['id', 'name']
+    search_fields = ['id', 'name']
 
 
 @admin.register(FittingDiameter)

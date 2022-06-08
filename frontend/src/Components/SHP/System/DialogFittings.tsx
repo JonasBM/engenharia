@@ -23,7 +23,7 @@ import { Close, Delete, DragIndicator } from "@mui/icons-material";
 import React, { useEffect, useState } from "react";
 import { hideDialog, showDialog } from "redux/modal";
 
-import { FittingSerializer } from "api/types/shpTypes";
+// import { FittingSerializer } from "api/types/shpTypes";
 import { SHPCalcState } from "redux/shp";
 import store from "redux/store";
 import { useAppSelector } from "redux/utils";
@@ -58,7 +58,7 @@ const DialogFittings = () => {
 
   const { watch, setValue } = useFormContext<SHPCalcState>();
 
-  const material_id = watch(`paths.${index}.material_id`);
+  // const material_id = watch(`paths.${index}.material_id`);
   const start = watch(`paths.${index}.start`);
   const end = watch(`paths.${index}.end`);
   const has_fixture = watch(`paths.${index}.has_fixture`);
@@ -66,20 +66,20 @@ const DialogFittings = () => {
   const equivalent_length = watch(`paths.${index}.equivalent_length`);
   const fittings_ids = watch(`paths.${index}.fittings_ids`);
 
-  const [currentFittings, setCurrentFittings] = useState<FittingSerializer[]>(
-    []
-  );
+  // const [currentFittings, setCurrentFittings] = useState<FittingSerializer[]>(
+  //   []
+  // );
 
-  useEffect(() => {
-    if (material_id > -1) {
-      setCurrentFittings((_) => {
-        const current = fittings
-          .filter((d) => d.material === material_id)
-          .sort((a, b) => a.name.localeCompare(b.name));
-        return current;
-      });
-    }
-  }, [fittings, material_id]);
+  // useEffect(() => {
+  //   if (material_id > -1) {
+  //     setCurrentFittings((_) => {
+  //       const current = fittings
+  //         .filter((d) => d.material === material_id)
+  //         .sort((a, b) => a.name.localeCompare(b.name));
+  //       return current;
+  //     });
+  //   }
+  // }, [fittings, material_id]);
 
   const handleClose = () => {
     closeDialogCalcFittings();
@@ -119,8 +119,8 @@ const DialogFittings = () => {
             <Grid item xs={6}>
               <List dense component={Paper}>
                 <ListSubheader>Escolha a conexão para o trecho</ListSubheader>
-                {currentFittings &&
-                  currentFittings.map((_fitting) => (
+                {fittings &&
+                  fittings.map((_fitting) => (
                     <ListItemButton
                       key={_fitting.id}
                       onClick={() => {
@@ -137,7 +137,7 @@ const DialogFittings = () => {
             </Grid>
             <Grid item xs={6}>
               <List dense component={Paper}>
-                {currentFittings && fittings_ids && fittings_ids.length > 0 ? (
+                {fittings && fittings_ids && fittings_ids.length > 0 ? (
                   fittings_ids.map((_fitting_id, _index) => (
                     <ListItemButton key={_index}>
                       <ListItemIcon>
@@ -145,8 +145,7 @@ const DialogFittings = () => {
                       </ListItemIcon>
                       <ListItemText
                         primary={
-                          currentFittings.find((f) => f.id === _fitting_id)
-                            ?.name
+                          fittings.find((f) => f.id === _fitting_id)?.name
                         }
                       />
                       <ListItemSecondaryAction>
