@@ -8,19 +8,18 @@ import {
   Typography,
   styled,
 } from "@mui/material";
-import { useAppDispatch, useAppSelector } from "redux/utils";
+import { Controller, useFormContext } from "react-hook-form";
 
 import { Delete } from "@mui/icons-material";
 import React from "react";
-import { actions } from "redux/shp";
+import { SHPCalcState } from "redux/shp";
 
 const StyledTableRow = styled(TableRow)(({ theme }) => ({
   backgroundColor: theme.palette.action.hover,
 }));
 
 const Fixture = ({ index }: { index: number }) => {
-  const dispatch = useAppDispatch();
-  const path = useAppSelector((state) => state.shpCalc.paths[index]);
+  const { register, control } = useFormContext<SHPCalcState>();
 
   return (
     <StyledTableRow>
@@ -41,25 +40,19 @@ const Fixture = ({ index }: { index: number }) => {
           inputProps={{
             style: { textAlign: "center" },
           }}
-          value={path.fixture.end || ""}
-          onChange={(event) => {
-            dispatch(
-              actions.setFixture([
-                index,
-                { end: event.target.value.toUpperCase() },
-              ])
-            );
-          }}
+          {...register(`paths.${index}.fixture.end`)}
         />
       </TableCell>
       <TableCell>
-        <Checkbox
-          checked={path.fixture.active || false}
-          onChange={(event) => {
-            dispatch(
-              actions.setFixture([index, { active: event.target.checked }])
-            );
-          }}
+        <Controller
+          name={`paths.${index}.fixture.active`}
+          control={control}
+          render={({ field: { value, onChange } }) => (
+            <Checkbox
+              checked={value || false}
+              onChange={(e) => onChange(e.target.checked)}
+            />
+          )}
         />
       </TableCell>
       <TableCell align="center">-</TableCell>
@@ -77,15 +70,7 @@ const Fixture = ({ index }: { index: number }) => {
             ),
             endAdornment: <InputAdornment position="end">mm</InputAdornment>,
           }}
-          value={path.fixture.hose_internal_diameter || ""}
-          onChange={(event) => {
-            dispatch(
-              actions.setFixture([
-                index,
-                { hose_internal_diameter: parseInt(event.target.value) },
-              ])
-            );
-          }}
+          {...register(`paths.${index}.fixture.hose_internal_diameter`)}
         />
       </TableCell>
       <TableCell align="center">
@@ -99,12 +84,7 @@ const Fixture = ({ index }: { index: number }) => {
           InputProps={{
             endAdornment: <InputAdornment position="end">m</InputAdornment>,
           }}
-          value={path.fixture.hose_length || ""}
-          onChange={(event) => {
-            dispatch(
-              actions.setFixture([index, { hose_length: event.target.value }])
-            );
-          }}
+          {...register(`paths.${index}.fixture.hose_length`)}
         />
       </TableCell>
       <TableCell align="center">
@@ -118,15 +98,7 @@ const Fixture = ({ index }: { index: number }) => {
           InputProps={{
             endAdornment: <InputAdornment position="end">m</InputAdornment>,
           }}
-          value={path.fixture.level_difference || ""}
-          onChange={(event) => {
-            dispatch(
-              actions.setFixture([
-                index,
-                { level_difference: event.target.value },
-              ])
-            );
-          }}
+          {...register(`paths.${index}.fixture.level_difference`)}
         />
       </TableCell>
       <TableCell align="center">-</TableCell>
@@ -136,10 +108,6 @@ const Fixture = ({ index }: { index: number }) => {
       <TableCell align="center">-</TableCell>
       <TableCell align="center">-</TableCell>
       <TableCell align="center">-</TableCell>
-      {/* </TableRow>
-          </TableBody>
-        </Table>
-      </TableCell> */}
     </StyledTableRow>
   );
 };

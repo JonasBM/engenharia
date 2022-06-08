@@ -10,95 +10,111 @@ import {
   TextField,
 } from "@mui/material";
 import {
+  Controller,
+  UseFieldArrayRemove,
+  useFieldArray,
+  useFormContext,
+  useWatch,
+} from "react-hook-form";
+import {
   DiameterSerializer,
   FittingDiameterSerializer,
 } from "api/types/shpTypes";
 import React, { useEffect, useState } from "react";
-import { actions, checkLetter } from "redux/shp";
+import { SHPCalcState, checkLetter } from "redux/shp";
 import { useAppDispatch, useAppSelector } from "redux/utils";
 
 import { DecimalFormatter } from "utils";
 import Fixture from "./Fixture";
+import { cleanup } from "@testing-library/react";
 import { showDialogCalcFittings } from "./DialogFittings";
 
-const Path = ({ index }: { index: number }) => {
-  const dispatch = useAppDispatch();
+const Path = ({
+  index,
+  remove,
+}: {
+  index: number;
+  remove: UseFieldArrayRemove;
+}) => {
   const materials = useAppSelector((state) => state.shp.materials);
   const diameters = useAppSelector((state) => state.shp.diameters);
-  const path = useAppSelector((state) => state.shpCalc.paths[index]);
   const fittingDiameters = useAppSelector(
     (state) => state.shp.fittingDiameters
   );
+
+  const { register, control, watch, setValue } = useFormContext<SHPCalcState>();
+  const material_id = useWatch({ control, name: `paths.${index}.material_id` });
+  const diameter_id = watch(`paths.${index}.diameter_id`);
+  const start = useWatch({ control, name: `paths.${index}.start` });
+  const has_fixture = useWatch({ control, name: `paths.${index}.has_fixture` });
+  const fixture = useWatch({ control, name: `paths.${index}.fixture` });
+  const fittings_ids = watch(`paths.${index}.fittings_ids`);
+  const equivalent_length = useWatch({
+    control,
+    name: `paths.${index}.equivalent_length`,
+  });
 
   const [currentFittingDiameters, setCurrentFittingDiameters] = useState<
     FittingDiameterSerializer[]
   >([]);
 
-  const [currentDiameters, setCurrentDiameters] = useState<
-    DiameterSerializer[]
-  >([]);
-
   useEffect(() => {
     setCurrentFittingDiameters(
-      fittingDiameters.find((d) => d.material === path.material_id)
+      fittingDiameters.find((d) => d.material === material_id)
         ?.fitting_diameter_array
     );
-  }, [fittingDiameters, dispatch, index, path.material_id]);
+    // setValue(`paths.${index}.fittings_ids`, []);
+  }, [fittingDiameters, index, material_id, setValue]);
 
   useEffect(() => {
-    setCurrentDiameters(
-      diameters
-        .filter((d) => d.material === path.material_id)
-        .sort((a, b) => a.internal_diameter - b.internal_diameter)
-    );
-  }, [diameters, dispatch, index, path.material_id]);
-
-  useEffect(() => {
-    if (currentDiameters.length > 0) {
-      const currentDiameter = currentDiameters.find(
-        (d) => d.id === path.diameter_id
-      );
-      if (!currentDiameter) {
-        dispatch(
-          actions.setPath([index, { diameter_id: currentDiameters[0].id }])
+    if (diameters.length > 0 && material_id) {
+      const _currentDiameter = diameters.find((d) => d.id === diameter_id);
+      if (_currentDiameter?.material !== material_id) {
+        const _currentDiameters = diameters.filter(
+          (d) => d.material === material_id
         );
+        if (_currentDiameters.length > 0) {
+          const _currentDiameter = _currentDiameters.find(
+            (d) => d.id === diameter_id
+          );
+          if (!_currentDiameter) {
+            setValue(`paths.${index}.diameter_id`, _currentDiameters[0].id);
+          }
+        }
       }
     }
-  }, [currentDiameters, dispatch, index, path.diameter_id]);
+  }, [diameter_id, diameters, index, material_id, setValue]);
 
   useEffect(() => {
     if (currentFittingDiameters?.length > 0) {
       let newEquivalentLength = 0;
-      for (const _fitting_id of path.fittings_ids) {
+      for (const _fitting_id of fittings_ids) {
         const _fitting = currentFittingDiameters?.find(
-          (fd) => fd.diameter === path.diameter_id && fd.fitting === _fitting_id
+          (fd) => fd.diameter === diameter_id && fd.fitting === _fitting_id
         );
+        // if (!_fitting) {
+        //   setValue(`paths.${index}.fittings_ids`, [
+        //     ...fittings_ids.filter((id) => id !== _fitting_id),
+        //   ]);
+        // }
         if (_fitting && _fitting.equivalent_length) {
           newEquivalentLength += parseFloat(
             _fitting.equivalent_length.toString()
           );
         }
       }
-      dispatch(
-        actions.setPath([index, { equivalent_length: newEquivalentLength }])
-      );
+      setValue(`paths.${index}.equivalent_length`, newEquivalentLength);
     }
-  }, [
-    currentFittingDiameters,
-    dispatch,
-    index,
-    path.diameter_id,
-    path.fittings_ids,
-  ]);
+  }, [currentFittingDiameters, diameter_id, fittings_ids, index, setValue]);
 
   return (
     <>
       <TableRow>
         <TableCell>
           <IconButton
-            sx={{ visibility: path.start === "RES" ? "hidden" : "visible" }}
+            sx={{ visibility: start === "RES" ? "hidden" : "visible" }}
             onClick={() => {
-              dispatch(actions.removePath(index));
+              remove(index);
             }}
           >
             <Delete />
@@ -108,24 +124,18 @@ const Path = ({ index }: { index: number }) => {
           <TextField
             sx={{ width: "40px" }}
             variant="standard"
-            disabled={path.start === "RES"}
+            disabled={start === "RES"}
             inputProps={{
               style: { textAlign: "center" },
             }}
-            value={path.start}
-            onChange={(event) => {
-              const letter = event.target.value.toUpperCase();
-              if (checkLetter(letter)) {
-                dispatch(actions.setPath([index, { start: letter }]));
-              }
-            }}
+            {...register(`paths.${index}.start`)}
           />
         </TableCell>
         <TableCell>
           <TextField
             sx={{
               width: "40px",
-              visibility: path.has_fixture ? "hidden" : "visible",
+              visibility: has_fixture ? "hidden" : "visible",
             }}
             variant="standard"
             inputProps={{
@@ -133,77 +143,76 @@ const Path = ({ index }: { index: number }) => {
                 textAlign: "center",
               },
             }}
-            value={path.end}
-            onChange={(event) => {
-              const letter = event.target.value.toUpperCase();
-              if (checkLetter(letter)) {
-                dispatch(actions.setPath([index, { end: letter }]));
-              }
-            }}
+            {...register(`paths.${index}.end`)}
           />
         </TableCell>
         <TableCell>
-          <Checkbox
-            checked={path.has_fixture || false}
-            onChange={(event) => {
-              dispatch(
-                actions.setPath([index, { has_fixture: event.target.checked }])
-              );
-            }}
+          <Controller
+            name={`paths.${index}.has_fixture`}
+            control={control}
+            render={({ field: { value, onChange } }) => (
+              <Checkbox
+                checked={value || false}
+                onChange={(e) => onChange(e.target.checked)}
+              />
+            )}
           />
         </TableCell>
         <TableCell align="center">
           {materials.length > 0 && (
-            <TextField
-              sx={{ width: "200px" }}
-              variant="standard"
-              select
-              value={path.material_id || ""}
-              onChange={(event) => {
-                dispatch(
-                  actions.setPath([
-                    index,
-                    {
-                      material_id: parseInt(event.target.value),
-                      diameter_id: undefined,
-                    },
-                  ])
-                );
-              }}
-            >
-              {materials.map((_material) => (
-                <MenuItem key={_material.id} value={_material.id}>
-                  {_material.name}
-                </MenuItem>
-              ))}
-            </TextField>
+            <Controller
+              control={control}
+              name={`paths.${index}.material_id`}
+              render={({ field: { value, onChange } }) => (
+                <TextField
+                  sx={{ width: "200px" }}
+                  variant="standard"
+                  select
+                  value={value || ""}
+                  onChange={(event) => {
+                    onChange(event.target.value);
+                  }}
+                >
+                  {materials.map((_material) => (
+                    <MenuItem key={_material.id} value={_material.id}>
+                      {_material.name}
+                    </MenuItem>
+                  ))}
+                </TextField>
+              )}
+            />
           )}
         </TableCell>
         <TableCell align="center">
-          {currentDiameters.length > 0 && (
-            <TextField
-              sx={{ width: "200px" }}
-              variant="standard"
-              select
-              value={
-                currentDiameters.find((d) => d.id === path.diameter_id)?.id ||
-                ""
-              }
-              onChange={(event) => {
-                dispatch(
-                  actions.setPath([
-                    index,
-                    { diameter_id: parseInt(event.target.value) },
-                  ])
-                );
-              }}
-            >
-              {currentDiameters.map((_diameter) => (
-                <MenuItem key={_diameter.id} value={_diameter.id}>
-                  {_diameter.name} ({_diameter.internal_diameter} mm)
-                </MenuItem>
-              ))}
-            </TextField>
+          {diameters.length > 0 && (
+            <Controller
+              control={control}
+              name={`paths.${index}.diameter_id`}
+              render={({ field: { value, onChange } }) => (
+                <TextField
+                  sx={{ width: "200px" }}
+                  variant="standard"
+                  select
+                  value={value || ""}
+                  onChange={(event) => {
+                    onChange(event.target.value);
+                  }}
+                >
+                  {diameters.map((_diameter) => (
+                    <MenuItem
+                      key={_diameter.id}
+                      value={_diameter.id}
+                      sx={{
+                        display:
+                          _diameter.material === material_id ? "" : "none",
+                      }}
+                    >
+                      {_diameter.name} ({_diameter.internal_diameter} mm)
+                    </MenuItem>
+                  ))}
+                </TextField>
+              )}
+            />
           )}
         </TableCell>
         <TableCell align="center">
@@ -211,7 +220,6 @@ const Path = ({ index }: { index: number }) => {
             sx={{ width: "100px" }}
             variant="standard"
             inputProps={{
-              // step: "0.01",
               style: { textAlign: "center" },
               inputMode: "numeric",
               pattern: "[0-9]*",
@@ -219,18 +227,7 @@ const Path = ({ index }: { index: number }) => {
             InputProps={{
               endAdornment: <InputAdornment position="end">m</InputAdornment>,
             }}
-            value={path.length ? DecimalFormatter(path.length) : ""}
-            onChange={(event) => {
-              console.log(DecimalFormatter(event.target.value));
-              dispatch(
-                actions.setPath([
-                  index,
-                  {
-                    length: DecimalFormatter(event.target.value),
-                  },
-                ])
-              );
-            }}
+            {...register(`paths.${index}.length`)}
           />
         </TableCell>
         <TableCell align="center">
@@ -244,15 +241,7 @@ const Path = ({ index }: { index: number }) => {
             InputProps={{
               endAdornment: <InputAdornment position="end">m</InputAdornment>,
             }}
-            value={path.level_difference || ""}
-            onChange={(event) => {
-              dispatch(
-                actions.setPath([
-                  index,
-                  { level_difference: event.target.value },
-                ])
-              );
-            }}
+            {...register(`paths.${index}.level_difference`)}
           />
         </TableCell>
         <TableCell align="center">
@@ -262,7 +251,7 @@ const Path = ({ index }: { index: number }) => {
               sx={{ width: "100px" }}
               variant="standard"
               inputProps={{ step: "0.01", style: { textAlign: "center" } }}
-              value={path.equivalent_length || "0,00"}
+              value={equivalent_length || "0,00"}
             />
             <IconButton
               onClick={() => {
@@ -280,7 +269,7 @@ const Path = ({ index }: { index: number }) => {
         <TableCell align="center">-</TableCell>
         <TableCell align="center">-</TableCell>
       </TableRow>
-      {path.has_fixture && path.fixture && <Fixture index={index} />}
+      {has_fixture && fixture && <Fixture index={index} />}
     </>
   );
 };

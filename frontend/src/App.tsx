@@ -13,12 +13,10 @@ import {
   orange,
   red,
 } from "@mui/material/colors";
-import { useAppDispatch, useAppSelector } from "redux/utils";
 
 import Alerts from "./Components/Alerts/Alerts";
 import AppRoutes from "./AppRoutes";
 import { Container } from "@mui/system";
-import DialogFittings from "Components/SHP/System/DialogFittings";
 import DiameterDialogForm from "Components/DialogForm/DiameterDialogForm";
 import FittingDialogForm from "Components/DialogForm/FittingDialogForm";
 import FixtureDialogForm from "Components/DialogForm/FixtureDialogForm";
@@ -29,6 +27,7 @@ import SnackbarCloseButton from "./Components/Alerts/SnackbarCloseButton";
 import { SnackbarProvider } from "notistack";
 import { documentTitles } from "myConstants";
 import { ptBR as muiPtBR } from "@mui/material/locale";
+import { useAppSelector } from "redux/utils";
 import { ptBR as yupPtBR } from "./yupLocale";
 import { setLocale as yupSetLocale } from "yup";
 
@@ -86,7 +85,6 @@ function App() {
       <ThemeProvider theme={theme}>
         <Header />
         <Alerts />
-        <DialogFittings />
         <MaterialDialogForm />
         <DiameterDialogForm />
         <FittingDialogForm />

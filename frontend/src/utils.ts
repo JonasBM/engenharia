@@ -1,5 +1,6 @@
+import { SHPCalcState, setCalc } from "redux/shp";
+
 import { MaterialFileSerializer } from "api/types/shpTypes";
-import { SHPCalcState } from "redux/shp";
 import { UserProfileSerializer } from "./api/types/accountsTypes";
 import store from "redux/store";
 
@@ -98,14 +99,12 @@ export const saveSHPMaterial = (_material_id: number) => {
   saveFile(jsonData, `${data.material.name}.shpmat`, "application/json");
 };
 
-export const saveSHPCalc = () => {
-  const data: SHPCalcState = {
-    ...store.getState().shpCalc,
-    fileinfo: {
-      type: "shp_calc",
-      version: "1.0.0",
-    },
+export const saveSHPCalc = (data: SHPCalcState) => {
+  data["fileinfo"] = {
+    type: "shp_calc",
+    version: "1.0.0",
   };
+  store.dispatch(setCalc(data));
   const jsonData = JSON.stringify(data);
   let fileName = sanitizeFilename(data.name);
   if (!data.name) {

@@ -1,6 +1,7 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 
 import { FileInfoSerializer } from "api/types/shpTypes";
+import store from "./store";
 
 export interface SHPCalcFixture {
   active: boolean;
@@ -92,7 +93,7 @@ const getNewFixture = (state: SHPCalcState): Partial<SHPCalcFixture> => {
   };
 };
 
-const getNewPath = (state: SHPCalcState): Partial<SHPCalcPath> => {
+export const getNewPath = (state: SHPCalcState): Partial<SHPCalcPath> => {
   const { start, end } = getNewStrings(state);
   return {
     start: start,
@@ -107,7 +108,7 @@ const getNewPath = (state: SHPCalcState): Partial<SHPCalcPath> => {
   };
 };
 
-const initialState = {
+export const initialState = {
   name: "",
   type: "gravitacional",
   pump_node: "",
@@ -121,54 +122,35 @@ const shpCalcSlice = createSlice({
     setCalc(state, action: PayloadAction<SHPCalcState>) {
       return action.payload;
     },
-    setName(state, action: PayloadAction<string>) {
-      state.name = action.payload;
-    },
     setMaterial(state, action: PayloadAction<number>) {
       state.material_id = action.payload;
     },
     setDiameter(state, action: PayloadAction<number>) {
       state.diameter_id = action.payload;
     },
-    setCalcFixture(state, action: PayloadAction<number>) {
+    setFixture(state, action: PayloadAction<number>) {
       state.fixture_id = action.payload;
     },
-    setType(state, action: PayloadAction<SHPCalcType>) {
-      state.type = action.payload;
-      state.pump_node = "";
+    setStarterPath(state) {
+      const { material_id, diameter_id } = state;
+      console.log("state: ", material_id, diameter_id);
+      if (material_id && diameter_id) {
+        console.log("sss: ", material_id, diameter_id);
+        state.paths = [getNewPath(state)];
+      }
     },
-    setPumpNode(state, action: PayloadAction<string>) {
-      state.pump_node = action.payload;
-    },
-    setPath(state, action: PayloadAction<[number, Partial<SHPCalcPath>]>) {
-      const index =
-        action.payload[0] > -1 ? action.payload[0] : state.paths.length;
-      const path = action.payload[1] ? action.payload[1] : getNewPath(state);
-      state.paths[index].length = action.payload[1].length;
-      // state.paths[index] = { ...state.paths[index], ...path };
-    },
-    setFixture(
-      state,
-      action: PayloadAction<[number, Partial<SHPCalcFixture>]>
-    ) {
-      const index =
-        action.payload[0] > -1 ? action.payload[0] : state.paths.length;
-      const fixture = action.payload[1]
-        ? action.payload[1]
-        : getNewFixture(state);
-      state.paths[index].fixture = {
-        ...state.paths[index].fixture,
-        ...fixture,
-      };
-    },
-    removePath(state, action: PayloadAction<number>) {
-      state.paths.splice(action.payload, 1);
-    },
-    reset(state) {
+    resetCalc(state) {
       return initialState;
     },
   },
 });
 
-export const { actions } = shpCalcSlice;
+export const {
+  setCalc,
+  // setMaterial,
+  // setDiameter,
+  // setFixture,
+  // setStarterPath,
+  resetCalc,
+} = shpCalcSlice.actions;
 export default shpCalcSlice.reducer;
