@@ -8,7 +8,7 @@ import {
 } from "@mui/material";
 import { Controller, useFormContext, useWatch } from "react-hook-form";
 import React, { useEffect } from "react";
-import { SHPCalcState, shpCalcTypes } from "redux/shp";
+import { SHPCalcState, shpCalcTypes, shpPressureTypes } from "redux/shp";
 
 import { Calculate } from "@mui/icons-material";
 import { StyledTextField } from ".";
@@ -19,9 +19,9 @@ const CalcToolbar = () => {
 
   const { register, control, setValue } = useFormContext<SHPCalcState>();
 
-  const type = useWatch({
+  const pressure_type = useWatch({
     control,
-    name: "type",
+    name: "pressure_type",
   });
 
   const fixture_id = useWatch({
@@ -44,11 +44,26 @@ const CalcToolbar = () => {
         spacing={1}
         width="100%"
       >
-        <StyledTextField
-          label="Nome"
-          sx={{ width: 300 }}
-          InputLabelProps={{ shrink: true }}
-          {...register("name")}
+        <Controller
+          control={control}
+          name="calc_type"
+          render={({ field: { value, onChange } }) => (
+            <StyledTextField
+              label="Tipo de cálculo"
+              sx={{ width: 200, margin: 0 }}
+              select
+              value={value || ""}
+              onChange={(event) => {
+                onChange(event.target.value);
+              }}
+            >
+              {shpCalcTypes.map((_shpCalcType) => (
+                <MenuItem key={_shpCalcType.value} value={_shpCalcType.value}>
+                  {_shpCalcType.title}
+                </MenuItem>
+              ))}
+            </StyledTextField>
+          )}
         />
         {fixtures.length > 0 && (
           <Controller
@@ -75,10 +90,10 @@ const CalcToolbar = () => {
         )}
         <Controller
           control={control}
-          name="type"
+          name="pressure_type"
           render={({ field: { value, onChange } }) => (
             <StyledTextField
-              label="Tipo de cálculo"
+              label="Tipo de pressurização"
               sx={{ width: 150, margin: 0 }}
               select
               value={value || ""}
@@ -86,15 +101,18 @@ const CalcToolbar = () => {
                 onChange(event.target.value);
               }}
             >
-              {shpCalcTypes.map((_shpCalcType) => (
-                <MenuItem key={_shpCalcType} value={_shpCalcType}>
-                  {_shpCalcType}
+              {shpPressureTypes.map((_shpPressureType) => (
+                <MenuItem
+                  key={_shpPressureType.value}
+                  value={_shpPressureType.value}
+                >
+                  {_shpPressureType.title}
                 </MenuItem>
               ))}
             </StyledTextField>
           )}
         />
-        {type === "bomba" && (
+        {pressure_type === "bomba" && (
           <TextField
             label="Nome do ponto da Bomba"
             InputLabelProps={{ shrink: true }}

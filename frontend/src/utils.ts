@@ -4,21 +4,14 @@ import { MaterialFileSerializer } from "api/types/shpTypes";
 import { UserProfileSerializer } from "./api/types/accountsTypes";
 import store from "redux/store";
 
-export const DecimalFormatter = (
+export const decimalFormatter = (
   value: string | number,
   decimals: number = 2
 ) => {
-  const clean = value
-    .toString()
-    .replace(/[^\d,]/g, "")
-    .replace(/(,.*?),(.*,)?/, "$1");
-  console.log(clean);
-  // const valueWithComma = value.toString().replace(".", ",");
-  // const commaIndex = clean.indexOf(",");
-  // console.log(teste[0]);
-  // console.log(teste[1]);
-  // valueWithComma.replace(/[^\d]/g, ""),
-  return clean;
+  return value?.toLocaleString("pt-BR", {
+    minimumFractionDigits: decimals,
+    maximumFractionDigits: decimals,
+  });
 };
 
 export const getUserInitials = (
@@ -84,13 +77,13 @@ export const saveSHPMaterial = (_material_id: number) => {
   const shpState = store.getState().shp;
   const data: MaterialFileSerializer = {
     fileinfo: {
-      type: "material_backup",
+      type: "shp_material",
       version: "1.0.0",
     },
     material: shpState.materials.find((m) => m.id === _material_id),
     reductions: shpState.reductions.filter((r) => r.material === _material_id),
     diameters: shpState.diameters.filter((d) => d.material === _material_id),
-    fittings: shpState.fittings.filter((f) => f.material === _material_id),
+    fittings: shpState.fittings,
     fittingdiameters: shpState.fittingDiameters.find(
       (fd) => fd.material === _material_id
     ),

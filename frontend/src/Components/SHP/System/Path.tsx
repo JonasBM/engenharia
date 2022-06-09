@@ -1,4 +1,4 @@
-import { Add, Delete } from "@mui/icons-material";
+import { Add, Delete, DragIndicator } from "@mui/icons-material";
 import {
   Box,
   Checkbox,
@@ -12,29 +12,28 @@ import {
 import {
   Controller,
   UseFieldArrayRemove,
-  useFieldArray,
   useFormContext,
   useWatch,
 } from "react-hook-form";
-import {
-  DiameterSerializer,
-  FittingDiameterSerializer,
-} from "api/types/shpTypes";
+import { DraggableProvided, DraggableStateSnapshot } from "react-beautiful-dnd";
 import React, { useEffect, useState } from "react";
-import { SHPCalcState, checkLetter } from "redux/shp";
-import { useAppDispatch, useAppSelector } from "redux/utils";
 
-import { DecimalFormatter } from "utils";
+import { FittingDiameterSerializer } from "api/types/shpTypes";
 import Fixture from "./Fixture";
-import { cleanup } from "@testing-library/react";
+import { SHPCalcState } from "redux/shp";
 import { showDialogCalcFittings } from "./DialogFittings";
+import { useAppSelector } from "redux/utils";
 
 const Path = ({
   index,
   remove,
+  provided,
+  snapshot,
 }: {
   index: number;
   remove: UseFieldArrayRemove;
+  provided: DraggableProvided;
+  snapshot: DraggableStateSnapshot;
 }) => {
   const materials = useAppSelector((state) => state.shp.materials);
   const diameters = useAppSelector((state) => state.shp.diameters);
@@ -42,7 +41,8 @@ const Path = ({
     (state) => state.shp.fittingDiameters
   );
 
-  const { register, control, watch, setValue } = useFormContext<SHPCalcState>();
+  const { register, control, watch, setValue, getValues, reset } =
+    useFormContext<SHPCalcState>();
   const material_id = useWatch({ control, name: `paths.${index}.material_id` });
   const diameter_id = watch(`paths.${index}.diameter_id`);
   const start = useWatch({ control, name: `paths.${index}.start` });
@@ -53,18 +53,27 @@ const Path = ({
     control,
     name: `paths.${index}.equivalent_length`,
   });
+  const extra_equivalent_length = useWatch({
+    control,
+    name: `paths.${index}.extra_equivalent_length`,
+  });
 
   const [currentFittingDiameters, setCurrentFittingDiameters] = useState<
     FittingDiameterSerializer[]
   >([]);
 
   useEffect(() => {
+    if (has_fixture === false) {
+      setValue(`paths.${index}.fixture.active`, false);
+    }
+  }, [has_fixture, index, setValue]);
+
+  useEffect(() => {
     setCurrentFittingDiameters(
       fittingDiameters.find((d) => d.material === material_id)
         ?.fitting_diameter_array
     );
-    // setValue(`paths.${index}.fittings_ids`, []);
-  }, [fittingDiameters, index, material_id, setValue]);
+  }, [fittingDiameters, material_id]);
 
   useEffect(() => {
     if (diameters.length > 0 && material_id) {
@@ -86,7 +95,8 @@ const Path = ({
   }, [diameter_id, diameters, index, material_id, setValue]);
 
   useEffect(() => {
-    let newEquivalentLength = 0;
+    let newEquivalentLength =
+      parseFloat(extra_equivalent_length?.toString()) || 0;
     for (const _fitting_id of fittings_ids) {
       const _fitting = currentFittingDiameters?.find(
         (fd) => fd.diameter === diameter_id && fd.fitting === _fitting_id
@@ -98,16 +108,29 @@ const Path = ({
       }
     }
     setValue(`paths.${index}.equivalent_length`, newEquivalentLength);
-  }, [currentFittingDiameters, diameter_id, fittings_ids, index, setValue]);
+  }, [
+    currentFittingDiameters,
+    diameter_id,
+    extra_equivalent_length,
+    fittings_ids,
+    index,
+    setValue,
+  ]);
 
   return (
     <>
-      <TableRow>
+      <TableRow ref={provided.innerRef} {...provided.draggableProps}>
+        <TableCell>
+          <IconButton {...provided.dragHandleProps}>
+            <DragIndicator />
+          </IconButton>
+        </TableCell>
         <TableCell>
           <IconButton
             sx={{ visibility: start === "RES" ? "hidden" : "visible" }}
             onClick={() => {
               remove(index);
+              reset(getValues());
             }}
           >
             <Delete />
@@ -210,12 +233,12 @@ const Path = ({
         </TableCell>
         <TableCell align="center">
           <TextField
+            type="number"
             sx={{ width: "100px" }}
             variant="standard"
             inputProps={{
+              step: "0.01",
               style: { textAlign: "center" },
-              inputMode: "numeric",
-              pattern: "[0-9]*",
             }}
             InputProps={{
               endAdornment: <InputAdornment position="end">m</InputAdornment>,
@@ -225,6 +248,7 @@ const Path = ({
         </TableCell>
         <TableCell align="center">
           <TextField
+            type="number"
             sx={{ width: "100px" }}
             variant="standard"
             inputProps={{
@@ -240,11 +264,12 @@ const Path = ({
         <TableCell align="center">
           <Box sx={{ display: "flex", alignItems: "flex-end" }}>
             <TextField
+              type="number"
               disabled
               sx={{ width: "100px" }}
               variant="standard"
-              inputProps={{ step: "0.01", style: { textAlign: "center" } }}
-              value={equivalent_length || "0,00"}
+              inputProps={{ style: { textAlign: "center" } }}
+              value={equivalent_length?.toFixed(2) || "0,00"}
             />
             <IconButton
               onClick={() => {
@@ -262,7 +287,9 @@ const Path = ({
         <TableCell align="center">-</TableCell>
         <TableCell align="center">-</TableCell>
       </TableRow>
-      {has_fixture && fixture && <Fixture index={index} />}
+      {has_fixture && fixture && (
+        <Fixture index={index} isDragging={snapshot.isDragging} />
+      )}
     </>
   );
 };

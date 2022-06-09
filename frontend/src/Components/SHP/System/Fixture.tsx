@@ -1,28 +1,49 @@
+import { Controller, useFormContext, useWatch } from "react-hook-form";
+import { Delete, DragIndicator } from "@mui/icons-material";
 import {
-  Checkbox,
   IconButton,
   InputAdornment,
+  Switch,
   TableCell,
   TableRow,
   TextField,
   Typography,
+  alpha,
   styled,
 } from "@mui/material";
-import { Controller, useFormContext } from "react-hook-form";
 
-import { Delete } from "@mui/icons-material";
 import React from "react";
 import { SHPCalcState } from "redux/shp";
 
-const StyledTableRow = styled(TableRow)(({ theme }) => ({
-  backgroundColor: theme.palette.action.hover,
-}));
+const StyledTableRow = styled(TableRow)<{ active: string }>(
+  ({ theme, active }) => ({
+    backgroundColor:
+      active === "true"
+        ? alpha(theme.palette.success.light, 0.3)
+        : theme.palette.action.hover,
+  })
+);
 
-const Fixture = ({ index }: { index: number }) => {
+const Fixture = ({
+  index,
+  isDragging,
+}: {
+  index: number;
+  isDragging: boolean;
+}) => {
   const { register, control } = useFormContext<SHPCalcState>();
+  const active = useWatch({ control, name: `paths.${index}.fixture.active` });
 
   return (
-    <StyledTableRow>
+    <StyledTableRow
+      sx={{ visibility: isDragging ? "hidden" : "visible" }}
+      active={active ? "true" : "false"}
+    >
+      <TableCell>
+        <IconButton sx={{ visibility: "hidden" }}>
+          <DragIndicator />
+        </IconButton>
+      </TableCell>
       <TableCell>
         <IconButton sx={{ visibility: "hidden" }}>
           <Delete />
@@ -48,7 +69,7 @@ const Fixture = ({ index }: { index: number }) => {
           name={`paths.${index}.fixture.active`}
           control={control}
           render={({ field: { value, onChange } }) => (
-            <Checkbox
+            <Switch
               checked={value || false}
               onChange={(e) => onChange(e.target.checked)}
             />

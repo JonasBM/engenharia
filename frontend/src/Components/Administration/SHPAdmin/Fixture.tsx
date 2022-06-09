@@ -5,13 +5,14 @@ import {
   GridColumns,
   GridRowId,
   GridToolbarContainer,
+  GridValueGetterParams,
 } from "@mui/x-data-grid";
+import { FixtureSerializer, fixtureTypes } from "api/types/shpTypes";
 import { Grid, Stack, Typography } from "@mui/material";
 import {
   destroyFixture,
   showFixtureDialog,
 } from "Components/DialogForm/FixtureDialogForm";
-import { useAppDispatch, useAppSelector } from "redux/utils";
 
 import AddIcon from "@mui/icons-material/Add";
 import Box from "@mui/material/Box";
@@ -19,6 +20,7 @@ import Button from "@mui/material/Button";
 import DeleteIcon from "@mui/icons-material/DeleteOutlined";
 import EditIcon from "@mui/icons-material/Edit";
 import React from "react";
+import { useAppSelector } from "redux/utils";
 
 function EditToolbar() {
   return (
@@ -40,6 +42,7 @@ function EditToolbar() {
               showFixtureDialog();
             }}
             sx={{ margin: 1 }}
+            title="Adicionar hidrante"
           >
             Hidrante
           </Button>
@@ -58,7 +61,6 @@ const CustomNoRowsOverlay = () => {
 };
 
 const Fixture = () => {
-  const dispatch = useAppDispatch();
   const fixtures = useAppSelector((state) => state.shp.fixtures);
 
   const handleEditClick = (id: GridRowId) => {
@@ -75,11 +77,18 @@ const Fixture = () => {
     }
   };
 
+  const getFixtureType = (
+    params: GridValueGetterParams<string, FixtureSerializer>
+  ): string => {
+    return fixtureTypes.find((ft) => ft.value === params.value)?.name;
+  };
+
   const CommonFieldAttributes: GridColDef = {
     field: "",
     flex: 1,
-    editable: true,
+    editable: false,
     sortable: false,
+    headerAlign: "center",
     align: "center",
   };
 
@@ -91,9 +100,30 @@ const Fixture = () => {
       align: "left",
     },
     {
+      ...CommonFieldAttributes,
+      field: "type",
+      headerName: "Tipo de hidrante",
+      valueGetter: getFixtureType,
+    },
+    {
+      ...CommonFieldAttributes,
+      field: "hose_internal_diameter",
+      headerName: "Diâmetro da mangueira (mm)",
+    },
+    {
+      ...CommonFieldAttributes,
+      field: "outlet_diameter",
+      headerName: "Diâmetro do esguicho (mm)",
+    },
+    {
+      ...CommonFieldAttributes,
+      field: "minimum_flow_rate",
+      headerName: "Vazão mínima (l/min)",
+    },
+    {
       field: "actions",
       type: "actions",
-      headerName: "Actions",
+      headerName: "",
       width: 100,
       cellClassName: "actions",
       getActions: ({ id }) => {
@@ -106,6 +136,7 @@ const Fixture = () => {
               handleEditClick(id);
             }}
             color="warning"
+            title="Editar hidrante"
           />,
           <GridActionsCellItem
             icon={<DeleteIcon />}
@@ -114,6 +145,7 @@ const Fixture = () => {
               handleDeleteClick(id);
             }}
             color="error"
+            title="Remover hidrante"
           />,
         ];
       },
@@ -130,15 +162,6 @@ const Fixture = () => {
           Toolbar: EditToolbar,
           NoRowsOverlay: CustomNoRowsOverlay,
         }}
-        componentsProps={
-          {
-            // toolbar: {
-            //   rows: currentMaterialConnections,
-            //   setRows: setCurrentMaterialConnections,
-            //   setRowModesModel,
-            // },
-          }
-        }
         rowHeight={50}
         hideFooter
         disableColumnMenu

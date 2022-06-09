@@ -1,22 +1,26 @@
 import * as yup from "yup";
 
 import { Controller, useForm, useWatch } from "react-hook-form";
-import { FittingSerializer, MaterialSerializer } from "api/types/shpTypes";
 import { MenuItem, TextField } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { hideDialog, showDialog } from "redux/modal";
 import { useAppDispatch, useAppSelector } from "redux/utils";
 
 import BaseDialogForm from "./BaseDialogForm";
 import { MaterialCRUDAction } from "api/shp";
+import { MaterialSerializer } from "api/types/shpTypes";
 import { addServerErrors } from "utils";
 import store from "redux/store";
 import { yupResolver } from "@hookform/resolvers/yup";
 
 const _newMaterial: Partial<MaterialSerializer> = {
   id: 0,
-  name: null,
+  name: "",
   hazen_williams_coefficient: null,
+  one_outlet_connection: null,
+  two_outlet_connection: null,
+  three_outlet_connection: null,
+  default_diameter: null,
 };
 
 const _dialogName = "MODAL_MATERIAL";
@@ -59,6 +63,7 @@ const validationSchema = () =>
 const MaterialDialogForm = () => {
   const dispatch = useAppDispatch();
   const fittings = useAppSelector((state) => state.shp.fittings);
+  const diameters = useAppSelector((state) => state.shp.diameters);
   const { dialogName, dialogObject } = useAppSelector(
     (state) => state.modal
   ) as {
@@ -76,19 +81,7 @@ const MaterialDialogForm = () => {
     resolver: yupResolver(validationSchema()),
     defaultValues: dialogObject,
   });
-  // const material_id = useWatch({ control, name: "id" });
-
-  // const [currentFitttings, setCurrentFitttings] = useState<FittingSerializer[]>(
-  //   []
-  // );
-
-  // useEffect(() => {
-  //   setCurrentFitttings(
-  //     fittings
-  //       .filter((f) => f.material === material_id)
-  //       .sort((a, b) => a.name.localeCompare(b.name))
-  //   );
-  // }, [fittings, material_id]);
+  const material_id = useWatch({ control, name: "id" });
 
   useEffect(() => {
     reset(dialogObject);
@@ -155,6 +148,7 @@ const MaterialDialogForm = () => {
       <TextField
         type="number"
         label="Coeficiente de hazen-williams"
+        inputProps={{ step: "1" }}
         error={errors.hazen_williams_coefficient ? true : false}
         helperText={errors.hazen_williams_coefficient?.message}
         {...register("hazen_williams_coefficient")}
@@ -169,7 +163,7 @@ const MaterialDialogForm = () => {
               label="Conexão para uma saída"
               value={value || ""}
               onChange={(event) => {
-                onChange(event.target.value || "");
+                onChange(event.target.value);
               }}
               error={errors.one_outlet_connection ? true : false}
               helperText={errors.one_outlet_connection?.message}
@@ -194,12 +188,12 @@ const MaterialDialogForm = () => {
               label="Conexão para duas saídas"
               value={value || ""}
               onChange={(event) => {
-                onChange(event.target.value || "");
+                onChange(event.target.value);
               }}
               error={errors.two_outlet_connection ? true : false}
               helperText={errors.two_outlet_connection?.message}
             >
-              <MenuItem value={""}>Sem conexão</MenuItem>
+              <MenuItem value={null}>Sem conexão</MenuItem>
               {fittings.map((_fitting) => (
                 <MenuItem key={_fitting.id} value={_fitting.id}>
                   {_fitting.name}
@@ -219,15 +213,47 @@ const MaterialDialogForm = () => {
               label="Conexão para três saídas"
               value={value || ""}
               onChange={(event) => {
-                onChange(event.target.value || "");
+                onChange(event.target.value);
               }}
               error={errors.three_outlet_connection ? true : false}
               helperText={errors.three_outlet_connection?.message}
             >
-              <MenuItem value={""}>Sem conexão</MenuItem>
+              <MenuItem value={null}>Sem conexão</MenuItem>
               {fittings.map((_fitting) => (
                 <MenuItem key={_fitting.id} value={_fitting.id}>
                   {_fitting.name}
+                </MenuItem>
+              ))}
+            </TextField>
+          )}
+        />
+      )}
+
+      {diameters.length > 0 && (
+        <Controller
+          control={control}
+          name="default_diameter"
+          render={({ field: { value, onChange } }) => (
+            <TextField
+              select
+              label="Diâmetro padrão"
+              value={value || ""}
+              onChange={(event) => {
+                onChange(event.target.value);
+              }}
+              error={errors.one_outlet_connection ? true : false}
+              helperText={errors.one_outlet_connection?.message}
+            >
+              <MenuItem value={null}>Sem Diâmetro</MenuItem>
+              {diameters.map((_diameter) => (
+                <MenuItem
+                  key={_diameter.id}
+                  value={_diameter.id}
+                  sx={{
+                    display: _diameter.material === material_id ? "" : "none",
+                  }}
+                >
+                  {_diameter.name}
                 </MenuItem>
               ))}
             </TextField>

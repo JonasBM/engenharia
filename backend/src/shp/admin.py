@@ -41,5 +41,5 @@ class ReductionAdmin(admin.ModelAdmin):
 @admin.register(MaterialConnection)
 class MaterialConnectionAdmin(admin.ModelAdmin):
     model = MaterialConnection
-    list_display = ['id', 'inlet_material', 'outlet_material', 'name', 'equivalent_length']
-    search_fields = ['id', 'inlet_material__name', 'outlet_material__name', 'name']
+    list_display = ['id', 'inlet_diameter', 'outlet_diameter', 'name', 'equivalent_length']
+    search_fields = ['id', 'inlet_diameter__material__name', 'outlet_diameter__material__name', 'name']

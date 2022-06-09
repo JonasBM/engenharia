@@ -6,9 +6,9 @@ import store from "./store";
 export interface SHPCalcFixture {
   active: boolean;
   end: string;
-  hose_length: number | string;
+  hose_length: number;
   hose_internal_diameter: number;
-  level_difference: number | string;
+  level_difference: number;
 }
 
 export interface SHPCalcPath {
@@ -18,22 +18,31 @@ export interface SHPCalcPath {
   has_fixture: boolean;
   material_id: number;
   diameter_id: number;
-  length: number | string;
-  equivalent_length: number | string;
-  extra_equivalent_length: number | string;
-  total_length: number | string;
-  level_difference: number | string;
+  length: number;
+  equivalent_length: number;
+  extra_equivalent_length: number;
+  total_length: number;
+  level_difference: number;
   fittings_ids: number[];
 }
 
-export type SHPCalcType = "gravitacional" | "bomba";
+export type SHPCalcType = "indeterminado" | "residual";
+export const shpCalcTypes = [
+  { title: "Indeterminado", value: "indeterminado" },
+  { title: "Residual", value: "residual" },
+];
 
-export const shpCalcTypes = ["gravitacional", "bomba"];
+export type SHPPressureType = "gravitacional" | "bomba";
+export const shpPressureTypes = [
+  { title: "Gravitacional", value: "gravitacional" },
+  { title: "Bomba", value: "bomba" },
+];
 
 export interface SHPCalcState {
   fileinfo: FileInfoSerializer;
   name: string;
-  type: SHPCalcType;
+  pressure_type: SHPPressureType;
+  calc_type: SHPCalcType;
   pump_node: string;
   material_id: number;
   diameter_id: number;
@@ -87,9 +96,8 @@ const getNewFixture = (state: SHPCalcState): Partial<SHPCalcFixture> => {
   return {
     active: false,
     end: `H${state.paths.length}`,
-    hose_length: "",
-    hose_internal_diameter: 0,
-    level_difference: "",
+    hose_length: undefined,
+    level_difference: undefined,
   };
 };
 
@@ -102,15 +110,16 @@ export const getNewPath = (state: SHPCalcState): Partial<SHPCalcPath> => {
     fixture: getNewFixture(state),
     material_id: state.material_id,
     diameter_id: state.diameter_id,
-    length: "",
-    level_difference: "",
+    length: undefined,
+    level_difference: undefined,
     fittings_ids: [],
   };
 };
 
 export const initialState = {
   name: "",
-  type: "gravitacional",
+  pressure_type: "gravitacional",
+  calc_type: "indeterminado",
   pump_node: "",
   paths: [],
 } as SHPCalcState;

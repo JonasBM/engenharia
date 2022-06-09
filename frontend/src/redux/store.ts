@@ -59,9 +59,6 @@ const persistConfig = {
   whitelist: ["shpCalc"],
 };
 
-// shpCalc: "{\"name\":\"\",\"paths\":[{\"start\":\"c\",\"end\":\"B\",\"material_id\":5,\"diameter_id\":7,\"length\":0,\"fittings_ids\":[],\"reductions_ids\":[]},{\"start\":\"d\",\"end\":\"B\",\"material_id\":3,\"diameter_id\":6,\"length\":0,\"fittings_ids\":[],\"reductions_ids\":[]}],\"material_id\":3,\"diameter_id\":1}"
-// shpCalc: "{\"name\":\"\",\"paths\":[{\"start\":\"c\",\"end\":\"B\",\"material_id\":5,\"diameter_id\":7,\"length\":0,\"fittings_ids\":[],\"reductions_ids\":[]},{\"start\":\"d\",\"end\":\"B\",\"material_id\":3,\"diameter_id\":1,\"length\":0,\"fittings_ids\":[],\"reductions_ids\":[]}],\"material_id\":3,\"diameter_id\":1}"
-
 const persistedReducer = persistReducer(persistConfig, rootReducer);
 
 const store = configureStore({

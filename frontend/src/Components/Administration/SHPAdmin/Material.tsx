@@ -42,13 +42,6 @@ const Material = () => {
   const materials = useAppSelector((state) => state.shp.materials);
 
   const [materialFile, setMaterialFile] = useState<MaterialFileSerializer>();
-  // const [expanded, setExpanded] = useState<{ [key: string]: boolean }>({});
-
-  // const handleChange = (panel: string) => {
-  //   setExpanded((value) => {
-  //     return { ...value, [panel]: !value[panel] };
-  //   });
-  // };
 
   const handleLoadMaterialFile = (file: Blob) => {
     const reader = new FileReader();
@@ -56,11 +49,20 @@ const Material = () => {
       const materialFile = JSON.parse(
         e.target.result.toString()
       ) as MaterialFileSerializer;
+      console.log(materialFile);
       if (
         materialFile.fileinfo.type === "shp_material" &&
         materialFile.fileinfo.version.startsWith("1.0.")
       ) {
         setMaterialFile(materialFile);
+      } else {
+        let newLine = "\r\n";
+        let message = "Problemas ao carregar o arquivo";
+        message += newLine;
+        message += `filetype: ${materialFile.fileinfo.type}, expected: shp_material`;
+        message += newLine;
+        message += `fileversion: ${materialFile.fileinfo.version}, expected: 1.0.x`;
+        alert(message);
       }
     };
     reader.readAsText(file);
@@ -79,6 +81,7 @@ const Material = () => {
           onClick={() => {
             showMaterialDialog();
           }}
+          title="Adicionar Material"
         >
           Adicionar Material
         </Button>
@@ -116,6 +119,7 @@ const Material = () => {
                   }
                 });
               }}
+              title="Salvar material carregado"
             >
               Salvar
             </Button>
@@ -129,7 +133,11 @@ const Material = () => {
             </IconButton>
           </Paper>
         ) : (
-          <Button variant="contained" component="label">
+          <Button
+            variant="contained"
+            component="label"
+            title="Carregar arquivo de material"
+          >
             Carregar Material
             <input
               type="file"
@@ -145,15 +153,11 @@ const Material = () => {
       <Container sx={{ padding: 2 }}>
         {materials.map((_material) => (
           <Box key={_material.id} sx={{ border: 1 }}>
-            <Accordion
-            // expanded={expanded[`panel-${_material.id}`] ? true : false}
-            // onChange={() => {
-            //   handleChange(`panel-${_material.id}`);
-            // }}
-            >
+            <Accordion>
               <AccordionSummary
                 expandIcon={<ExpandMore />}
                 sx={{ backgroundColor: "warning.main" }}
+                title="Clique para expandir"
               >
                 <Typography sx={{ width: "50%", flexShrink: 0 }}>
                   {_material.name}
@@ -175,13 +179,14 @@ const Material = () => {
                         direction="row"
                         justifyContent="center"
                         alignItems="center"
-                        spacing={1}
+                        spacing={3}
                         width="100%"
                       >
                         <Button
                           onClick={() => {
                             showMaterialDialog(_material);
                           }}
+                          title="Editar material"
                         >
                           Editar
                         </Button>
@@ -190,6 +195,7 @@ const Material = () => {
                           onClick={() => {
                             destroyMaterial(_material);
                           }}
+                          title="Remover material"
                         >
                           Excluir
                         </Button>
@@ -198,14 +204,16 @@ const Material = () => {
                           onClick={() => {
                             showDiameterDialog({ material: _material.id });
                           }}
+                          title="Adicionar diâmetro"
                         >
                           Diâmetro
                         </Button>
                         <Button
                           startIcon={<Add />}
                           onClick={() => {
-                            showFittingDialog({ material: _material.id });
+                            showFittingDialog();
                           }}
+                          title="Adicionar conexão"
                         >
                           Conexão
                         </Button>
@@ -215,6 +223,7 @@ const Material = () => {
                           onClick={() => {
                             saveSHPMaterial(_material.id);
                           }}
+                          title="Baixar arquivo de backup do material"
                         >
                           Baixar
                         </Button>

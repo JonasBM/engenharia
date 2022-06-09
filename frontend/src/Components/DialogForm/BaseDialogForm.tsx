@@ -44,8 +44,22 @@ const BaseDialogForm = ({
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down("md"));
 
+  const onCloseWithoutBackDrop = (
+    event: object,
+    reason: "backdropClick" | "escapeKeyDown"
+  ) => {
+    if (reason !== "backdropClick") {
+      onClose();
+    }
+  };
+
   return (
-    <Dialog open={open} onClose={onClose} fullScreen={fullScreen} fullWidth>
+    <Dialog
+      open={open}
+      onClose={onCloseWithoutBackDrop}
+      fullScreen={fullScreen}
+      fullWidth
+    >
       <Box component="form" onSubmit={onSubmit}>
         <DialogTitle>
           {title}

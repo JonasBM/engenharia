@@ -14,6 +14,9 @@ class Material(models.Model):
     three_outlet_connection = models.ForeignKey(
         'Fitting', default=None, null=True, blank=True, related_name="three_outlet_materials",
         on_delete=models.SET_NULL, verbose_name="conexão para três saídas")
+    default_diameter = models.ForeignKey(
+        'Diameter', default=None, null=True, blank=True, related_name="default_diameter_materials",
+        on_delete=models.SET_NULL, verbose_name="Diâmetro padrão")
 
     class Meta:
         verbose_name = "material"
@@ -93,7 +96,7 @@ class Reduction(models.Model):
     class Meta:
         verbose_name = "redução"
         verbose_name_plural = "reduções"
-        ordering = ['inlet_diameter', 'outlet_diameter', 'name', 'equivalent_length']
+        ordering = ['name', 'equivalent_length']
         indexes = [
             models.Index(fields=['inlet_diameter']),
             models.Index(fields=['outlet_diameter']),
@@ -109,12 +112,6 @@ class Reduction(models.Model):
 
 class MaterialConnection(models.Model):
 
-    inlet_material = models.ForeignKey(
-        Material, related_name="inlet_material_connections", on_delete=models.CASCADE,
-        verbose_name="Material de Entrada")
-    outlet_material = models.ForeignKey(
-        Material, related_name="outlet_material_connections", on_delete=models.CASCADE,
-        verbose_name="Material de Saída")
     inlet_diameter = models.ForeignKey(Diameter, related_name="inlet_material_connections",
                                        on_delete=models.CASCADE, verbose_name="diâmetro do material de Entrada")
     outlet_diameter = models.ForeignKey(Diameter, related_name="outlet_material_connections",
@@ -125,19 +122,17 @@ class MaterialConnection(models.Model):
     class Meta:
         verbose_name = "conexão entre materiais"
         verbose_name_plural = "conexões entre materiais"
-        ordering = ['inlet_material', 'outlet_material', 'name', 'equivalent_length']
+        ordering = ['name', 'equivalent_length']
         indexes = [
-            models.Index(fields=['inlet_material']),
             models.Index(fields=['inlet_diameter']),
-            models.Index(fields=['outlet_material']),
             models.Index(fields=['outlet_diameter']),
         ]
-        unique_together = [['inlet_material', 'inlet_diameter', 'outlet_material', 'outlet_diameter']]
+        unique_together = [['inlet_diameter', 'outlet_diameter']]
 
     def __str__(self):
         return (
-            f'{self.id} - {self.inlet_material.name} ({self.inlet_diameter.name}) -> '
-            f'{self.outlet_material.name} ({self.outlet_diameter.name}) - {self.name}'
+            f'{self.id} - {self.inlet_diameter.material.name} ({self.inlet_diameter.name}) -> '
+            f'{self.outlet_diameter.material.name} ({self.outlet_diameter.name}) - {self.name}'
         )
 
 
@@ -154,12 +149,15 @@ class Fixture(models.Model):
                                  related_name="fixtures", on_delete=models.CASCADE, verbose_name="material")
     inlet_diameter = models.ForeignKey(Diameter, default=None, null=True, blank=True, related_name="fixtures",
                                        on_delete=models.CASCADE, verbose_name="diâmetro de Entrada")
+    reductions = models.ManyToManyField(Reduction, default=None, blank=True,
+                                        related_name="fixtures", verbose_name="reduções")
     fittings = models.ManyToManyField(Fitting, default=None, blank=True,
                                       related_name="fixtures", verbose_name="conexões")
     extra_equivalent_length = models.DecimalField(
         max_digits=9, decimal_places=2, default=0, null=True,
         blank=True, verbose_name="comprimento equivalente extra")
     hose_hazen_williams_coefficient = models.IntegerField(verbose_name="coeficiente de hazen-williams da mangueira")
+    hose_internal_diameter = models.IntegerField(verbose_name="diâmetro interno da mangueira")
     k_factor = models.DecimalField(max_digits=9, decimal_places=2, default=0, null=True,
                                    blank=True, verbose_name="fator K do esguicho")
     outlet_diameter = models.DecimalField(max_digits=9, decimal_places=2, verbose_name="diâmetro da saída")
@@ -172,5 +170,5 @@ class Fixture(models.Model):
 
     def __str__(self):
         return (
-            f'{self.id} - {self.name} - {self.inlet_diameter.name} -> {self.outlet_diameter}'
+            f'{self.id} - {self.name}'
         )

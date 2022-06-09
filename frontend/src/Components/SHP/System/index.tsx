@@ -8,11 +8,13 @@ import {
   TableHead,
   TableRow,
   TextField,
+  Toolbar,
   alpha,
   styled,
   tableBodyClasses,
   tableCellClasses,
 } from "@mui/material";
+import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 import {
   FormProvider,
   useFieldArray,
@@ -24,7 +26,6 @@ import { SHPCalcState, getNewPath, initialState, setCalc } from "redux/shp";
 import { useAppDispatch, useAppSelector } from "redux/utils";
 
 import CalcToolbar from "./CalcToolbar";
-import { ContentPasteSearchOutlined } from "@mui/icons-material";
 import DialogFittings from "./DialogFittings";
 import Path from "./Path";
 import PathToolbar from "./PathToolbar";
@@ -60,11 +61,13 @@ const SHP = () => {
   const formMethods = useForm<SHPCalcState>({
     defaultValues: initialState,
   });
-  const { control, reset, getValues } = formMethods;
+  const { control, reset, getValues, register } = formMethods;
   const {
     fields: paths,
     remove,
     append,
+    move,
+    insert,
   } = useFieldArray({
     control,
     name: "paths",
@@ -92,9 +95,17 @@ const SHP = () => {
   }, [material_id, diameter_id, append, paths.length, getValues]);
 
   useEffect(() => {
-    console.log("shpCalc");
     reset(shpCalc);
   }, [reset, shpCalc]);
+
+  const handleOnDragEnd = (result: any) => {
+    console.log(result);
+    if (!result.destination) return;
+    if (result.source.index !== result.destination.index) {
+      move(result.source.index, result.destination.index);
+      reset(getValues());
+    }
+  };
 
   const onSubmit = (data: SHPCalcState) => {
     console.log(data);
@@ -106,6 +117,14 @@ const SHP = () => {
       <form onSubmit={formMethods.handleSubmit(onSubmit)}>
         <DialogFittings />
         <Container maxWidth="xl">
+          <Toolbar>
+            <TextField
+              label="Nome"
+              sx={{ width: 400 }}
+              InputLabelProps={{ shrink: true }}
+              {...register("name")}
+            />
+          </Toolbar>
           <CalcToolbar />
           <PathToolbar append={append} />
           <TableContainer component={Paper}>
@@ -116,6 +135,7 @@ const SHP = () => {
             >
               <TableHead>
                 <TableRow>
+                  <TableCell align="center" />
                   <TableCell align="center" />
                   <TableCell align="center" width={"50px"} colSpan={2}>
                     TRECHO
@@ -138,11 +158,34 @@ const SHP = () => {
                   <TableCell align="center">M.C.A.</TableCell>
                 </TableRow>
               </TableHead>
-              <TableBody>
-                {paths.map((_, index) => (
-                  <Path key={index} index={index} remove={remove} />
-                ))}
-              </TableBody>
+              <DragDropContext onDragEnd={handleOnDragEnd}>
+                <Droppable droppableId="paths">
+                  {(provided) => (
+                    <TableBody
+                      {...provided.droppableProps}
+                      ref={provided.innerRef}
+                    >
+                      {paths.map((_, _index) => (
+                        <Draggable
+                          key={_index}
+                          draggableId={`paths-${_index}`}
+                          index={_index}
+                        >
+                          {(provided, snapshot) => (
+                            <Path
+                              index={_index}
+                              remove={remove}
+                              provided={provided}
+                              snapshot={snapshot}
+                            />
+                          )}
+                        </Draggable>
+                      ))}
+                      {provided.placeholder}
+                    </TableBody>
+                  )}
+                </Droppable>
+              </DragDropContext>
             </StyledTable>
           </TableContainer>
         </Container>

@@ -17,7 +17,6 @@ import {
 import {
   DiameterSerializer,
   FittingDiameterResponseSerializer,
-  FittingSerializer,
   MaterialSerializer,
 } from "api/types/shpTypes";
 import React, { useEffect, useState } from "react";
@@ -36,9 +35,6 @@ const FittingDiameter = ({ material }: { material: MaterialSerializer }) => {
     (state) => state.shp.fittingDiameters
   );
 
-  // const [currentFitttings, setCurrentFitttings] = useState<FittingSerializer[]>(
-  //   []
-  // );
   const [currentDiameters, setCurrentDiameters] = useState<
     DiameterSerializer[]
   >([]);
@@ -58,14 +54,6 @@ const FittingDiameter = ({ material }: { material: MaterialSerializer }) => {
       });
     }
   }, [fittingDiameters, material]);
-
-  // useEffect(() => {
-  //   setCurrentFitttings(
-  //     fittings
-  //       .filter((f) => f.material === material.id)
-  //       .sort((a, b) => a.name.localeCompare(b.name))
-  //   );
-  // }, [fittings, material]);
 
   useEffect(() => {
     setCurrentDiameters(

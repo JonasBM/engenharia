@@ -15,7 +15,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 
 const _newFitting: Partial<FittingSerializer> = {
   id: 0,
-  name: null,
+  name: "",
 };
 
 const _dialogName = "MODAL_FITTING";

@@ -22,7 +22,9 @@ import FittingDialogForm from "Components/DialogForm/FittingDialogForm";
 import FixtureDialogForm from "Components/DialogForm/FixtureDialogForm";
 import Header from "./Components/Main/Header";
 import { LoadingIndicator } from "redux-simplified";
+import MaterialConnectionDialogForm from "Components/DialogForm/MaterialConnectionDialogForm";
 import MaterialDialogForm from "./Components/DialogForm/MaterialDialogForm";
+import ReductionDialogForm from "Components/DialogForm/ReductionDialogForm";
 import SnackbarCloseButton from "./Components/Alerts/SnackbarCloseButton";
 import { SnackbarProvider } from "notistack";
 import { documentTitles } from "myConstants";
@@ -88,6 +90,8 @@ function App() {
         <MaterialDialogForm />
         <DiameterDialogForm />
         <FittingDialogForm />
+        <ReductionDialogForm />
+        <MaterialConnectionDialogForm />
         <FixtureDialogForm />
         <LoadingIndicator fetching={fetching} />
         <Container maxWidth={false} sx={{ marginTop: 3, marginBottom: 5 }}>

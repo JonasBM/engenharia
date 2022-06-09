@@ -15,9 +15,9 @@ import { yupResolver } from "@hookform/resolvers/yup";
 
 const _newDiameter: Partial<DiameterSerializer> = {
   id: 0,
-  name: null,
+  name: "",
   internal_diameter: null,
-  material: "",
+  material: null,
 };
 
 const _dialogName = "MODAL_DIAMETER";
@@ -144,6 +144,7 @@ const DiameterDialogForm = () => {
       <TextField
         type="number"
         label="Diâmetro interno (mm)"
+        inputProps={{ step: "1" }}
         error={errors.internal_diameter ? true : false}
         helperText={errors.internal_diameter?.message}
         {...register("internal_diameter")}

@@ -64,9 +64,23 @@ class ReductionSerializer(serializers.ModelSerializer):
 
 @ts_interface('shp')
 class MaterialConnectionSerializer(serializers.ModelSerializer):
+
+    inlet_material = serializers.IntegerField(source='inlet_diameter.material_id', read_only=True)
+    outlet_material = serializers.IntegerField(source='outlet_diameter.material_id', read_only=True)
+
     class Meta:
         model = MaterialConnection
         fields = '__all__'
+
+    def validate_material(self, attrs):
+        """Check if the inlet_diameter and outlet_diameter has the same material"""
+
+        if not isinstance(attrs, int) and attrs.get('inlet_diameter') == attrs.get('outlet_diameter'):
+            raise serializers.ValidationError("Os diâmetros devem ser de diferente materiais")
+
+    def validate(self, attrs):
+        self.validate_material(attrs)
+        return super().validate(attrs)
 
 
 @ts_interface('shp')

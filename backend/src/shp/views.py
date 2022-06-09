@@ -190,9 +190,6 @@ class LoadMaterialBackup(views.APIView):
                     reduction.pop('material', None)
                     old_inlet_diameter = reduction.pop('inlet_diameter', None)
                     old_outlet_diameter = reduction.pop('outlet_diameter', None)
-                    reduction = {
-
-                    }
                     reduction = Reduction(
                         **reduction,
                         inlet_diameter_id=_diameters_ids_change[old_inlet_diameter],

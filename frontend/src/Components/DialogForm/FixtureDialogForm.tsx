@@ -3,7 +3,6 @@ import * as yup from "yup";
 import { Controller, useForm, useWatch } from "react-hook-form";
 import {
   DiameterSerializer,
-  FittingSerializer,
   FixtureSerializer,
   fixtureType,
   fixtureTypes,
@@ -23,13 +22,15 @@ const _newFixture: Partial<FixtureSerializer> = {
   id: 0,
   name: "",
   type: "",
-  extra_equivalent_length: "",
+  extra_equivalent_length: null,
   hose_hazen_williams_coefficient: null,
-  k_factor: "",
-  outlet_diameter: "",
-  minimum_flow_rate: "",
-  material: "",
-  inlet_diameter: "",
+  hose_internal_diameter: null,
+  k_factor: null,
+  outlet_diameter: null,
+  minimum_flow_rate: null,
+  material: null,
+  inlet_diameter: null,
+  reductions: [],
   fittings: [],
 };
 
@@ -67,29 +68,25 @@ const validationSchema = () =>
     .object({
       name: yup.string().max(255).required(),
       type: yup.string().required(),
-      minimum_flow_rate: yup.number().integer().min(0).required(),
-      outlet_diameter: yup.number().min(0).required(),
-      // k_factor: yup.string().when("type", {
-      //   is: fixtureType.TRONCO_CONICO.value,
-      //   then: yup
-      //     .string()
-      //     .nullable()
-      //     .matches(/^[0-9]+$/, {
-      //       message: "Deve ser um número",
-      //       excludeEmptyString: true,
-      //     }),
-      //   otherwise: yup.string().matches(/^[0-9]+$/, {
-      //     message: "Deve ser um número",
-      //   }),
-      // }),
       hose_hazen_williams_coefficient: yup.number().integer().min(0).required(),
+      hose_internal_diameter: yup.number().integer().min(0).required(),
+      // k_factor: null,
+      outlet_diameter: yup.number().min(1).required(),
+      minimum_flow_rate: yup.number().min(0).required(),
     })
     .required();
 
 const FixtureDialogForm = () => {
   const dispatch = useAppDispatch();
   const materials = useAppSelector((state) => state.shp.materials);
-  const diameters = useAppSelector((state) => state.shp.diameters);
+  const diameters = useAppSelector((state) =>
+    [...state.shp.diameters].sort(
+      (a, b) => a.internal_diameter - b.internal_diameter
+    )
+  );
+  const reductions = useAppSelector((state) =>
+    [...state.shp.reductions].sort((a, b) => a.name.localeCompare(b.name))
+  );
   const fittings = useAppSelector((state) => state.shp.fittings);
   const { dialogName, dialogObject } = useAppSelector(
     (state) => state.modal
@@ -103,6 +100,7 @@ const FixtureDialogForm = () => {
     handleSubmit,
     reset,
     setError,
+    setValue,
     formState: { errors },
   } = useForm<FixtureSerializer>({
     resolver: yupResolver(validationSchema()),
@@ -111,29 +109,10 @@ const FixtureDialogForm = () => {
   const material_id = useWatch({ control, name: "material" });
   const type = useWatch({ control, name: "type" });
 
-  // const [currentFitttings, setCurrentFitttings] = useState<FittingSerializer[]>(
-  //   []
-  // );
-
-  const [currentDiameters, setCurrentDiameters] = useState<
-    DiameterSerializer[]
-  >([]);
-
-  // useEffect(() => {
-  //   setCurrentFitttings(
-  //     fittings
-  //       .filter((f) => f.material === material_id)
-  //       .sort((a, b) => a.name.localeCompare(b.name))
-  //   );
-  // }, [fittings, material_id]);
-
   useEffect(() => {
-    setCurrentDiameters(
-      diameters
-        .filter((d) => d.material === material_id)
-        .sort((a, b) => a.internal_diameter - b.internal_diameter)
-    );
-  }, [diameters, material_id]);
+    setValue("inlet_diameter", null, { shouldValidate: true });
+    setValue("reductions", [], { shouldValidate: true });
+  }, [material_id, setValue]);
 
   useEffect(() => {
     reset(dialogObject);
@@ -185,7 +164,7 @@ const FixtureDialogForm = () => {
     <BaseDialogForm
       key={dialogObject.id}
       open={dialogName === _dialogName ? true : false}
-      title={dialogObject.id ? "Editar Fixture" : "Criar Fixture"}
+      title={dialogObject.id ? "Editar Hidrante" : "Criar Hidrante"}
       onClose={handleClose}
       onSubmit={handleSubmit(onSubmit)}
       onReset={handleReset}
@@ -204,10 +183,10 @@ const FixtureDialogForm = () => {
           render={({ field: { value, onChange } }) => (
             <TextField
               select
-              label="Conexão para uma saída"
+              label="Tipo de hidrante"
               value={value || ""}
               onChange={(event) => {
-                onChange(event.target.value || "");
+                onChange(event.target.value);
               }}
               error={errors.type ? true : false}
               helperText={errors.type?.message}
@@ -243,6 +222,7 @@ const FixtureDialogForm = () => {
       />
       <TextField
         type="number"
+        inputProps={{ step: "0.01" }}
         label="Vazão mínima (l/min)"
         error={errors.minimum_flow_rate ? true : false}
         helperText={errors.minimum_flow_rate?.message}
@@ -250,10 +230,20 @@ const FixtureDialogForm = () => {
       />
       <TextField
         type="number"
+        inputProps={{ step: "1" }}
         label="Coeficiente de hazen-williams da mangueira"
         error={errors.hose_hazen_williams_coefficient ? true : false}
         helperText={errors.hose_hazen_williams_coefficient?.message}
         {...register("hose_hazen_williams_coefficient")}
+      />
+
+      <TextField
+        type="number"
+        inputProps={{ step: "1" }}
+        label="Diâmetro interno da mangueira (mm)"
+        error={errors.hose_internal_diameter ? true : false}
+        helperText={errors.hose_internal_diameter?.message}
+        {...register("hose_internal_diameter")}
       />
 
       {materials.length > 0 && (
@@ -266,7 +256,7 @@ const FixtureDialogForm = () => {
               label="Material"
               value={value || ""}
               onChange={(event) => {
-                onChange(event.target.value || "");
+                onChange(event.target.value);
               }}
               error={errors.material ? true : false}
               helperText={errors.material?.message}
@@ -282,7 +272,7 @@ const FixtureDialogForm = () => {
         />
       )}
 
-      {currentDiameters.length > 0 && (
+      {diameters.length > 0 && (
         <Controller
           control={control}
           name="inlet_diameter"
@@ -292,15 +282,55 @@ const FixtureDialogForm = () => {
               label="Diâmetro de entrada"
               value={value || ""}
               onChange={(event) => {
-                onChange(event.target.value || "");
+                onChange(event.target.value);
               }}
               error={errors.inlet_diameter ? true : false}
               helperText={errors.inlet_diameter?.message}
             >
               <MenuItem value={""}>Sem Diâmetro de entrada</MenuItem>
-              {currentDiameters.map((_diameter) => (
-                <MenuItem key={_diameter.id} value={_diameter.id}>
+              {diameters.map((_diameter) => (
+                <MenuItem
+                  key={_diameter.id}
+                  value={_diameter.id}
+                  sx={{
+                    display: _diameter.material === material_id ? "" : "none",
+                  }}
+                >
                   {_diameter.name} ({_diameter.internal_diameter} mm)
+                </MenuItem>
+              ))}
+            </TextField>
+          )}
+        />
+      )}
+
+      {reductions.length > 0 && (
+        <Controller
+          control={control}
+          name="reductions"
+          render={({ field: { value, onChange } }) => (
+            <TextField
+              select
+              SelectProps={{
+                multiple: true,
+              }}
+              label="Reduções"
+              value={value || []}
+              onChange={(event) => {
+                onChange(event.target.value || []);
+              }}
+              error={errors.reductions ? true : false}
+              helperText={errors.reductions?.join(", ")}
+            >
+              {reductions.map((_reduction) => (
+                <MenuItem
+                  key={_reduction.id}
+                  value={_reduction.id}
+                  sx={{
+                    display: _reduction.material === material_id ? "" : "none",
+                  }}
+                >
+                  {_reduction.name}
                 </MenuItem>
               ))}
             </TextField>
@@ -339,7 +369,7 @@ const FixtureDialogForm = () => {
       <TextField
         type="number"
         inputProps={{ step: "0.01" }}
-        label="Comprimento equivalente extra"
+        label="Comprimento equivalente extra (m)"
         error={errors.extra_equivalent_length ? true : false}
         helperText={errors.extra_equivalent_length?.message}
         {...register("extra_equivalent_length")}
