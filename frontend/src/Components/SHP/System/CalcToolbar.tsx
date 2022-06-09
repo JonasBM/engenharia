@@ -36,7 +36,7 @@ const CalcToolbar = () => {
   }, [fixtures, fixture_id, setValue]);
 
   return (
-    <Toolbar>
+    <Toolbar sx={{ minWidth: 800 }}>
       <Stack
         direction="row"
         justifyContent="center"

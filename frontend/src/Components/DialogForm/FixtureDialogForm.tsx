@@ -2,13 +2,12 @@ import * as yup from "yup";
 
 import { Controller, useForm, useWatch } from "react-hook-form";
 import {
-  DiameterSerializer,
   FixtureSerializer,
   fixtureType,
   fixtureTypes,
 } from "api/types/shpTypes";
 import { MenuItem, TextField } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { hideDialog, showDialog } from "redux/modal";
 import { useAppDispatch, useAppSelector } from "redux/utils";
 

@@ -5,7 +5,6 @@ import {
   GridColumns,
   GridRowId,
   GridToolbarContainer,
-  GridValueFormatterParams,
   GridValueGetterParams,
 } from "@mui/x-data-grid";
 import { Grid, Stack, Typography } from "@mui/material";
@@ -21,7 +20,6 @@ import DeleteIcon from "@mui/icons-material/DeleteOutlined";
 import EditIcon from "@mui/icons-material/Edit";
 import { MaterialConnectionSerializer } from "api/types/shpTypes";
 import React from "react";
-import { decimalFormatter } from "utils";
 import { useAppSelector } from "redux/utils";
 
 function EditToolbar() {
@@ -99,7 +97,11 @@ const MaterialConnection = () => {
   const getDiameterName = (
     params: GridValueGetterParams<number, MaterialConnectionSerializer>
   ): string => {
-    return diameters.find((m) => m.id === params.value)?.name;
+    const diameter = diameters.find((m) => m.id === params.value);
+    if (diameter) {
+      return `${diameter.name} (${diameter.internal_diameter} mm)`;
+    }
+    return params.value.toString();
   };
 
   const CommonFieldAttributes: GridColDef = {

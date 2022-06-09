@@ -18,16 +18,9 @@ import {
   useWatch,
 } from "react-hook-form";
 import React, { useEffect, useState } from "react";
-import {
-  SHPCalcState,
-  getNewPath,
-  initialState,
-  resetCalc,
-  setCalc,
-} from "redux/shp";
+import { SHPCalcState, getNewPath, initialState, setCalc } from "redux/shp";
 import { useAppDispatch, useAppSelector } from "redux/utils";
 
-import { DiameterSerializer } from "api/types/shpTypes";
 import { StyledTextField } from ".";
 import { saveSHPCalc } from "utils";
 
@@ -56,23 +49,24 @@ const PathToolbar = ({
   }, [materials, material_id, setValue]);
 
   useEffect(() => {
-    if (diameters.length > 0 && material_id) {
-      const _currentDiameter = diameters.find((d) => d.id === diameter_id);
-      if (_currentDiameter?.material !== material_id) {
-        const _currentDiameters = diameters.filter(
-          (d) => d.material === material_id
+    const _diameter = diameters.find((d) => d.id === diameter_id);
+    if (
+      materials &&
+      diameters &&
+      material_id &&
+      _diameter?.material !== material_id
+    ) {
+      const material = materials.find((m) => m.id === material_id);
+      if (material?.default_diameter) {
+        setValue("diameter_id", material.default_diameter);
+      } else {
+        setValue(
+          "diameter_id",
+          diameters.find((d) => d.material === material_id)?.id
         );
-        if (_currentDiameters.length > 0) {
-          const _currentDiameter = _currentDiameters.find(
-            (d) => d.id === diameter_id
-          );
-          if (!_currentDiameter) {
-            setValue("diameter_id", _currentDiameters[0].id);
-          }
-        }
       }
     }
-  }, [diameter_id, diameters, material_id, setValue]);
+  }, [diameters, material_id, diameter_id, materials, setValue]);
 
   const handleLoadCalcFile = (file: Blob) => {
     const reader = new FileReader();
@@ -83,13 +77,21 @@ const PathToolbar = ({
         _calcFile.fileinfo.version.startsWith("1.0.")
       ) {
         setcalcFile(_calcFile);
+      } else {
+        let newLine = "\r\n";
+        let message = "Problemas ao carregar o arquivo";
+        message += newLine;
+        message += `filetype: ${_calcFile.fileinfo.type}, expected: shp_calc`;
+        message += newLine;
+        message += `fileversion: ${_calcFile.fileinfo.version}, expected: 1.0.x`;
+        alert(message);
       }
     };
     reader.readAsText(file);
   };
 
   return (
-    <AppBar position="static" color="secondary">
+    <AppBar position="static" color="secondary" sx={{ minWidth: 800 }}>
       <Toolbar variant="dense">
         <Stack
           direction="row"

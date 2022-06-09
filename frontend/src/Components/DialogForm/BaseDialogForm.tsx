@@ -7,16 +7,10 @@ import {
   DialogTitle,
   Grid,
   IconButton,
-  Stack,
   useMediaQuery,
   useTheme,
 } from "@mui/material";
-import {
-  Close,
-  Delete,
-  Restore,
-  SettingsBackupRestore,
-} from "@mui/icons-material";
+import { Close, Delete, SettingsBackupRestore } from "@mui/icons-material";
 
 import React from "react";
 

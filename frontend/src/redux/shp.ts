@@ -1,13 +1,11 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 
 import { FileInfoSerializer } from "api/types/shpTypes";
-import store from "./store";
 
 export interface SHPCalcFixture {
   active: boolean;
   end: string;
   hose_length: number;
-  hose_internal_diameter: number;
   level_difference: number;
 }
 
@@ -50,7 +48,7 @@ export interface SHPCalcState {
   paths: Partial<SHPCalcPath>[];
 }
 
-export const checkLetter = (letter: string) => {
+export const checkLetter = (letter: string): boolean => {
   const check = letter === "RES";
   if (check) {
     alert('"RES" está designado para o reservatório');
@@ -92,10 +90,21 @@ const getNewStrings = (state: SHPCalcState): { start: string; end: string } => {
   };
 };
 
+const getNewFixtureString = (state: SHPCalcState): string => {
+  let lastNumber = 1;
+  for (const path of state.paths) {
+    if (path.fixture.end) {
+      const current = parseInt(path.fixture.end.match(/\d+/).shift());
+      lastNumber = current > lastNumber ? current : lastNumber;
+    }
+  }
+  return `H${lastNumber + 1}`;
+};
+
 const getNewFixture = (state: SHPCalcState): Partial<SHPCalcFixture> => {
   return {
     active: false,
-    end: `H${state.paths.length}`,
+    end: getNewFixtureString(state),
     hose_length: undefined,
     level_difference: undefined,
   };

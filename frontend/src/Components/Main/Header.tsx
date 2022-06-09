@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { getUserFullName, getUserInitials } from "utils";
 import { useEffect, useState } from "react";
 

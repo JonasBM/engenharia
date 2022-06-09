@@ -67,7 +67,6 @@ const SHP = () => {
     remove,
     append,
     move,
-    insert,
   } = useFieldArray({
     control,
     name: "paths",
@@ -99,7 +98,6 @@ const SHP = () => {
   }, [reset, shpCalc]);
 
   const handleOnDragEnd = (result: any) => {
-    console.log(result);
     if (!result.destination) return;
     if (result.source.index !== result.destination.index) {
       move(result.source.index, result.destination.index);
@@ -108,7 +106,6 @@ const SHP = () => {
   };
 
   const onSubmit = (data: SHPCalcState) => {
-    console.log(data);
     dispatch(setCalc(data));
   };
 
@@ -127,12 +124,8 @@ const SHP = () => {
           </Toolbar>
           <CalcToolbar />
           <PathToolbar append={append} />
-          <TableContainer component={Paper}>
-            <StyledTable
-              sx={{ minWidth: 650 }}
-              size="small"
-              aria-label="a dense table"
-            >
+          <TableContainer component={Paper} sx={{ minWidth: 800 }}>
+            <StyledTable size="small" aria-label="a dense table">
               <TableHead>
                 <TableRow>
                   <TableCell align="center" />

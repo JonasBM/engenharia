@@ -17,10 +17,10 @@ import {
 } from "react-hook-form";
 import { DraggableProvided, DraggableStateSnapshot } from "react-beautiful-dnd";
 import React, { useEffect, useState } from "react";
+import { SHPCalcState, checkLetter } from "redux/shp";
 
 import { FittingDiameterSerializer } from "api/types/shpTypes";
 import Fixture from "./Fixture";
-import { SHPCalcState } from "redux/shp";
 import { showDialogCalcFittings } from "./DialogFittings";
 import { useAppSelector } from "redux/utils";
 
@@ -76,23 +76,24 @@ const Path = ({
   }, [fittingDiameters, material_id]);
 
   useEffect(() => {
-    if (diameters.length > 0 && material_id) {
-      const _currentDiameter = diameters.find((d) => d.id === diameter_id);
-      if (_currentDiameter?.material !== material_id) {
-        const _currentDiameters = diameters.filter(
-          (d) => d.material === material_id
+    const _diameter = diameters.find((d) => d.id === diameter_id);
+    if (
+      materials &&
+      diameters &&
+      material_id &&
+      _diameter?.material !== material_id
+    ) {
+      const material = materials.find((m) => m.id === material_id);
+      if (material?.default_diameter) {
+        setValue(`paths.${index}.diameter_id`, material.default_diameter);
+      } else {
+        setValue(
+          `paths.${index}.diameter_id`,
+          diameters.find((d) => d.material === material_id)?.id
         );
-        if (_currentDiameters.length > 0) {
-          const _currentDiameter = _currentDiameters.find(
-            (d) => d.id === diameter_id
-          );
-          if (!_currentDiameter) {
-            setValue(`paths.${index}.diameter_id`, _currentDiameters[0].id);
-          }
-        }
       }
     }
-  }, [diameter_id, diameters, index, material_id, setValue]);
+  }, [diameters, material_id, diameter_id, materials, setValue, index]);
 
   useEffect(() => {
     let newEquivalentLength =
@@ -121,7 +122,10 @@ const Path = ({
     <>
       <TableRow ref={provided.innerRef} {...provided.draggableProps}>
         <TableCell>
-          <IconButton {...provided.dragHandleProps}>
+          <IconButton
+            sx={{ visibility: start === "RES" ? "hidden" : "visible" }}
+            {...provided.dragHandleProps}
+          >
             <DragIndicator />
           </IconButton>
         </TableCell>
@@ -137,29 +141,49 @@ const Path = ({
           </IconButton>
         </TableCell>
         <TableCell>
-          <TextField
-            sx={{ width: "40px" }}
-            variant="standard"
-            disabled={start === "RES"}
-            inputProps={{
-              style: { textAlign: "center" },
-            }}
-            {...register(`paths.${index}.start`)}
+          <Controller
+            name={`paths.${index}.start`}
+            control={control}
+            render={({ field: { value, onChange } }) => (
+              <TextField
+                sx={{ width: "40px" }}
+                variant="standard"
+                disabled={start === "RES"}
+                inputProps={{
+                  style: { textAlign: "center" },
+                }}
+                value={value || ""}
+                onChange={(event) => {
+                  if (checkLetter(event.target.value)) {
+                    onChange(event.target.value);
+                  }
+                }}
+              />
+            )}
           />
         </TableCell>
         <TableCell>
-          <TextField
-            sx={{
-              width: "40px",
-              visibility: has_fixture ? "hidden" : "visible",
-            }}
-            variant="standard"
-            inputProps={{
-              style: {
-                textAlign: "center",
-              },
-            }}
-            {...register(`paths.${index}.end`)}
+          <Controller
+            name={`paths.${index}.end`}
+            control={control}
+            render={({ field: { value, onChange } }) => (
+              <TextField
+                sx={{
+                  width: "40px",
+                  visibility: has_fixture ? "hidden" : "visible",
+                }}
+                variant="standard"
+                inputProps={{
+                  style: { textAlign: "center" },
+                }}
+                value={value || ""}
+                onChange={(event) => {
+                  if (checkLetter(event.target.value)) {
+                    onChange(event.target.value);
+                  }
+                }}
+              />
+            )}
           />
         </TableCell>
         <TableCell>
@@ -169,7 +193,7 @@ const Path = ({
             render={({ field: { value, onChange } }) => (
               <Checkbox
                 checked={value || false}
-                onChange={(e) => onChange(e.target.checked)}
+                onChange={(event) => onChange(event.target.checked)}
               />
             )}
           />

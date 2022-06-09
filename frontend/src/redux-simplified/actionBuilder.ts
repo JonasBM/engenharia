@@ -215,7 +215,6 @@ export class CRUDAction<T extends object, S = T[]> {
           if (this.getSaveState(_config)) {
             dispatch({ type: this.types.CREATE, payload: res.data });
           }
-          console.log();
           dispatch(
             createMessage({ CRUDCreate: this.getActionMesseges().create })
           );

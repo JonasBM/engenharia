@@ -49,7 +49,6 @@ const Material = () => {
       const materialFile = JSON.parse(
         e.target.result.toString()
       ) as MaterialFileSerializer;
-      console.log(materialFile);
       if (
         materialFile.fileinfo.type === "shp_material" &&
         materialFile.fileinfo.version.startsWith("1.0.")
@@ -107,17 +106,18 @@ const Material = () => {
             <Button
               sx={{ marginX: 1 }}
               onClick={() => {
-                dispatch(loadMaterialBackup(materialFile)).then((res) => {
-                  console.log(res);
-                  if (res) {
-                    dispatch(MaterialCRUDAction.list());
-                    dispatch(DiameterCRUDAction.list());
-                    dispatch(FittingCRUDAction.list());
-                    dispatch(FittingDiameterCRUDAction.list());
-                    dispatch(ReductionCRUDAction.list());
-                    setMaterialFile(undefined);
-                  }
-                });
+                dispatch(loadMaterialBackup(materialFile))
+                  .then((res) => {
+                    if (res) {
+                      dispatch(MaterialCRUDAction.list());
+                      dispatch(DiameterCRUDAction.list());
+                      dispatch(FittingCRUDAction.list());
+                      dispatch(FittingDiameterCRUDAction.list());
+                      dispatch(ReductionCRUDAction.list());
+                      setMaterialFile(undefined);
+                    }
+                  })
+                  .catch();
               }}
               title="Salvar material carregado"
             >

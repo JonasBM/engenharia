@@ -1,9 +1,4 @@
-import {
-  OptionsObject,
-  SnackbarKey,
-  SnackbarMessage,
-  useSnackbar,
-} from "notistack";
+import { OptionsObject, SnackbarMessage, useSnackbar } from "notistack";
 import React, { Fragment, useCallback, useEffect } from "react";
 
 import { useAppSelector } from "redux/utils";

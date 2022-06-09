@@ -11,9 +11,9 @@ import {
   alpha,
   styled,
 } from "@mui/material";
+import { SHPCalcState, checkLetter } from "redux/shp";
 
 import React from "react";
-import { SHPCalcState } from "redux/shp";
 
 const StyledTableRow = styled(TableRow)<{ active: string }>(
   ({ theme, active }) => ({
@@ -55,13 +55,24 @@ const Fixture = ({
         </Typography>
       </TableCell>
       <TableCell>
-        <TextField
-          sx={{ width: "30px" }}
-          variant="standard"
-          inputProps={{
-            style: { textAlign: "center" },
-          }}
-          {...register(`paths.${index}.fixture.end`)}
+        <Controller
+          name={`paths.${index}.fixture.end`}
+          control={control}
+          render={({ field: { value, onChange } }) => (
+            <TextField
+              sx={{ width: "40px" }}
+              variant="standard"
+              inputProps={{
+                style: { textAlign: "center" },
+              }}
+              value={value || ""}
+              onChange={(event) => {
+                if (checkLetter(event.target.value)) {
+                  onChange(event.target.value);
+                }
+              }}
+            />
+          )}
         />
       </TableCell>
       <TableCell>
@@ -77,23 +88,7 @@ const Fixture = ({
         />
       </TableCell>
       <TableCell align="center">-</TableCell>
-      <TableCell align="center">
-        <TextField
-          sx={{ width: "100px" }}
-          variant="standard"
-          inputProps={{
-            step: "0.01",
-            style: { textAlign: "center" },
-          }}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">&empty;</InputAdornment>
-            ),
-            endAdornment: <InputAdornment position="end">mm</InputAdornment>,
-          }}
-          {...register(`paths.${index}.fixture.hose_internal_diameter`)}
-        />
-      </TableCell>
+      <TableCell align="center">-</TableCell>
       <TableCell align="center">
         <TextField
           sx={{ width: "100px" }}

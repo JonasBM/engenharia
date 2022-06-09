@@ -253,7 +253,7 @@ const MaterialDialogForm = () => {
                     display: _diameter.material === material_id ? "" : "none",
                   }}
                 >
-                  {_diameter.name}
+                  {_diameter.name} ({_diameter.internal_diameter} mm)
                 </MenuItem>
               ))}
             </TextField>
