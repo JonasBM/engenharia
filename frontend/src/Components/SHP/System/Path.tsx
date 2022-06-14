@@ -1,10 +1,11 @@
-import { Add, Delete, DragIndicator } from "@mui/icons-material";
+import { Add, Delete, DragIndicator, Info } from "@mui/icons-material";
 import {
   Box,
   Checkbox,
   IconButton,
   InputAdornment,
   MenuItem,
+  Popover,
   TableCell,
   TableRow,
   TextField,
@@ -16,11 +17,18 @@ import {
   useWatch,
 } from "react-hook-form";
 import { DraggableProvided, DraggableStateSnapshot } from "react-beautiful-dnd";
+import {
+  FittingDiameterSerializer,
+  FixtureSerializer,
+  SHPCalcSerializer,
+} from "api/types/shpTypes";
 import React, { useEffect, useState } from "react";
-import { SHPCalcState, checkLetter } from "redux/shp";
 
-import { FittingDiameterSerializer } from "api/types/shpTypes";
+import ConnectionsPopover from "./ConnectionsPopover";
 import Fixture from "./Fixture";
+import { StyledTableCellBorderLeft } from ".";
+import { checkLetter } from "redux/shp";
+import { decimalFormatter } from "utils";
 import { showDialogCalcFittings } from "./DialogFittings";
 import { useAppSelector } from "redux/utils";
 
@@ -37,17 +45,28 @@ const Path = ({
 }) => {
   const materials = useAppSelector((state) => state.shp.materials);
   const diameters = useAppSelector((state) => state.shp.diameters);
+  const fixtures = useAppSelector((state) => state.shp.fixtures);
   const fittingDiameters = useAppSelector(
     (state) => state.shp.fittingDiameters
   );
 
-  const { register, control, watch, setValue, getValues, reset } =
-    useFormContext<SHPCalcState>();
+  const {
+    register,
+    control,
+    watch,
+    setValue,
+    getValues,
+    reset,
+    formState: { errors },
+  } = useFormContext<SHPCalcSerializer>();
   const material_id = useWatch({ control, name: `paths.${index}.material_id` });
   const diameter_id = watch(`paths.${index}.diameter_id`);
   const start = useWatch({ control, name: `paths.${index}.start` });
+  const calc_type = useWatch({ control, name: `calc_type` });
+  const pressure_type = useWatch({ control, name: `pressure_type` });
   const has_fixture = useWatch({ control, name: `paths.${index}.has_fixture` });
   const fixture = useWatch({ control, name: `paths.${index}.fixture` });
+  const fixture_id = useWatch({ control, name: `fixture_id` });
   const fittings_ids = watch(`paths.${index}.fittings_ids`);
   const equivalent_length = useWatch({
     control,
@@ -61,6 +80,17 @@ const Path = ({
   const [currentFittingDiameters, setCurrentFittingDiameters] = useState<
     FittingDiameterSerializer[]
   >([]);
+
+  const [currentFixture, setCurrentFixture] = useState<FixtureSerializer>();
+
+  const [anchorPopover, setAnchorPopover] =
+    React.useState<HTMLButtonElement | null>(null);
+
+  useEffect(() => {
+    if (fixture_id) {
+      setCurrentFixture(fixtures.find((f) => f.id === fixture_id));
+    }
+  }, [fixture_id, fixtures]);
 
   useEffect(() => {
     if (has_fixture === false) {
@@ -79,7 +109,9 @@ const Path = ({
     const _diameter = diameters.find((d) => d.id === diameter_id);
     if (
       materials &&
+      materials.length > 0 &&
       diameters &&
+      diameters.length > 0 &&
       material_id &&
       _diameter?.material !== material_id
     ) {
@@ -125,6 +157,7 @@ const Path = ({
           <IconButton
             sx={{ visibility: start === "RES" ? "hidden" : "visible" }}
             {...provided.dragHandleProps}
+            title="Mover trecho"
           >
             <DragIndicator />
           </IconButton>
@@ -136,6 +169,7 @@ const Path = ({
               remove(index);
               reset(getValues());
             }}
+            title="Remover trecho"
           >
             <Delete />
           </IconButton>
@@ -192,8 +226,29 @@ const Path = ({
             control={control}
             render={({ field: { value, onChange } }) => (
               <Checkbox
+                sx={{ visibility: start === "RES" ? "hidden" : "visible" }}
                 checked={value || false}
-                onChange={(event) => onChange(event.target.checked)}
+                onChange={(event) => {
+                  console.log(
+                    event.target.checked,
+                    currentFixture.material,
+                    currentFixture.inlet_diameter
+                  );
+                  if (event.target.checked) {
+                    setValue(
+                      `paths.${index}.material_id`,
+                      currentFixture.material
+                    );
+                    setValue(
+                      `paths.${index}.diameter_id`,
+                      currentFixture.inlet_diameter
+                    );
+                  }
+                  onChange(event.target.checked);
+                }}
+                title={`${
+                  has_fixture ? "Remover" : "Adicionar"
+                } hidrante do trecho`}
               />
             )}
           />
@@ -205,13 +260,14 @@ const Path = ({
               name={`paths.${index}.material_id`}
               render={({ field: { value, onChange } }) => (
                 <TextField
-                  sx={{ width: "200px" }}
+                  sx={{ width: 200 }}
                   variant="standard"
                   select
                   value={value || ""}
                   onChange={(event) => {
                     onChange(event.target.value);
                   }}
+                  disabled={has_fixture}
                 >
                   {materials.map((_material) => (
                     <MenuItem key={_material.id} value={_material.id}>
@@ -230,13 +286,14 @@ const Path = ({
               name={`paths.${index}.diameter_id`}
               render={({ field: { value, onChange } }) => (
                 <TextField
-                  sx={{ width: "200px" }}
+                  sx={{ width: 150 }}
                   variant="standard"
                   select
                   value={value || ""}
                   onChange={(event) => {
                     onChange(event.target.value);
                   }}
+                  disabled={has_fixture}
                 >
                   {diameters.map((_diameter) => (
                     <MenuItem
@@ -267,6 +324,8 @@ const Path = ({
             InputProps={{
               endAdornment: <InputAdornment position="end">m</InputAdornment>,
             }}
+            error={errors?.paths?.[index]?.length ? true : false}
+            helperText={errors?.paths?.[index]?.length?.message}
             {...register(`paths.${index}.length`)}
           />
         </TableCell>
@@ -275,10 +334,26 @@ const Path = ({
             type="number"
             sx={{ width: "100px" }}
             variant="standard"
-            inputProps={{
-              step: "0.01",
-              style: { textAlign: "center" },
-            }}
+            inputProps={
+              start === "RES" &&
+              calc_type === "vazao_minima" &&
+              pressure_type === "gravitacional"
+                ? {
+                    step: "0.01",
+                    style: {
+                      textAlign: "center",
+                      color: "green",
+                      fontWeight: "bold",
+                    },
+                    disabled: true,
+                  }
+                : {
+                    step: "0.01",
+                    style: {
+                      textAlign: "center",
+                    },
+                  }
+            }
             InputProps={{
               endAdornment: <InputAdornment position="end">m</InputAdornment>,
             }}
@@ -299,17 +374,58 @@ const Path = ({
               onClick={() => {
                 showDialogCalcFittings({ index });
               }}
+              title="Alterar conexões no trecho"
             >
               <Add />
             </IconButton>
           </Box>
         </TableCell>
-        <TableCell align="center">-</TableCell>
-        <TableCell align="center">-</TableCell>
-        <TableCell align="center">-</TableCell>
-        <TableCell align="center">-</TableCell>
-        <TableCell align="center">-</TableCell>
-        <TableCell align="center">-</TableCell>
+        <StyledTableCellBorderLeft align="center">
+          {decimalFormatter(
+            flow_to_l_p_min(getValues(`paths.${index}.flow`)),
+            2
+          )}
+        </StyledTableCellBorderLeft>
+        <StyledTableCellBorderLeft align="center">
+          {decimalFormatter(getValues(`paths.${index}.speed`), 2)}
+        </StyledTableCellBorderLeft>
+        <StyledTableCellBorderLeft align="right">
+          {decimalFormatter(getValues(`paths.${index}.total_length`), 2)}
+          <IconButton
+            sx={{ marginLeft: 1 }}
+            onClick={(event: React.MouseEvent<HTMLButtonElement>) => {
+              setAnchorPopover(event.currentTarget);
+            }}
+            title={"Lista de conexões"}
+            size={"small"}
+          >
+            <Info color={"secondary"} />
+          </IconButton>
+          <Popover
+            open={Boolean(anchorPopover) && !snapshot.isDragging}
+            anchorEl={anchorPopover}
+            onClose={() => {
+              setAnchorPopover(null);
+            }}
+            anchorOrigin={{
+              vertical: "bottom",
+              horizontal: "left",
+            }}
+          >
+            <ConnectionsPopover
+              connectionNames={getValues(`paths.${index}.connection_names`)}
+            />
+          </Popover>
+        </StyledTableCellBorderLeft>
+        <StyledTableCellBorderLeft align="center">
+          {decimalFormatter(getValues(`paths.${index}.unit_pressure_drop`), 4)}
+        </StyledTableCellBorderLeft>
+        <StyledTableCellBorderLeft align="center">
+          {decimalFormatter(getValues(`paths.${index}.pressure_drop`), 3)}
+        </StyledTableCellBorderLeft>
+        <StyledTableCellBorderLeft align="center">
+          {decimalFormatter(getValues(`paths.${index}.end_pressure`), 3)}
+        </StyledTableCellBorderLeft>
       </TableRow>
       {has_fixture && fixture && (
         <Fixture index={index} isDragging={snapshot.isDragging} />
@@ -319,3 +435,6 @@ const Path = ({
 };
 
 export default Path;
+const flow_to_l_p_min = (flow: number): number => {
+  return flow * 60000;
+};

@@ -13,7 +13,7 @@ import { addServerErrors } from "utils";
 import store from "redux/store";
 import { yupResolver } from "@hookform/resolvers/yup";
 
-const _newMaterial: Partial<MaterialSerializer> = {
+const _newMaterial: MaterialSerializer = {
   id: 0,
   name: "",
   hazen_williams_coefficient: null,
@@ -25,7 +25,9 @@ const _newMaterial: Partial<MaterialSerializer> = {
 
 const _dialogName = "MODAL_MATERIAL";
 
-export const showMaterialDialog = (_dialogObject = _newMaterial) => {
+export const showMaterialDialog = (
+  _dialogObject?: Partial<MaterialSerializer>
+) => {
   store.dispatch(
     showDialog({
       dialogName: _dialogName,

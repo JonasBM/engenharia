@@ -13,7 +13,7 @@ import { addServerErrors } from "utils";
 import store from "redux/store";
 import { yupResolver } from "@hookform/resolvers/yup";
 
-const _newDiameter: Partial<DiameterSerializer> = {
+const _newDiameter: DiameterSerializer = {
   id: 0,
   name: "",
   internal_diameter: null,
@@ -22,7 +22,9 @@ const _newDiameter: Partial<DiameterSerializer> = {
 
 const _dialogName = "MODAL_DIAMETER";
 
-export const showDiameterDialog = (_dialogObject = _newDiameter) => {
+export const showDiameterDialog = (
+  _dialogObject?: Partial<DiameterSerializer>
+) => {
   store.dispatch(
     showDialog({
       dialogName: _dialogName,

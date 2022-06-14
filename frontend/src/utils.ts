@@ -1,7 +1,8 @@
-import { SHPCalcState, setCalc } from "redux/shp";
+import { MaterialFileSerializer, SHPCalcSerializer } from "api/types/shpTypes";
+import { getNewFileInfo, setCalc } from "redux/shp";
 
-import { MaterialFileSerializer } from "api/types/shpTypes";
 import { UserProfileSerializer } from "./api/types/accountsTypes";
+import { formatInTimeZone } from "date-fns-tz";
 import store from "redux/store";
 
 export const decimalFormatter = (
@@ -75,13 +76,22 @@ export const sanitizeFilename = (filename: string) => {
 
 export const saveSHPMaterial = (_material_id: number) => {
   const shpState = store.getState().shp;
+
+  const todayString = formatInTimeZone(
+    new Date(),
+    "America/Sao_Paulo",
+    "yyyy-MM-dd HH:mm:ssXXX"
+  );
+
   const data: MaterialFileSerializer = {
     fileinfo: {
       type: "shp_material",
       version: "1.0.0",
+      created: todayString,
+      updated: todayString,
     },
     material: shpState.materials.find((m) => m.id === _material_id),
-    reductions: shpState.reductions.filter((r) => r.material === _material_id),
+    reductions: shpState.reductions.find((r) => r.material === _material_id),
     diameters: shpState.diameters.filter((d) => d.material === _material_id),
     fittings: shpState.fittings,
     fittingdiameters: shpState.fittingDiameters.find(
@@ -92,16 +102,28 @@ export const saveSHPMaterial = (_material_id: number) => {
   saveFile(jsonData, `${data.material.name}.shpmat`, "application/json");
 };
 
-export const saveSHPCalc = (data: SHPCalcState) => {
-  data["fileinfo"] = {
-    type: "shp_calc",
-    version: "1.0.0",
-  };
-  store.dispatch(setCalc(data));
+export const saveFileSHPCalc = (data: SHPCalcSerializer) => {
+  data["fileinfo"] = getNewFileInfo();
+
+  data = saveSHPCalc(data);
   const jsonData = JSON.stringify(data);
   let fileName = sanitizeFilename(data.name);
   if (!data.name) {
     fileName = "Cálculo de SHP";
   }
   saveFile(jsonData, `${fileName}.shpcalc`, "application/json");
+};
+
+export const saveSHPCalc = (data: SHPCalcSerializer) => {
+  if (!data.fileinfo) {
+    data.fileinfo = getNewFileInfo();
+  } else {
+    data.fileinfo.updated = formatInTimeZone(
+      new Date(),
+      "America/Sao_Paulo",
+      "yyyy-MM-dd HH:mm:ssXXX"
+    );
+  }
+  store.dispatch(setCalc(data));
+  return data;
 };

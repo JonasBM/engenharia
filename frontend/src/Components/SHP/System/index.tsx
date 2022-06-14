@@ -1,3 +1,5 @@
+import * as yup from "yup";
+
 import {
   Container,
   Paper,
@@ -8,7 +10,6 @@ import {
   TableHead,
   TableRow,
   TextField,
-  Toolbar,
   alpha,
   styled,
   tableBodyClasses,
@@ -22,14 +23,20 @@ import {
   useWatch,
 } from "react-hook-form";
 import React, { useEffect } from "react";
-import { SHPCalcState, getNewPath, initialState, setCalc } from "redux/shp";
+import { getNewPath, initialState } from "redux/shp";
 import { useAppDispatch, useAppSelector } from "redux/utils";
 
+import CalcResult from "./CalcResult";
 import CalcToolbar from "./CalcToolbar";
 import DialogFittings from "./DialogFittings";
+import FileToolbar from "./FileToolbar";
 import Path from "./Path";
 import PathToolbar from "./PathToolbar";
+import { SHPCalcSerializer } from "api/types/shpTypes";
+import { calculateSHP } from "api/shp";
 import { documentTitles } from "myConstants";
+import { saveSHPCalc } from "utils";
+import { yupResolver } from "@hookform/resolvers/yup";
 
 const StyledTable = styled(Table)(({ theme }) => ({
   [`.${tableCellClasses.head}`]: { fontWeight: "bold" },
@@ -45,6 +52,11 @@ const StyledTable = styled(Table)(({ theme }) => ({
   },
 }));
 
+export const StyledTableCellBorderLeft = styled(TableCell)(({ theme }) => ({
+  borderLeft: "1px solid",
+  borderLeftColor: theme.palette.divider,
+}));
+
 export const StyledTextField = styled(TextField)(({ theme }) => ({
   borderRadius: theme.shape.borderRadius,
   backgroundColor: alpha(theme.palette.common.white, 0.3),
@@ -54,14 +66,42 @@ export const StyledTextField = styled(TextField)(({ theme }) => ({
   margin: theme.spacing(1),
 }));
 
+const validationSchema = () =>
+  yup
+    .object({
+      name: yup.string().max(255).notRequired(),
+      pressure_type: yup.string().max(255).required(),
+      calc_type: yup.string().max(255).required(),
+      material_id: yup.number().integer().min(1).required(),
+      diameter_id: yup.number().integer().min(1).required(),
+      fixture_id: yup.number().integer().min(1).required(),
+      paths: yup.array().of(
+        yup.object().shape({
+          start: yup.string().max(255).required(),
+          end: yup.string().max(255).nullable(true),
+          material_id: yup.number().integer().min(1).required(),
+          diameter_id: yup.number().integer().min(1).required(),
+          fittings_ids: yup.array().of(yup.number().notRequired()),
+          has_fixture: yup.boolean().required(),
+        })
+      ),
+    })
+    .required();
+
 const SHP = () => {
   const dispatch = useAppDispatch();
   const shpCalc = useAppSelector((state) => state.shpCalc);
 
-  const formMethods = useForm<SHPCalcState>({
+  const formMethods = useForm<SHPCalcSerializer>({
+    resolver: yupResolver(validationSchema()),
     defaultValues: initialState,
   });
-  const { control, reset, getValues, register } = formMethods;
+  const {
+    control,
+    reset,
+    getValues,
+    formState: { errors },
+  } = formMethods;
   const {
     fields: paths,
     remove,
@@ -97,6 +137,12 @@ const SHP = () => {
     reset(shpCalc);
   }, [reset, shpCalc]);
 
+  useEffect(() => {
+    if (Object.entries(errors).length) {
+      console.log(errors);
+    }
+  }, [errors]);
+
   const handleOnDragEnd = (result: any) => {
     if (!result.destination) return;
     if (result.source.index !== result.destination.index) {
@@ -105,8 +151,14 @@ const SHP = () => {
     }
   };
 
-  const onSubmit = (data: SHPCalcState) => {
-    dispatch(setCalc(data));
+  const onSubmit = (data: SHPCalcSerializer) => {
+    dispatch(calculateSHP(saveSHPCalc(data)))
+      .then((data) => {
+        reset(data);
+      })
+      .catch((errors) => {
+        console.log(errors);
+      });
   };
 
   return (
@@ -114,14 +166,7 @@ const SHP = () => {
       <form onSubmit={formMethods.handleSubmit(onSubmit)}>
         <DialogFittings />
         <Container maxWidth="xl">
-          <Toolbar>
-            <TextField
-              label="Nome"
-              sx={{ width: 400 }}
-              InputLabelProps={{ shrink: true }}
-              {...register("name")}
-            />
-          </Toolbar>
+          <FileToolbar />
           <CalcToolbar />
           <PathToolbar append={append} />
           <TableContainer component={Paper} sx={{ minWidth: 800 }}>
@@ -130,25 +175,61 @@ const SHP = () => {
                 <TableRow>
                   <TableCell align="center" />
                   <TableCell align="center" />
-                  <TableCell align="center" width={"50px"} colSpan={2}>
+                  <StyledTableCellBorderLeft
+                    align="center"
+                    width={"50px"}
+                    colSpan={2}
+                  >
                     TRECHO
-                  </TableCell>
-                  <TableCell align="center" width={"30px"}>
-                    H
-                  </TableCell>
-                  <TableCell align="center" width={"100px"}>
+                  </StyledTableCellBorderLeft>
+                  <StyledTableCellBorderLeft align="center" width={"30px"}>
+                    Hid
+                  </StyledTableCellBorderLeft>
+                  <StyledTableCellBorderLeft align="center" width={"100px"}>
                     Material
-                  </TableCell>
-                  <TableCell align="center">&empty;</TableCell>
-                  <TableCell align="center">Comprimento</TableCell>
-                  <TableCell align="center">Desnível</TableCell>
-                  <TableCell align="center">Equivalente</TableCell>
-                  <TableCell align="center">Vazão L/min</TableCell>
-                  <TableCell align="center">Velocidade m/s</TableCell>
-                  <TableCell align="center">Comprimento Total</TableCell>
-                  <TableCell align="center">Jt</TableCell>
-                  <TableCell align="center">&Delta;t</TableCell>
-                  <TableCell align="center">M.C.A.</TableCell>
+                  </StyledTableCellBorderLeft>
+                  <StyledTableCellBorderLeft align="center">
+                    &empty;
+                  </StyledTableCellBorderLeft>
+                  <StyledTableCellBorderLeft align="center">
+                    Comprimento
+                  </StyledTableCellBorderLeft>
+                  <StyledTableCellBorderLeft align="center">
+                    Desnível
+                  </StyledTableCellBorderLeft>
+                  <StyledTableCellBorderLeft align="center">
+                    Equivalente
+                  </StyledTableCellBorderLeft>
+                  <StyledTableCellBorderLeft align="center">
+                    Vazão
+                    <br />
+                    (L/min)
+                  </StyledTableCellBorderLeft>
+                  <StyledTableCellBorderLeft align="center">
+                    Velocidade
+                    <br />
+                    (m/s)
+                  </StyledTableCellBorderLeft>
+                  <StyledTableCellBorderLeft align="center">
+                    Comprimento
+                    <br />
+                    Total (m)
+                  </StyledTableCellBorderLeft>
+                  <StyledTableCellBorderLeft align="center">
+                    Jt
+                    <br />
+                    (m.c.a./m)
+                  </StyledTableCellBorderLeft>
+                  <StyledTableCellBorderLeft align="center">
+                    &Delta;t
+                    <br />
+                    (m.c.a.)
+                  </StyledTableCellBorderLeft>
+                  <StyledTableCellBorderLeft align="center">
+                    Pressão
+                    <br />
+                    (m.c.a.)
+                  </StyledTableCellBorderLeft>
                 </TableRow>
               </TableHead>
               <DragDropContext onDragEnd={handleOnDragEnd}>
@@ -181,6 +262,7 @@ const SHP = () => {
               </DragDropContext>
             </StyledTable>
           </TableContainer>
+          {/* <CalcResult /> */}
         </Container>
       </form>
     </FormProvider>

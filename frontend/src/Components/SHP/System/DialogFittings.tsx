@@ -27,11 +27,13 @@ import {
   useTheme,
 } from "@mui/material";
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
+import {
+  FittingDiameterSerializer,
+  SHPCalcSerializer,
+} from "api/types/shpTypes";
 import React, { useEffect, useState } from "react";
 import { hideDialog, showDialog } from "redux/modal";
 
-import { FittingDiameterSerializer } from "api/types/shpTypes";
-import { SHPCalcState } from "redux/shp";
 import { decimalFormatter } from "utils";
 import store from "redux/store";
 import { useAppSelector } from "redux/utils";
@@ -67,7 +69,7 @@ const DialogFittings = () => {
     dialogObject: { index: number };
   };
 
-  const { watch, setValue, register } = useFormContext<SHPCalcState>();
+  const { watch, setValue, register } = useFormContext<SHPCalcSerializer>();
 
   const material_id = watch(`paths.${index}.material_id`);
   const diameter_id = watch(`paths.${index}.diameter_id`);

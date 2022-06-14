@@ -13,7 +13,7 @@ import { addServerErrors } from "utils";
 import store from "redux/store";
 import { yupResolver } from "@hookform/resolvers/yup";
 
-const _newReduction: Partial<ReductionSerializer> = {
+const _newReduction: ReductionSerializer = {
   id: 0,
   name: "",
   equivalent_length: null,
@@ -24,7 +24,9 @@ const _newReduction: Partial<ReductionSerializer> = {
 
 const _dialogName = "MODAL_REDUCTION";
 
-export const showReductionDialog = (_dialogObject = _newReduction) => {
+export const showReductionDialog = (
+  _dialogObject?: Partial<ReductionSerializer>
+) => {
   store.dispatch(
     showDialog({
       dialogName: _dialogName,
@@ -103,7 +105,9 @@ const ReductionDialogForm = () => {
     const _diameter = diameters.find((d) => d.id === inlet_diameter_id);
     if (
       materials &&
+      materials.length > 0 &&
       diameters &&
+      diameters.length > 0 &&
       material_id &&
       _diameter?.material !== material_id
     ) {
@@ -126,7 +130,9 @@ const ReductionDialogForm = () => {
     const _diameter = diameters.find((d) => d.id === outlet_diameter_id);
     if (
       materials &&
+      materials.length > 0 &&
       diameters &&
+      diameters.length > 0 &&
       material_id &&
       _diameter?.material !== material_id
     ) {

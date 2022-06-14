@@ -16,3 +16,6 @@ django-cors-headers
 psycopg2
 uWSGI
 django-typomatic
+
+# ########## EXTRAS ##########
+dataclasses

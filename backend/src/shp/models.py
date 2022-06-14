@@ -1,4 +1,7 @@
+from .constants import GRAVITY
 from django.db import models
+
+import math
 
 
 class Material(models.Model):
@@ -112,9 +115,15 @@ class Reduction(models.Model):
 
 class MaterialConnection(models.Model):
 
-    inlet_diameter = models.ForeignKey(Diameter, related_name="inlet_material_connections",
+    inlet_material = models.ForeignKey(
+        Material, related_name="inlet_material_connections", on_delete=models.CASCADE,
+        verbose_name="Material de Entrada")
+    outlet_material = models.ForeignKey(
+        Material, related_name="outlet_material_connections", on_delete=models.CASCADE,
+        verbose_name="Material de Saída")
+    inlet_diameter = models.ForeignKey(Diameter, related_name="inlet_diameter_connections",
                                        on_delete=models.CASCADE, verbose_name="diâmetro do material de Entrada")
-    outlet_diameter = models.ForeignKey(Diameter, related_name="outlet_material_connections",
+    outlet_diameter = models.ForeignKey(Diameter, related_name="outlet_diameter_connections",
                                         on_delete=models.CASCADE, verbose_name="diâmetro do material de Saída")
     name = models.CharField(max_length=255, verbose_name="nome")
     equivalent_length = models.DecimalField(max_digits=9, decimal_places=2, verbose_name="Comprimento equivalente")
@@ -124,10 +133,12 @@ class MaterialConnection(models.Model):
         verbose_name_plural = "conexões entre materiais"
         ordering = ['name', 'equivalent_length']
         indexes = [
+            models.Index(fields=['inlet_material']),
             models.Index(fields=['inlet_diameter']),
+            models.Index(fields=['outlet_material']),
             models.Index(fields=['outlet_diameter']),
         ]
-        unique_together = [['inlet_diameter', 'outlet_diameter']]
+        unique_together = [['inlet_material', 'inlet_diameter', 'outlet_material', 'outlet_diameter']]
 
     def __str__(self):
         return (
@@ -144,7 +155,7 @@ class Fixture(models.Model):
         MANGOTINHO = 'MA', 'mangotinho'
 
     name = models.CharField(max_length=255, verbose_name="nome")
-    type = models.CharField(max_length=2, choices=FixtureType.choices, verbose_name="tipo do hidrante")
+    nozzle_type = models.CharField(max_length=2, choices=FixtureType.choices, verbose_name="tipo do hidrante")
     material = models.ForeignKey(Material, default=None, null=True, blank=True,
                                  related_name="fixtures", on_delete=models.CASCADE, verbose_name="material")
     inlet_diameter = models.ForeignKey(Diameter, default=None, null=True, blank=True, related_name="fixtures",
@@ -158,8 +169,11 @@ class Fixture(models.Model):
         blank=True, verbose_name="comprimento equivalente extra")
     hose_hazen_williams_coefficient = models.IntegerField(verbose_name="coeficiente de hazen-williams da mangueira")
     hose_internal_diameter = models.IntegerField(verbose_name="diâmetro interno da mangueira")
-    k_factor = models.DecimalField(max_digits=9, decimal_places=2, default=0, null=True,
-                                   blank=True, verbose_name="fator K do esguicho")
+    k_factor = models.DecimalField(default=None, max_digits=9, decimal_places=2,
+                                   verbose_name="coeficiente de vazão do esguicho")
+    k_factor_includes_hose = models.BooleanField(default=False, verbose_name="coeficiente de vazão inclue a mangueira")
+    k_nozzle = models.DecimalField(default=0, max_digits=9, decimal_places=2,
+                                   verbose_name="coeficiente próprio do esguicho")
     outlet_diameter = models.DecimalField(max_digits=9, decimal_places=2, verbose_name="diâmetro da saída")
     minimum_flow_rate = models.DecimalField(max_digits=9, decimal_places=2, verbose_name="vazão mínima no esguicho")
 
@@ -172,3 +186,47 @@ class Fixture(models.Model):
         return (
             f'{self.id} - {self.name}'
         )
+
+    @property
+    def area(self) -> float:
+        '''
+        return area in m²
+        '''
+        return (math.pi * math.pow(float(self.outlet_diameter)/float(1000), 2)) / float(4)
+
+    @property
+    def minimum_flow_rate_in_m3_p_s(self) -> float:
+        return float(self.minimum_flow_rate)/float(60000)
+
+    def flow_to_pressure(self, flow: float) -> float:
+        '''
+        converts from flow in m³/s to pressure in m.c.a.
+        '''
+        if flow and flow > 0:
+            if self.k_factor:
+                return math.pow(flow/self.k_factor, 2)
+            if self.outlet_diameter:
+                speed = flow/self.area
+                return math.pow(speed, 2) / (2 * GRAVITY * math.pow(0.97, 2))  # Cd = 0.97
+        return None
+
+    def pressure_to_flow(self, pressure: float) -> float:
+        '''
+        converts from pressure m.c.a. to flow in m³/s
+        '''
+        if pressure and pressure > 0:
+            if self.k_factor:
+                return self.k_factor * math.sqrt(pressure)
+            speed = math.sqrt(2*GRAVITY*pressure)
+            if self.outlet_diameter:
+                return self.area * speed * 0.97  # Cd = 0.97
+        return None
+
+    def get_fixture_pressure_drop(self, flow: float) -> float:
+        '''
+        converts from pressure m.c.a. to flow in m³/s
+        '''
+        if flow and flow > 0 and self.outlet_diameter:
+            speed = flow/self.area
+            return float(self.k_nozzle) * (math.pow(speed, 2) / (2 * GRAVITY))
+        return 0

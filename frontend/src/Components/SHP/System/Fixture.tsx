@@ -1,8 +1,9 @@
 import { Controller, useFormContext, useWatch } from "react-hook-form";
-import { Delete, DragIndicator } from "@mui/icons-material";
+import { Delete, DragIndicator, Info } from "@mui/icons-material";
 import {
   IconButton,
   InputAdornment,
+  Popover,
   Switch,
   TableCell,
   TableRow,
@@ -11,18 +12,25 @@ import {
   alpha,
   styled,
 } from "@mui/material";
-import { SHPCalcState, checkLetter } from "redux/shp";
 
+import ConnectionsPopover from "./ConnectionsPopover";
 import React from "react";
+import { SHPCalcSerializer } from "api/types/shpTypes";
+import { StyledTableCellBorderLeft } from ".";
+import { checkLetter } from "redux/shp";
+import { decimalFormatter } from "utils";
 
-const StyledTableRow = styled(TableRow)<{ active: string }>(
-  ({ theme, active }) => ({
-    backgroundColor:
-      active === "true"
-        ? alpha(theme.palette.success.light, 0.3)
-        : theme.palette.action.hover,
-  })
-);
+const StyledTableRow = styled(TableRow)<{
+  active: string;
+  lessfavorable: string;
+}>(({ theme, active, lessfavorable }) => ({
+  backgroundColor:
+    active === "true"
+      ? lessfavorable === "true"
+        ? alpha(theme.palette.success.main, 0.7)
+        : alpha(theme.palette.success.light, 0.3)
+      : theme.palette.action.hover,
+}));
 
 const Fixture = ({
   index,
@@ -31,13 +39,23 @@ const Fixture = ({
   index: number;
   isDragging: boolean;
 }) => {
-  const { register, control } = useFormContext<SHPCalcState>();
+  const { register, control, getValues } = useFormContext<SHPCalcSerializer>();
   const active = useWatch({ control, name: `paths.${index}.fixture.active` });
+  const less_favorable_path_fixture_index = useWatch({
+    control,
+    name: `less_favorable_path_fixture_index`,
+  });
+
+  const [anchorPopover, setAnchorPopover] =
+    React.useState<HTMLButtonElement | null>(null);
 
   return (
     <StyledTableRow
       sx={{ visibility: isDragging ? "hidden" : "visible" }}
       active={active ? "true" : "false"}
+      lessfavorable={
+        index === less_favorable_path_fixture_index ? "true" : "false"
+      }
     >
       <TableCell>
         <IconButton sx={{ visibility: "hidden" }}>
@@ -81,8 +99,10 @@ const Fixture = ({
           control={control}
           render={({ field: { value, onChange } }) => (
             <Switch
+              size="small"
               checked={value || false}
               onChange={(e) => onChange(e.target.checked)}
+              title={`${active ? "Desativar" : "Ativar"} hidrante`}
             />
           )}
         />
@@ -118,14 +138,67 @@ const Fixture = ({
         />
       </TableCell>
       <TableCell align="center">-</TableCell>
-      <TableCell align="center">-</TableCell>
-      <TableCell align="center">-</TableCell>
-      <TableCell align="center">-</TableCell>
-      <TableCell align="center">-</TableCell>
-      <TableCell align="center">-</TableCell>
-      <TableCell align="center">-</TableCell>
+      <StyledTableCellBorderLeft align="center">
+        {decimalFormatter(flow_to_l_p_min(getValues(`paths.${index}.flow`)), 2)}
+      </StyledTableCellBorderLeft>
+      <StyledTableCellBorderLeft align="center">-</StyledTableCellBorderLeft>
+      <StyledTableCellBorderLeft align="right">
+        {decimalFormatter(getValues(`paths.${index}.fixture.total_length`), 2)}
+        <IconButton
+          sx={{ marginLeft: 1 }}
+          onClick={(event: React.MouseEvent<HTMLButtonElement>) => {
+            setAnchorPopover(event.currentTarget);
+          }}
+          title={"Lista de conexões"}
+          size={"small"}
+        >
+          <Info color={"secondary"} />
+        </IconButton>
+        <Popover
+          open={Boolean(anchorPopover) && !isDragging}
+          anchorEl={anchorPopover}
+          onClose={() => {
+            setAnchorPopover(null);
+          }}
+          anchorOrigin={{
+            vertical: "bottom",
+            horizontal: "left",
+          }}
+        >
+          <ConnectionsPopover
+            connectionNames={getValues(
+              `paths.${index}.fixture.connection_names`
+            )}
+          />
+        </Popover>
+      </StyledTableCellBorderLeft>
+      <StyledTableCellBorderLeft align="center">
+        {decimalFormatter(
+          getValues(`paths.${index}.fixture.unit_pressure_drop`),
+          4
+        )}
+        <br />
+        {decimalFormatter(
+          getValues(`paths.${index}.fixture.unit_hose_pressure_drop`),
+          4
+        )}
+      </StyledTableCellBorderLeft>
+      <StyledTableCellBorderLeft align="center">
+        {decimalFormatter(getValues(`paths.${index}.fixture.pressure_drop`), 3)}
+        <br />
+        {decimalFormatter(
+          getValues(`paths.${index}.fixture.hose_pressure_drop`),
+          3
+        )}
+      </StyledTableCellBorderLeft>
+      <StyledTableCellBorderLeft align="center">
+        {decimalFormatter(getValues(`paths.${index}.fixture.end_pressure`), 3)}
+      </StyledTableCellBorderLeft>
     </StyledTableRow>
   );
 };
 
 export default Fixture;
+const flow_to_l_p_min = (flow: number): number => {
+  return flow * 60000;
+};

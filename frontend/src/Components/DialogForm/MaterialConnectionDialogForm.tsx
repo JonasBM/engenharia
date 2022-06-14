@@ -13,7 +13,7 @@ import { addServerErrors } from "utils";
 import store from "redux/store";
 import { yupResolver } from "@hookform/resolvers/yup";
 
-const _newMaterialConnection: Partial<MaterialConnectionSerializer> = {
+const _newMaterialConnection: MaterialConnectionSerializer = {
   id: 0,
   name: "",
   equivalent_length: null,
@@ -26,7 +26,7 @@ const _newMaterialConnection: Partial<MaterialConnectionSerializer> = {
 const _dialogName = "MODAL_MATERIALCONNECTION";
 
 export const showMaterialConnectionDialog = (
-  _dialogObject = _newMaterialConnection
+  _dialogObject?: Partial<MaterialConnectionSerializer>
 ) => {
   store.dispatch(
     showDialog({
@@ -115,7 +115,9 @@ const MaterialConnectionDialogForm = () => {
     const _diameter = diameters.find((d) => d.id === inlet_diameter_id);
     if (
       materials &&
+      materials.length > 0 &&
       diameters &&
+      diameters.length > 0 &&
       inlet_material_id &&
       _diameter?.material !== inlet_material_id
     ) {
@@ -138,7 +140,9 @@ const MaterialConnectionDialogForm = () => {
     const _diameter = diameters.find((d) => d.id === outlet_diameter_id);
     if (
       materials &&
+      materials.length > 0 &&
       diameters &&
+      diameters.length > 0 &&
       outlet_material_id &&
       _diameter?.material !== outlet_material_id
     ) {

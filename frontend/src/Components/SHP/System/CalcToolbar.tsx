@@ -6,18 +6,26 @@ import {
   TextField,
   Toolbar,
 } from "@mui/material";
+import { Calculate, Save } from "@mui/icons-material";
 import { Controller, useFormContext, useWatch } from "react-hook-form";
 import React, { useEffect } from "react";
-import { SHPCalcState, shpCalcTypes, shpPressureTypes } from "redux/shp";
+import { shpCalcTypes, shpPressureTypes } from "redux/shp";
 
-import { Calculate } from "@mui/icons-material";
+import { SHPCalcSerializer } from "api/types/shpTypes";
 import { StyledTextField } from ".";
+import { saveSHPCalc } from "utils";
 import { useAppSelector } from "redux/utils";
 
 const CalcToolbar = () => {
   const fixtures = useAppSelector((state) => state.shp.fixtures);
 
-  const { register, control, setValue } = useFormContext<SHPCalcState>();
+  const {
+    register,
+    control,
+    setValue,
+    getValues,
+    formState: { isDirty },
+  } = useFormContext<SHPCalcSerializer>();
 
   const pressure_type = useWatch({
     control,
@@ -37,13 +45,7 @@ const CalcToolbar = () => {
 
   return (
     <Toolbar sx={{ minWidth: 800 }}>
-      <Stack
-        direction="row"
-        justifyContent="center"
-        alignItems="center"
-        spacing={1}
-        width="100%"
-      >
+      <Stack direction="row" alignItems="center" spacing={3} width="100%">
         <Controller
           control={control}
           name="calc_type"
@@ -71,7 +73,7 @@ const CalcToolbar = () => {
             name="fixture_id"
             render={({ field: { value, onChange } }) => (
               <StyledTextField
-                label="Tipo de Hidrante"
+                label="Hidrante"
                 sx={{ width: 300 }}
                 select
                 value={value || ""}
@@ -121,6 +123,16 @@ const CalcToolbar = () => {
           />
         )}
         <Box sx={{ flexGrow: 1 }} />
+        <Button
+          startIcon={<Save />}
+          onClick={() => {
+            saveSHPCalc(getValues());
+          }}
+          disabled={!isDirty}
+          title={"Salva os dados no navegador"}
+        >
+          {isDirty ? "Salvar" : "Salvo"}
+        </Button>
         <Button color="success" startIcon={<Calculate />} type="submit">
           Calcular
         </Button>

@@ -42,6 +42,11 @@ export interface ReductionSerializer {
   outlet_diameter: any;
 }
 
+export interface ReductionResponseSerializer {
+  material: number;
+  reductions: ReductionSerializer[];
+}
+
 export interface MaterialConnectionSerializer {
   id?: number;
   inlet_material?: number;
@@ -55,11 +60,13 @@ export interface MaterialConnectionSerializer {
 export interface FixtureSerializer {
   id?: number;
   name: string;
-  type: "TC" | "RE" | "MA" | "";
+  nozzle_type: "TC" | "RE" | "MA" | "";
   extra_equivalent_length: number;
   hose_hazen_williams_coefficient: number;
   hose_internal_diameter: number;
   k_factor: number;
+  k_factor_includes_hose?: boolean;
+  k_nozzle?: number;
   outlet_diameter: number;
   minimum_flow_rate: number;
   material?: any;
@@ -83,13 +90,68 @@ export const fixtureTypes = [
 export interface FileInfoSerializer {
   type: string;
   version: string;
+  created: string;
+  updated: string;
 }
 
 export interface MaterialFileSerializer {
   fileinfo: FileInfoSerializer;
   material: MaterialSerializer;
-  reductions: ReductionSerializer[];
+  reductions: ReductionResponseSerializer;
   diameters: DiameterSerializer[];
   fittings: FittingSerializer[];
   fittingdiameters: FittingDiameterResponseSerializer;
+}
+
+export interface SHPCalcFixtureSerializer {
+  active?: boolean;
+  end: string;
+  hose_length?: number;
+  level_difference?: number;
+  flow?: number;
+  total_length?: number;
+  start_pressure?: number;
+  middle_pressure?: number;
+  end_pressure?: number;
+  hose_pressure_drop?: number;
+  unit_hose_pressure_drop?: number;
+  pressure_drop?: number;
+  unit_pressure_drop?: number;
+  connection_names?: string[];
+}
+
+export interface SHPCalcPathSerializer {
+  start: string;
+  end: string;
+  fixture?: SHPCalcFixtureSerializer;
+  material_id: number;
+  diameter_id: number;
+  length?: number;
+  level_difference?: number;
+  fittings_ids?: number[];
+  extra_equivalent_length?: number;
+  equivalent_length?: number;
+  total_length?: number;
+  has_fixture?: boolean;
+  connection_names?: string[];
+  flow?: number;
+  speed?: number;
+  start_pressure?: number;
+  end_pressure?: number;
+  pressure_drop?: number;
+  unit_pressure_drop?: number;
+}
+
+export interface SHPCalcSerializer {
+  fileinfo: FileInfoSerializer;
+  name: string;
+  pressure_type: "gravitacional" | "bomba";
+  calc_type: "vazao_minima" | "vazao_residual";
+  pump_node?: string;
+  material_id: number;
+  diameter_id: number;
+  fixture_id: number;
+  paths: SHPCalcPathSerializer[];
+  error?: string | null;
+  less_favorable_path_fixture_index?: number | null;
 }

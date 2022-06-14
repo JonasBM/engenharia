@@ -13,14 +13,16 @@ import store from "redux/store";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 
-const _newFitting: Partial<FittingSerializer> = {
+const _newFitting: FittingSerializer = {
   id: 0,
   name: "",
 };
 
 const _dialogName = "MODAL_FITTING";
 
-export const showFittingDialog = (_dialogObject = _newFitting) => {
+export const showFittingDialog = (
+  _dialogObject?: Partial<FittingSerializer>
+) => {
   store.dispatch(
     showDialog({
       dialogName: _dialogName,
