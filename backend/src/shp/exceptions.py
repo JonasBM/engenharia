@@ -38,3 +38,9 @@ class NoReservoir(APIException):
     status_code = status.HTTP_400_BAD_REQUEST
     default_detail = 'Nenhum reservatório encontrado'
     default_code = 'invalid'
+
+
+class ReservoirTooLow(APIException):
+    status_code = status.HTTP_400_BAD_REQUEST
+    default_detail = 'Reservatório baixo demais'
+    default_code = 'invalid'

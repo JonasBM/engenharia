@@ -4,6 +4,42 @@ from django.db import models
 import math
 
 
+class Config(models.Model):
+
+    class CalcType(models.TextChoices):
+        VAZAO_MINIMA = 'VM', 'Vazão mínima'
+        VAZAO_RESIDUAL = 'VR', 'Vazão Residual'
+
+    class PressureType(models.TextChoices):
+        GRAVITACIONAL = 'GR', 'Gravitacional'
+        BOMBA = 'BO', 'Bomba'
+
+    material = models.ForeignKey('Material', default=None, null=True, blank=True,
+                                 on_delete=models.SET_NULL, verbose_name="Material padrão")
+    fixture = models.ForeignKey('Fixture', default=None, null=True, blank=True,
+                                on_delete=models.SET_NULL, verbose_name="Hidrante padrão")
+    calc_type = models.CharField(max_length=2, default=CalcType.VAZAO_MINIMA,
+                                 choices=CalcType.choices, verbose_name="tipo de cálculo")
+    pressure_type = models.CharField(max_length=2, default=PressureType.GRAVITACIONAL,
+                                     choices=PressureType.choices, verbose_name="tipo de pressurização")
+
+    class Meta:
+        verbose_name = "configuração"
+        verbose_name_plural = "configurações"
+
+    def save(self, *args, **kwargs):
+        self.id = 1
+        super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        pass
+
+    @classmethod
+    def load(cls):
+        obj, created = cls.objects.get_or_create(id=1)
+        return obj
+
+
 class Material(models.Model):
 
     name = models.CharField(max_length=255, unique=True, verbose_name="nome")
@@ -160,10 +196,8 @@ class Fixture(models.Model):
                                  related_name="fixtures", on_delete=models.CASCADE, verbose_name="material")
     inlet_diameter = models.ForeignKey(Diameter, default=None, null=True, blank=True, related_name="fixtures",
                                        on_delete=models.CASCADE, verbose_name="diâmetro de Entrada")
-    reductions = models.ManyToManyField(Reduction, default=None, blank=True,
-                                        related_name="fixtures", verbose_name="reduções")
-    fittings = models.ManyToManyField(Fitting, default=None, blank=True,
-                                      related_name="fixtures", verbose_name="conexões")
+    reductions_ids = models.JSONField(default=list, verbose_name="reduções")
+    fittings_ids = models.JSONField(default=list, verbose_name="conexões")
     extra_equivalent_length = models.DecimalField(
         max_digits=9, decimal_places=2, default=0, null=True,
         blank=True, verbose_name="comprimento equivalente extra")
@@ -204,7 +238,8 @@ class Fixture(models.Model):
         '''
         if flow and flow > 0:
             if self.k_factor:
-                return math.pow(flow/self.k_factor, 2)
+                corrected_factor = float(self.k_factor)/float(60000)
+                return math.pow(flow/corrected_factor, 2)
             if self.outlet_diameter:
                 speed = flow/self.area
                 return math.pow(speed, 2) / (2 * GRAVITY * math.pow(0.97, 2))  # Cd = 0.97
@@ -216,7 +251,8 @@ class Fixture(models.Model):
         '''
         if pressure and pressure > 0:
             if self.k_factor:
-                return self.k_factor * math.sqrt(pressure)
+                corrected_factor = float(self.k_factor)/float(60000)
+                return corrected_factor * math.sqrt(pressure)
             speed = math.sqrt(2*GRAVITY*pressure)
             if self.outlet_diameter:
                 return self.area * speed * 0.97  # Cd = 0.97

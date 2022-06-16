@@ -4,6 +4,7 @@ import {
   Dialog,
   DialogActions,
   DialogContent,
+  DialogProps,
   DialogTitle,
   Grid,
   IconButton,
@@ -23,6 +24,7 @@ export interface BaseDialogFormProps {
   onReset: () => void;
   onDelete: () => void;
   canDelete?: boolean;
+  maxWidth?: DialogProps["maxWidth"];
 }
 
 const BaseDialogForm = ({
@@ -33,6 +35,7 @@ const BaseDialogForm = ({
   onReset,
   onDelete,
   canDelete = false,
+  maxWidth = "sm",
   children,
 }: BaseDialogFormProps) => {
   const theme = useTheme();
@@ -50,6 +53,7 @@ const BaseDialogForm = ({
   return (
     <Dialog
       open={open}
+      maxWidth={maxWidth}
       onClose={onCloseWithoutBackDrop}
       fullScreen={fullScreen}
       fullWidth

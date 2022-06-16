@@ -1,4 +1,5 @@
 import {
+  ConfigCRUDAction,
   DiameterCRUDAction,
   FittingCRUDAction,
   FittingDiameterCRUDAction,
@@ -24,6 +25,7 @@ const SHP = () => {
   }, []);
 
   useEffect(() => {
+    dispatch(ConfigCRUDAction.list());
     dispatch(MaterialCRUDAction.list());
     dispatch(DiameterCRUDAction.list());
     dispatch(FittingCRUDAction.list());

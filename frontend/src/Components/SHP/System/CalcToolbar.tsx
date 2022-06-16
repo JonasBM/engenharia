@@ -6,12 +6,16 @@ import {
   TextField,
   Toolbar,
 } from "@mui/material";
+import {
+  CalcTypes,
+  PressureType,
+  PressureTypes,
+  SHPCalcSerializer,
+} from "api/types/shpTypes";
 import { Calculate, Save } from "@mui/icons-material";
 import { Controller, useFormContext, useWatch } from "react-hook-form";
 import React, { useEffect } from "react";
-import { shpCalcTypes, shpPressureTypes } from "redux/shp";
 
-import { SHPCalcSerializer } from "api/types/shpTypes";
 import { StyledTextField } from ".";
 import { saveSHPCalc } from "utils";
 import { useAppSelector } from "redux/utils";
@@ -59,9 +63,9 @@ const CalcToolbar = () => {
                 onChange(event.target.value);
               }}
             >
-              {shpCalcTypes.map((_shpCalcType) => (
-                <MenuItem key={_shpCalcType.value} value={_shpCalcType.value}>
-                  {_shpCalcType.title}
+              {CalcTypes.map((_calcType) => (
+                <MenuItem key={_calcType.value} value={_calcType.value}>
+                  {_calcType.name}
                 </MenuItem>
               ))}
             </StyledTextField>
@@ -103,18 +107,18 @@ const CalcToolbar = () => {
                 onChange(event.target.value);
               }}
             >
-              {shpPressureTypes.map((_shpPressureType) => (
+              {PressureTypes.map((_shpPressureType) => (
                 <MenuItem
                   key={_shpPressureType.value}
                   value={_shpPressureType.value}
                 >
-                  {_shpPressureType.title}
+                  {_shpPressureType.name}
                 </MenuItem>
               ))}
             </StyledTextField>
           )}
         />
-        {pressure_type === "bomba" && (
+        {pressure_type === PressureType.BOMBA.value && (
           <TextField
             label="Nome do ponto da Bomba"
             InputLabelProps={{ shrink: true }}

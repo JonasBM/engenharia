@@ -1,8 +1,15 @@
 from django_typomatic import generate_ts, ts_interface
 from rest_framework import serializers
 
-from .models import (FittingDiameter, Fixture, Material, Diameter, Fitting, Reduction, MaterialConnection)
+from .models import (Config, FittingDiameter, Fixture, Material, Diameter, Fitting, Reduction, MaterialConnection)
 from rest_framework.exceptions import ValidationError
+
+
+@ts_interface('shp')
+class ConfigSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Config
+        fields = '__all__'
 
 
 @ts_interface('shp')
@@ -63,13 +70,6 @@ class ReductionSerializer(serializers.ModelSerializer):
     def validate(self, data):
         self.validate_material(data)
         return super().validate(data)
-
-
-@ts_interface('shp')
-class ReductionResponseSerializer(serializers.Serializer):
-
-    material = serializers.IntegerField()
-    reductions = ReductionSerializer(many=True)
 
 
 @ts_interface('shp')
@@ -172,20 +172,20 @@ class SHPCalcPathSerializer(serializers.Serializer):
 @ts_interface('shp')
 class SHPCalcSerializer(serializers.Serializer):
 
-    PRESSURE_TYPES = [
-        ('gravitacional', 'Gravitacional'),
-        ('bomba', 'Bomba'),
-    ]
+    # PRESSURE_TYPES = [
+    #     ('gravitacional', 'Gravitacional'),
+    #     ('bomba', 'Bomba'),
+    # ]
 
-    CALC_TYPES = [
-        ('vazao_minima', 'Vazão mínima'),
-        ('vazao_residual', 'Vazão Residual')
-    ]
+    # CALC_TYPES = [
+    #     ('vazao_minima', 'Vazão mínima'),
+    #     ('vazao_residual', 'Vazão Residual')
+    # ]
 
     fileinfo = FileInfoSerializer(required=True)
     name = serializers.CharField(required=False, allow_null=True, allow_blank=True)
-    pressure_type = serializers.ChoiceField(choices=PRESSURE_TYPES, required=True)
-    calc_type = serializers.ChoiceField(choices=CALC_TYPES, required=True)
+    pressure_type = serializers.ChoiceField(choices=Config.PressureType, required=True)
+    calc_type = serializers.ChoiceField(choices=Config.CalcType, required=True)
     pump_node = serializers.CharField(allow_blank=True, default=None)
     material_id = serializers.IntegerField(required=True)
     diameter_id = serializers.IntegerField(required=True)

@@ -19,6 +19,7 @@ import { SHPCalcSerializer } from "api/types/shpTypes";
 import { StyledTableCellBorderLeft } from ".";
 import { checkLetter } from "redux/shp";
 import { decimalFormatter } from "utils";
+import { flow_to_l_p_min } from "./utils";
 
 const StyledTableRow = styled(TableRow)<{
   active: string;
@@ -85,8 +86,9 @@ const Fixture = ({
               }}
               value={value || ""}
               onChange={(event) => {
-                if (checkLetter(event.target.value)) {
-                  onChange(event.target.value);
+                const string = event.target.value.toUpperCase();
+                if (checkLetter(string)) {
+                  onChange(string);
                 }
               }}
             />
@@ -139,11 +141,17 @@ const Fixture = ({
       </TableCell>
       <TableCell align="center">-</TableCell>
       <StyledTableCellBorderLeft align="center">
-        {decimalFormatter(flow_to_l_p_min(getValues(`paths.${index}.flow`)), 2)}
+        {decimalFormatter(
+          flow_to_l_p_min(getValues(`paths.${index}.flow`)),
+          2
+        ) || "-"}
       </StyledTableCellBorderLeft>
       <StyledTableCellBorderLeft align="center">-</StyledTableCellBorderLeft>
       <StyledTableCellBorderLeft align="right">
-        {decimalFormatter(getValues(`paths.${index}.fixture.total_length`), 2)}
+        {decimalFormatter(
+          getValues(`paths.${index}.fixture.total_length`),
+          2
+        ) || "-"}
         <IconButton
           sx={{ marginLeft: 1 }}
           onClick={(event: React.MouseEvent<HTMLButtonElement>) => {
@@ -176,15 +184,18 @@ const Fixture = ({
         {decimalFormatter(
           getValues(`paths.${index}.fixture.unit_pressure_drop`),
           4
-        )}
+        ) || "-"}
         <br />
         {decimalFormatter(
           getValues(`paths.${index}.fixture.unit_hose_pressure_drop`),
           4
-        )}
+        ) || "-"}
       </StyledTableCellBorderLeft>
       <StyledTableCellBorderLeft align="center">
-        {decimalFormatter(getValues(`paths.${index}.fixture.pressure_drop`), 3)}
+        {decimalFormatter(
+          getValues(`paths.${index}.fixture.pressure_drop`),
+          3
+        ) || "-"}
         <br />
         {decimalFormatter(
           getValues(`paths.${index}.fixture.hose_pressure_drop`),
@@ -192,13 +203,13 @@ const Fixture = ({
         )}
       </StyledTableCellBorderLeft>
       <StyledTableCellBorderLeft align="center">
-        {decimalFormatter(getValues(`paths.${index}.fixture.end_pressure`), 3)}
+        {decimalFormatter(
+          getValues(`paths.${index}.fixture.end_pressure`),
+          3
+        ) || "-"}
       </StyledTableCellBorderLeft>
     </StyledTableRow>
   );
 };
 
 export default Fixture;
-const flow_to_l_p_min = (flow: number): number => {
-  return flow * 60000;
-};

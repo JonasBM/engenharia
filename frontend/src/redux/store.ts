@@ -1,4 +1,5 @@
 import {
+  ConfigCRUDAction,
   DiameterCRUDAction,
   FittingCRUDAction,
   FittingDiameterCRUDAction,
@@ -31,6 +32,7 @@ import shpCalcReducer from "./shp";
 import storage from "redux-persist/lib/storage";
 
 const shp = combineReducers({
+  configs: ConfigCRUDAction.reducer,
   materials: MaterialCRUDAction.reducer,
   diameters: DiameterCRUDAction.reducer,
   fittings: FittingCRUDAction.reducer,

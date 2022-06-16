@@ -1,12 +1,13 @@
 
 from rest_framework import routers
-from .views import (Calculate, FixtureViewSet, LoadMaterialBackup, MaterialViewSet, DiameterViewSet,
+from .views import (Calculate, ConfigViewSet, FixtureViewSet, LoadMaterialBackup, MaterialViewSet, DiameterViewSet,
                     FittingViewSet, ReductionViewSet, MaterialConnectionViewSet, FittingDiameterViewSet)
 from django.urls import path
 
 app_name = 'shp'
 
 router = routers.SimpleRouter()
+router.register(r'configs', ConfigViewSet, 'configs')
 router.register(r'materials', MaterialViewSet, 'materials')
 router.register(r'diameters', DiameterViewSet, 'diameters')
 router.register(r'fittings', FittingViewSet, 'fittings')

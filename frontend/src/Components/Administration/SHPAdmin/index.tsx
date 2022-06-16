@@ -1,4 +1,5 @@
 import {
+  ConfigCRUDAction,
   DiameterCRUDAction,
   FittingCRUDAction,
   FittingDiameterCRUDAction,
@@ -19,6 +20,7 @@ const SHPAdmin = () => {
   const dispatch = useAppDispatch();
 
   useEffect(() => {
+    dispatch(ConfigCRUDAction.list());
     dispatch(MaterialCRUDAction.list());
     dispatch(DiameterCRUDAction.list());
     dispatch(FittingCRUDAction.list());

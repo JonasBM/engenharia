@@ -3,7 +3,7 @@ import * as yup from "yup";
 import { Controller, useForm, useWatch } from "react-hook-form";
 import { MenuItem, TextField } from "@mui/material";
 import React, { useEffect } from "react";
-import { hideDialog, showDialog } from "redux/modal";
+import { closeDialog, openDialog } from "redux/modal";
 import { useAppDispatch, useAppSelector } from "redux/utils";
 
 import BaseDialogForm from "./BaseDialogForm";
@@ -28,7 +28,7 @@ export const showReductionDialog = (
   _dialogObject?: Partial<ReductionSerializer>
 ) => {
   store.dispatch(
-    showDialog({
+    openDialog({
       dialogName: _dialogName,
       dialogObject: { ..._newReduction, ..._dialogObject },
     })
@@ -36,13 +36,14 @@ export const showReductionDialog = (
 };
 
 export const closeReductionDialog = () => {
-  store.dispatch(hideDialog());
+  store.dispatch(closeDialog(_dialogName));
 };
 
 export const destroyReduction = (_reduction: ReductionSerializer) => {
   if (_reduction && _reduction.id) {
     let newLine = "\r\n";
-    let confirm_alert = "Tem certeza que deseja remover este Hidrante?";
+    let confirm_alert =
+      "Tem certeza que deseja remover esta redução/ampliação?";
     confirm_alert += newLine;
     confirm_alert += _reduction.name;
     if (window.confirm(confirm_alert)) {
@@ -79,12 +80,11 @@ const ReductionDialogForm = () => {
       (a, b) => a.internal_diameter - b.internal_diameter
     )
   );
-  const { dialogName, dialogObject } = useAppSelector(
-    (state) => state.modal
-  ) as {
-    dialogName: string | null;
-    dialogObject: ReductionSerializer;
-  };
+  const openModals = useAppSelector((state) => state.modal.openModals);
+  const dialogObject = useAppSelector(
+    (state) => state.modal.dialogObjects[_dialogName] as ReductionSerializer
+  );
+
   const {
     register,
     control,
@@ -196,13 +196,13 @@ const ReductionDialogForm = () => {
 
   return (
     <BaseDialogForm
-      key={dialogObject.id}
-      open={dialogName === _dialogName ? true : false}
-      title={dialogObject.id ? "Editar Hidrante" : "Criar Hidrante"}
+      key={dialogObject?.id}
+      open={openModals.includes(_dialogName)}
+      title={dialogObject?.id ? "Editar Hidrante" : "Criar Hidrante"}
       onClose={handleClose}
       onSubmit={handleSubmit(onSubmit)}
       onReset={handleReset}
-      onDelete={dialogObject.id ? handleDestroy : null}
+      onDelete={dialogObject?.id ? handleDestroy : null}
     >
       <TextField
         label="Nome"

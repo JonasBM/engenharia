@@ -1,5 +1,7 @@
 import {
+  CalcType,
   FileInfoSerializer,
+  PressureType,
   SHPCalcFixtureSerializer,
   SHPCalcPathSerializer,
   SHPCalcSerializer,
@@ -7,52 +9,6 @@ import {
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 
 import { formatInTimeZone } from "date-fns-tz";
-
-// export interface SHPCalcFixture {
-//   active: boolean;
-//   end: string;
-//   hose_length: number;
-//   level_difference: number;
-// }
-
-// export interface SHPCalcPath {
-//   start: string;
-//   end: string;
-//   fixture?: Partial<SHPCalcFixture>;
-//   has_fixture: boolean;
-//   material_id: number;
-//   diameter_id: number;
-//   length: number;
-//   equivalent_length: number;
-//   extra_equivalent_length: number;
-//   total_length: number;
-//   level_difference: number;
-//   fittings_ids: number[];
-// }
-
-export type SHPCalcType = "vazao_minima" | "vazao_residual";
-export const shpCalcTypes = [
-  { title: "Vazão mínima", value: "vazao_minima" },
-  { title: "Vazão Residual", value: "vazao_residual" },
-];
-
-export type SHPPressureType = "gravitacional" | "bomba";
-export const shpPressureTypes = [
-  { title: "Gravitacional", value: "gravitacional" },
-  { title: "Bomba", value: "bomba" },
-];
-
-// export interface SHPCalcState {
-//   fileinfo: FileInfoSerializer;
-//   name: string;
-//   pressure_type: SHPPressureType;
-//   calc_type: SHPCalcType;
-//   pump_node: string;
-//   material_id: number;
-//   diameter_id: number;
-//   fixture_id: number;
-//   paths: Partial<SHPCalcPath>[];
-// }
 
 export const checkLetter = (letter: string): boolean => {
   const check = letter === "RES";
@@ -80,10 +36,10 @@ const getNewStrings = (
   state: SHPCalcSerializer
 ): { start: string; end: string } => {
   let lastLetter = null;
-  const total = state.paths.length;
+  const total = state?.paths?.length;
   for (let i = 0; i < total; i++) {
     const path = state.paths[total - i - 1];
-    if (path.end && !path.has_fixture) {
+    if (path?.end && !path.has_fixture) {
       lastLetter = path.end;
       break;
     }
@@ -97,7 +53,7 @@ const getNewStrings = (
 };
 
 const getNewFixtureString = (state: SHPCalcSerializer): string => {
-  let lastNumber = 1;
+  let lastNumber = 0;
   for (const path of state.paths) {
     if (path.fixture.end) {
       const current = parseInt(path.fixture.end.match(/\d+/).shift());
@@ -147,11 +103,14 @@ export const getNewFileInfo = (): FileInfoSerializer => {
   };
 };
 
+export const getSHPCalc = () => {
+  return {};
+};
 export const initialState = {
   fileinfo: getNewFileInfo(),
   name: "",
-  pressure_type: "gravitacional",
-  calc_type: "vazao_minima",
+  pressure_type: PressureType.GRAVITACIONAL.value,
+  calc_type: CalcType.VAZAO_MINIMA.value,
   pump_node: "",
   material_id: null,
   diameter_id: null,

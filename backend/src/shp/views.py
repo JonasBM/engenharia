@@ -6,13 +6,13 @@ from rest_framework import permissions, status, views, viewsets
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 
-from .models import (Diameter, Fitting, FittingDiameter, Fixture, Material,
+from .models import (Config, Diameter, Fitting, FittingDiameter, Fixture, Material,
                      MaterialConnection, Reduction)
-from .serializers import (DiameterSerializer,
+from .serializers import (ConfigSerializer, DiameterSerializer,
                           FittingDiameterResponseSerializer,
                           FittingDiameterSerializer, FittingSerializer,
                           FixtureSerializer, MaterialConnectionSerializer,
-                          MaterialFileSerializer, MaterialSerializer, ReductionResponseSerializer,
+                          MaterialFileSerializer, MaterialSerializer,
                           ReductionSerializer)
 
 '''
@@ -21,6 +21,21 @@ create extras on diameters and fittings creation
 '''
 
 logger = logging.getLogger(__name__)
+
+
+class ConfigViewSet(viewsets.ModelViewSet):
+    permission_classes = [
+        permissions.IsAdminUser,
+    ]
+    serializer_class = ConfigSerializer
+    queryset = Config.objects.all()
+
+    def get_object(self):
+        return Config.load()
+
+    def list(self, request, *args, **kwargs):
+        serializer = self.get_serializer([self.get_object()], many=True)
+        return Response(serializer.data)
 
 
 class MaterialViewSet(viewsets.ModelViewSet):
@@ -109,74 +124,12 @@ class FittingDiameterViewSet(viewsets.ViewSet):
         return Response(serializer.data)
 
 
-# class ReductionViewSet(viewsets.ModelViewSet):
-#     permission_classes = [
-#         permissions.IsAdminUser,
-#     ]
-#     serializer_class = ReductionSerializer
-#     queryset = Reduction.objects.all()
-
-
-class ReductionViewSet(viewsets.ViewSet):
+class ReductionViewSet(viewsets.ModelViewSet):
     permission_classes = [
         permissions.IsAdminUser,
     ]
-
-    def get_object_by_material_id(self, material_id):
-        queryset = Reduction.objects.filter(inlet_diameter__material_id=material_id)
-        obj = {'material': material_id, 'reductions': queryset}
-        return obj
-
-    def get_object(self):
-        lookup_url_kwarg = self.lookup_url_kwarg or self.lookup_field
-        material_id = self.kwargs[lookup_url_kwarg]
-        obj = self.get_object_by_material_id(material_id)
-        return obj
-
-    def list(self, request, *args, **kwargs):
-        material_ids = Material.objects.all().values_list('id', flat=True)
-        response = []
-        for material_id in material_ids:
-            response.append(self.get_object_by_material_id(material_id))
-        serializer = ReductionResponseSerializer(response, many=True)
-        return Response(serializer.data)
-
-    def retrieve(self, request, *args, **kwargs):
-        serializer = ReductionResponseSerializer(self.get_object())
-        return Response(serializer.data)
-
-    def update(self, request, *args, **kwargs):
-        return self.create_or_update(request, *args, **kwargs)
-
-    def create(self, request, *args, **kwargs):
-        return self.create_or_update(request, *args, **kwargs)
-
-    def create_or_update(self, request, *args, **kwargs):
-        errors = []
-        material = request.data.get('material')
-        if not material:
-            errors.append({'material': 'This field may not be blank.'})
-        reductions = request.data.get('reductions')
-        if not reductions:
-            errors.append({'reductions': 'This field may not be blank.'})
-        if len(errors):
-            raise ValidationError(errors)
-
-        for item in reductions:
-            id = item.pop('id', None)
-            instance = None
-            if id:
-                instance = Reduction.objects.filter(id=id).first()
-                if instance:
-                    serializer = ReductionSerializer(instance, data=item, partial=True)
-                    serializer.is_valid(raise_exception=True)
-                    serializer.save()
-            else:
-                serializer = ReductionSerializer(data=item)
-                serializer.is_valid(raise_exception=True)
-                serializer.save()
-        serializer = ReductionResponseSerializer(self.get_object_by_material_id(material))
-        return Response(serializer.data)
+    serializer_class = ReductionSerializer
+    queryset = Reduction.objects.all()
 
 
 class MaterialConnectionViewSet(viewsets.ModelViewSet):

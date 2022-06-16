@@ -29,55 +29,46 @@ import {
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 import {
   FittingDiameterSerializer,
+  FixtureSerializer,
   SHPCalcSerializer,
 } from "api/types/shpTypes";
 import React, { useEffect, useState } from "react";
 import { closeDialog, openDialog } from "redux/modal";
 
-import { decimalFormatter } from "utils";
 import store from "redux/store";
 import { useAppSelector } from "redux/utils";
 import { useFormContext } from "react-hook-form";
 
-const _dialogName = "DIALOG_FITTINGSCALC";
+const _dialogName = "DIALOG_FITTINGSFIXTURE";
 
-export const showDialogCalcFittings = (index: number) => {
+export const showDialogFixtureFittings = () => {
   store.dispatch(
     openDialog({
       dialogName: _dialogName,
-      dialogObject: { index },
+      dialogObject: {},
     })
   );
 };
 
-export const closeDialogCalcFittings = () => {
+export const closeDialogFixtureFittings = () => {
   store.dispatch(closeDialog(_dialogName));
 };
 
-const DialogFittings = () => {
+const FixtureDialogFittings = () => {
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down("md"));
   const fittings = useAppSelector((state) => state.shp.fittings);
   const fittingDiameters = useAppSelector(
     (state) => state.shp.fittingDiameters
   );
+
   const openModals = useAppSelector((state) => state.modal.openModals);
-  const dialogObject = useAppSelector(
-    (state) => state.modal.dialogObjects[_dialogName] as { index: number }
-  );
-  const { index } = dialogObject || {};
 
-  const { watch, setValue, register } = useFormContext<SHPCalcSerializer>();
+  const { watch, setValue, register } = useFormContext<FixtureSerializer>();
 
-  const material_id = watch(`paths.${index}.material_id`);
-  const diameter_id = watch(`paths.${index}.diameter_id`);
-
-  const start = watch(`paths.${index}.start`);
-  const end = watch(`paths.${index}.end`);
-  const has_fixture = watch(`paths.${index}.has_fixture`);
-  const fixture = watch(`paths.${index}.fixture`);
-  const equivalent_length = watch(`paths.${index}.equivalent_length`);
-  const fittings_ids = watch(`paths.${index}.fittings_ids`);
+  const material_id = watch("material");
+  const diameter_id = watch("inlet_diameter");
+  const fittings_ids = watch("fittings_ids");
 
   const [currentFittingDiameters, setCurrentFittingDiameters] = useState<
     FittingDiameterSerializer[]
@@ -106,12 +97,12 @@ const DialogFittings = () => {
       const newArray = [...fittings_ids];
       const element = newArray.splice(result.source.index, 1)[0];
       newArray.splice(result.destination.index, 0, element);
-      setValue(`paths.${index}.fittings_ids`, newArray);
+      setValue("fittings_ids", newArray);
     }
   };
 
   const handleClose = () => {
-    closeDialogCalcFittings();
+    closeDialogFixtureFittings();
   };
 
   const onClose = (
@@ -132,9 +123,7 @@ const DialogFittings = () => {
     >
       <Box>
         <DialogTitle>
-          {`Adicione as conexões no trecho ${start} - ${
-            has_fixture ? fixture.end : end
-          }`}
+          Adicione as conexões do Hidrante
           <IconButton
             onClick={handleClose}
             sx={{
@@ -156,32 +145,14 @@ const DialogFittings = () => {
             spacing={1}
             height={500}
           >
-            <Grid
-              item
-              xs={8}
-              display="flex"
-              flexDirection="column"
-              justifyContent="center"
-              height={60}
-            >
-              {`Comprimento equivalente total:
-                ${decimalFormatter(equivalent_length) || "0,00"} m`}
-            </Grid>
-            <Grid item xs={4} height={60}>
-              <TextField
-                type="number"
-                label="Comprimento extra"
-                {...register(`paths.${index}.extra_equivalent_length`)}
-              />
-            </Grid>
-            <Grid item xs={5} height={440}>
+            <Grid item xs={5} height={"100%"}>
               <List dense component={Paper}>
                 {fittings &&
                   fittings.map((_fitting) => (
                     <ListItemButton
                       key={_fitting.id}
                       onClick={() => {
-                        setValue(`paths.${index}.fittings_ids`, [
+                        setValue("fittings_ids", [
                           ...fittings_ids,
                           _fitting.id,
                         ]);
@@ -257,10 +228,7 @@ const DialogFittings = () => {
                                     onClick={() => {
                                       const newFittings_ids = [...fittings_ids];
                                       newFittings_ids.splice(_index, 1);
-                                      setValue(
-                                        `paths.${index}.fittings_ids`,
-                                        newFittings_ids
-                                      );
+                                      setValue("fittings_ids", newFittings_ids);
                                     }}
                                   >
                                     <Delete />
@@ -279,7 +247,6 @@ const DialogFittings = () => {
                 </Droppable>
               </DragDropContext>
             </Grid>
-            <Grid item xs={12}></Grid>
           </Grid>
         </DialogContent>
         <DialogActions>
@@ -290,4 +257,4 @@ const DialogFittings = () => {
   );
 };
 
-export default DialogFittings;
+export default FixtureDialogFittings;

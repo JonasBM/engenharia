@@ -11,17 +11,19 @@ import {
   TextField,
 } from "@mui/material";
 import {
+  CalcType,
+  FittingDiameterSerializer,
+  FixtureSerializer,
+  PressureType,
+  SHPCalcSerializer,
+} from "api/types/shpTypes";
+import {
   Controller,
   UseFieldArrayRemove,
   useFormContext,
   useWatch,
 } from "react-hook-form";
 import { DraggableProvided, DraggableStateSnapshot } from "react-beautiful-dnd";
-import {
-  FittingDiameterSerializer,
-  FixtureSerializer,
-  SHPCalcSerializer,
-} from "api/types/shpTypes";
 import React, { useEffect, useState } from "react";
 
 import ConnectionsPopover from "./ConnectionsPopover";
@@ -29,6 +31,7 @@ import Fixture from "./Fixture";
 import { StyledTableCellBorderLeft } from ".";
 import { checkLetter } from "redux/shp";
 import { decimalFormatter } from "utils";
+import { flow_to_l_p_min } from "./utils";
 import { showDialogCalcFittings } from "./DialogFittings";
 import { useAppSelector } from "redux/utils";
 
@@ -106,6 +109,12 @@ const Path = ({
   }, [fittingDiameters, material_id]);
 
   useEffect(() => {
+    if (materials?.length > 0 && !material_id) {
+      setValue(`paths.${index}.material_id`, materials[0].id);
+    }
+  }, [material_id, materials, setValue, index]);
+
+  useEffect(() => {
     const _diameter = diameters.find((d) => d.id === diameter_id);
     if (
       materials &&
@@ -130,14 +139,16 @@ const Path = ({
   useEffect(() => {
     let newEquivalentLength =
       parseFloat(extra_equivalent_length?.toString()) || 0;
-    for (const _fitting_id of fittings_ids) {
-      const _fitting = currentFittingDiameters?.find(
-        (fd) => fd.diameter === diameter_id && fd.fitting === _fitting_id
-      );
-      if (_fitting && _fitting.equivalent_length) {
-        newEquivalentLength += parseFloat(
-          _fitting.equivalent_length.toString()
+    if (fittings_ids?.length > 0) {
+      for (const _fitting_id of fittings_ids) {
+        const _fitting = currentFittingDiameters?.find(
+          (fd) => fd.diameter === diameter_id && fd.fitting === _fitting_id
         );
+        if (_fitting && _fitting.equivalent_length) {
+          newEquivalentLength += parseFloat(
+            _fitting.equivalent_length.toString()
+          );
+        }
       }
     }
     setValue(`paths.${index}.equivalent_length`, newEquivalentLength);
@@ -188,8 +199,9 @@ const Path = ({
                 }}
                 value={value || ""}
                 onChange={(event) => {
-                  if (checkLetter(event.target.value)) {
-                    onChange(event.target.value);
+                  const string = event.target.value.toUpperCase();
+                  if (checkLetter(string)) {
+                    onChange(string);
                   }
                 }}
               />
@@ -212,8 +224,9 @@ const Path = ({
                 }}
                 value={value || ""}
                 onChange={(event) => {
-                  if (checkLetter(event.target.value)) {
-                    onChange(event.target.value);
+                  const string = event.target.value.toUpperCase();
+                  if (checkLetter(string)) {
+                    onChange(string);
                   }
                 }}
               />
@@ -229,11 +242,6 @@ const Path = ({
                 sx={{ visibility: start === "RES" ? "hidden" : "visible" }}
                 checked={value || false}
                 onChange={(event) => {
-                  console.log(
-                    event.target.checked,
-                    currentFixture.material,
-                    currentFixture.inlet_diameter
-                  );
                   if (event.target.checked) {
                     setValue(
                       `paths.${index}.material_id`,
@@ -336,8 +344,8 @@ const Path = ({
             variant="standard"
             inputProps={
               start === "RES" &&
-              calc_type === "vazao_minima" &&
-              pressure_type === "gravitacional"
+              calc_type === CalcType.VAZAO_MINIMA.value &&
+              pressure_type === PressureType.GRAVITACIONAL.value
                 ? {
                     step: "0.01",
                     style: {
@@ -372,7 +380,7 @@ const Path = ({
             />
             <IconButton
               onClick={() => {
-                showDialogCalcFittings({ index });
+                showDialogCalcFittings(index);
               }}
               title="Alterar conexões no trecho"
             >
@@ -384,13 +392,13 @@ const Path = ({
           {decimalFormatter(
             flow_to_l_p_min(getValues(`paths.${index}.flow`)),
             2
-          )}
+          ) || "-"}
         </StyledTableCellBorderLeft>
         <StyledTableCellBorderLeft align="center">
-          {decimalFormatter(getValues(`paths.${index}.speed`), 2)}
+          {decimalFormatter(getValues(`paths.${index}.speed`), 2) || "-"}
         </StyledTableCellBorderLeft>
         <StyledTableCellBorderLeft align="right">
-          {decimalFormatter(getValues(`paths.${index}.total_length`), 2)}
+          {decimalFormatter(getValues(`paths.${index}.total_length`), 2) || "-"}
           <IconButton
             sx={{ marginLeft: 1 }}
             onClick={(event: React.MouseEvent<HTMLButtonElement>) => {
@@ -418,13 +426,17 @@ const Path = ({
           </Popover>
         </StyledTableCellBorderLeft>
         <StyledTableCellBorderLeft align="center">
-          {decimalFormatter(getValues(`paths.${index}.unit_pressure_drop`), 4)}
+          {decimalFormatter(
+            getValues(`paths.${index}.unit_pressure_drop`),
+            4
+          ) || "-"}
         </StyledTableCellBorderLeft>
         <StyledTableCellBorderLeft align="center">
-          {decimalFormatter(getValues(`paths.${index}.pressure_drop`), 3)}
+          {decimalFormatter(getValues(`paths.${index}.pressure_drop`), 3) ||
+            "-"}
         </StyledTableCellBorderLeft>
         <StyledTableCellBorderLeft align="center">
-          {decimalFormatter(getValues(`paths.${index}.end_pressure`), 3)}
+          {decimalFormatter(getValues(`paths.${index}.end_pressure`), 3) || "-"}
         </StyledTableCellBorderLeft>
       </TableRow>
       {has_fixture && fixture && (
@@ -435,6 +447,3 @@ const Path = ({
 };
 
 export default Path;
-const flow_to_l_p_min = (flow: number): number => {
-  return flow * 60000;
-};

@@ -96,6 +96,7 @@ const SHP = () => {
     resolver: yupResolver(validationSchema()),
     defaultValues: initialState,
   });
+
   const {
     control,
     reset,
@@ -239,22 +240,23 @@ const SHP = () => {
                       {...provided.droppableProps}
                       ref={provided.innerRef}
                     >
-                      {paths.map((_, _index) => (
-                        <Draggable
-                          key={_index}
-                          draggableId={`paths-${_index}`}
-                          index={_index}
-                        >
-                          {(provided, snapshot) => (
-                            <Path
-                              index={_index}
-                              remove={remove}
-                              provided={provided}
-                              snapshot={snapshot}
-                            />
-                          )}
-                        </Draggable>
-                      ))}
+                      {paths.length > 0 &&
+                        paths.map((_, _index) => (
+                          <Draggable
+                            key={_index}
+                            draggableId={`paths-${_index}`}
+                            index={_index}
+                          >
+                            {(provided, snapshot) => (
+                              <Path
+                                index={_index}
+                                remove={remove}
+                                provided={provided}
+                                snapshot={snapshot}
+                              />
+                            )}
+                          </Draggable>
+                        ))}
                       {provided.placeholder}
                     </TableBody>
                   )}

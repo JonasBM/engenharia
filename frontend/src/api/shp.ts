@@ -6,6 +6,7 @@ import {
   startFetching,
 } from "redux-simplified";
 import {
+  ConfigSerializer,
   DiameterSerializer,
   FittingDiameterResponseSerializer,
   FittingSerializer,
@@ -13,15 +14,18 @@ import {
   MaterialConnectionSerializer,
   MaterialFileSerializer,
   MaterialSerializer,
-  ReductionResponseSerializer,
   ReductionSerializer,
   SHPCalcSerializer,
 } from "./types/shpTypes";
 import axios, { AxiosRequestConfig } from "axios";
 
 import { Dispatch } from "@reduxjs/toolkit";
-import { setCalc } from "redux/shp";
 import store from "redux/store";
+
+export const ConfigCRUDAction = new CRUDAction<ConfigSerializer>(
+  "shp/configs",
+  new URL("/shp/configs/", process.env.REACT_APP_API_URL).href
+);
 
 export const MaterialCRUDAction = new CRUDAction<MaterialSerializer>(
   "shp/materials",
@@ -48,7 +52,7 @@ export const FittingDiameterCRUDAction =
     }
   );
 
-export const ReductionCRUDAction = new CRUDAction<ReductionResponseSerializer>(
+export const ReductionCRUDAction = new CRUDAction<ReductionSerializer>(
   "shp/reductions",
   new URL("/shp/reductions/", process.env.REACT_APP_API_URL).href
 );

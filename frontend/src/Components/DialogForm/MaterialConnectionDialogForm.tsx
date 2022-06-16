@@ -3,7 +3,7 @@ import * as yup from "yup";
 import { Controller, useForm, useWatch } from "react-hook-form";
 import { MenuItem, TextField } from "@mui/material";
 import React, { useEffect } from "react";
-import { hideDialog, showDialog } from "redux/modal";
+import { closeDialog, openDialog } from "redux/modal";
 import { useAppDispatch, useAppSelector } from "redux/utils";
 
 import BaseDialogForm from "./BaseDialogForm";
@@ -29,7 +29,7 @@ export const showMaterialConnectionDialog = (
   _dialogObject?: Partial<MaterialConnectionSerializer>
 ) => {
   store.dispatch(
-    showDialog({
+    openDialog({
       dialogName: _dialogName,
       dialogObject: { ..._newMaterialConnection, ..._dialogObject },
     })
@@ -37,7 +37,7 @@ export const showMaterialConnectionDialog = (
 };
 
 export const closeMaterialConnectionDialog = () => {
-  store.dispatch(hideDialog());
+  store.dispatch(closeDialog(_dialogName));
 };
 
 export const destroyMaterialConnection = (
@@ -87,13 +87,11 @@ const MaterialConnectionDialogForm = () => {
       (a, b) => a.internal_diameter - b.internal_diameter
     )
   );
-
-  const { dialogName, dialogObject } = useAppSelector(
-    (state) => state.modal
-  ) as {
-    dialogName: string | null;
-    dialogObject: MaterialConnectionSerializer;
-  };
+  const openModals = useAppSelector((state) => state.modal.openModals);
+  const dialogObject = useAppSelector(
+    (state) =>
+      state.modal.dialogObjects[_dialogName] as MaterialConnectionSerializer
+  );
   const {
     register,
     control,
@@ -211,17 +209,17 @@ const MaterialConnectionDialogForm = () => {
 
   return (
     <BaseDialogForm
-      key={dialogObject.id}
-      open={dialogName === _dialogName ? true : false}
+      key={dialogObject?.id}
+      open={openModals.includes(_dialogName)}
       title={
-        dialogObject.id
+        dialogObject?.id
           ? "Editar Conexão de materiais"
           : "Criar Conexão de materiais"
       }
       onClose={handleClose}
       onSubmit={handleSubmit(onSubmit)}
       onReset={handleReset}
-      onDelete={dialogObject.id ? handleDestroy : null}
+      onDelete={dialogObject?.id ? handleDestroy : null}
     >
       <TextField
         label="Nome"

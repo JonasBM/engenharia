@@ -2,7 +2,7 @@ import * as yup from "yup";
 
 import React, { useEffect } from "react";
 import { TextField, Typography } from "@mui/material";
-import { hideDialog, showDialog } from "redux/modal";
+import { closeDialog, openDialog } from "redux/modal";
 import { useAppDispatch, useAppSelector } from "redux/utils";
 
 import BaseDialogForm from "./BaseDialogForm";
@@ -24,7 +24,7 @@ export const showFittingDialog = (
   _dialogObject?: Partial<FittingSerializer>
 ) => {
   store.dispatch(
-    showDialog({
+    openDialog({
       dialogName: _dialogName,
       dialogObject: { ..._newFitting, ..._dialogObject },
     })
@@ -32,7 +32,7 @@ export const showFittingDialog = (
 };
 
 export const closeFittingDialog = () => {
-  store.dispatch(hideDialog());
+  store.dispatch(closeDialog(_dialogName));
 };
 
 export const destroyFitting = (_fitting: FittingSerializer) => {
@@ -58,12 +58,10 @@ const validationSchema = () =>
 
 const FittingDialogForm = () => {
   const dispatch = useAppDispatch();
-  const { dialogName, dialogObject } = useAppSelector(
-    (state) => state.modal
-  ) as {
-    dialogName: string | null;
-    dialogObject: FittingSerializer;
-  };
+  const openModals = useAppSelector((state) => state.modal.openModals);
+  const dialogObject = useAppSelector(
+    (state) => state.modal.dialogObjects[_dialogName] as FittingSerializer
+  );
   const {
     register,
     handleSubmit,
@@ -123,13 +121,13 @@ const FittingDialogForm = () => {
 
   return (
     <BaseDialogForm
-      key={dialogObject.id}
-      open={dialogName === _dialogName ? true : false}
-      title={dialogObject.id ? "Editar Conexão" : "Criar Conexão"}
+      key={dialogObject?.id}
+      open={openModals.includes(_dialogName)}
+      title={dialogObject?.id ? "Editar Conexão" : "Criar Conexão"}
       onClose={handleClose}
       onSubmit={handleSubmit(onSubmit)}
       onReset={handleReset}
-      onDelete={dialogObject.id ? handleDestroy : null}
+      onDelete={dialogObject?.id ? handleDestroy : null}
     >
       <Typography>A conexão criada vale para todos os materiais</Typography>
       <TextField

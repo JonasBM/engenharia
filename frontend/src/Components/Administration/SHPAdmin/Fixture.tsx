@@ -2,6 +2,7 @@ import {
   DataGrid,
   GridActionsCellItem,
   GridColDef,
+  GridColumnHeaderParams,
   GridColumns,
   GridRowId,
   GridToolbarContainer,
@@ -101,20 +102,25 @@ const Fixture = () => {
     },
     {
       ...CommonFieldAttributes,
-      field: "type",
+      field: "nozzle_type",
       headerName: "Tipo de hidrante",
       valueGetter: getFixtureType,
     },
-    {
-      ...CommonFieldAttributes,
-      field: "hose_internal_diameter",
-      headerName: "Diâmetro da mangueira (mm)",
-    },
-    {
-      ...CommonFieldAttributes,
-      field: "outlet_diameter",
-      headerName: "Diâmetro do esguicho (mm)",
-    },
+    // {
+    //   ...CommonFieldAttributes,
+    //   field: "k_factor",
+    //   headerName: "Fator de Vazão",
+    // },
+    // {
+    //   ...CommonFieldAttributes,
+    //   field: "k_nozzle",
+    //   headerName: "Coeficiente tipico do esguicho",
+    // },
+    // {
+    //   ...CommonFieldAttributes,
+    //   field: "outlet_diameter",
+    //   headerName: "Diâmetro de saída do esguicho (mm)",
+    // },
     {
       ...CommonFieldAttributes,
       field: "minimum_flow_rate",

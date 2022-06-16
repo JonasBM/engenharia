@@ -1,3 +1,11 @@
+export interface ConfigSerializer {
+    id?: number;
+    calc_type?: "VM" | "VR";
+    pressure_type?: "GR" | "BO";
+    material?: 3 | 5 | null;
+    fixture?: 5 | 4 | 3 | null;
+}
+
 export interface MaterialSerializer {
     id?: number;
     name: string;
@@ -42,11 +50,6 @@ export interface ReductionSerializer {
     outlet_diameter: 105 | 1 | 2 | 106 | 7 | 103;
 }
 
-export interface ReductionResponseSerializer {
-    material: number;
-    reductions: ReductionSerializer[];
-}
-
 export interface MaterialConnectionSerializer {
     id?: number;
     name: string;
@@ -61,6 +64,8 @@ export interface FixtureSerializer {
     id?: number;
     name: string;
     nozzle_type: "TC" | "RE" | "MA";
+    reductions_ids?: any;
+    fittings_ids?: any;
     extra_equivalent_length?: number | null;
     hose_hazen_williams_coefficient: number;
     hose_internal_diameter: number;
@@ -71,8 +76,6 @@ export interface FixtureSerializer {
     minimum_flow_rate: number;
     material?: 3 | 5 | null;
     inlet_diameter?: 105 | 1 | 2 | 106 | 7 | 103 | null;
-    reductions?: 14 | 53 | 1 | 52[];
-    fittings?: 3 | 83 | 1 | 84[];
 }
 
 export interface FileInfoSerializer {
@@ -133,8 +136,8 @@ export interface SHPCalcPathSerializer {
 export interface SHPCalcSerializer {
     fileinfo: FileInfoSerializer;
     name?: string | null;
-    pressure_type: "gravitacional" | "bomba";
-    calc_type: "vazao_minima" | "vazao_residual";
+    pressure_type: GR | BO;
+    calc_type: VM | VR;
     pump_node?: string;
     material_id: number;
     diameter_id: number;

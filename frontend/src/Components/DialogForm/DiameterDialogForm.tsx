@@ -3,7 +3,7 @@ import * as yup from "yup";
 import { Controller, useForm } from "react-hook-form";
 import { MenuItem, TextField } from "@mui/material";
 import React, { useEffect } from "react";
-import { hideDialog, showDialog } from "redux/modal";
+import { closeDialog, openDialog } from "redux/modal";
 import { useAppDispatch, useAppSelector } from "redux/utils";
 
 import BaseDialogForm from "./BaseDialogForm";
@@ -26,7 +26,7 @@ export const showDiameterDialog = (
   _dialogObject?: Partial<DiameterSerializer>
 ) => {
   store.dispatch(
-    showDialog({
+    openDialog({
       dialogName: _dialogName,
       dialogObject: { ..._newDiameter, ..._dialogObject },
     })
@@ -34,7 +34,7 @@ export const showDiameterDialog = (
 };
 
 export const closeDiameterDialog = () => {
-  store.dispatch(hideDialog());
+  store.dispatch(closeDialog(_dialogName));
 };
 
 export const destroyDiameter = (_diameter: DiameterSerializer) => {
@@ -63,12 +63,10 @@ const validationSchema = () =>
 const DiameterDialogForm = () => {
   const dispatch = useAppDispatch();
   const materials = useAppSelector((state) => state.shp.materials);
-  const { dialogName, dialogObject } = useAppSelector(
-    (state) => state.modal
-  ) as {
-    dialogName: string | null;
-    dialogObject: DiameterSerializer;
-  };
+  const openModals = useAppSelector((state) => state.modal.openModals);
+  const dialogObject = useAppSelector(
+    (state) => state.modal.dialogObjects[_dialogName] as DiameterSerializer
+  );
   const {
     register,
     handleSubmit,
@@ -129,13 +127,13 @@ const DiameterDialogForm = () => {
 
   return (
     <BaseDialogForm
-      key={dialogObject.id}
-      open={dialogName === _dialogName ? true : false}
-      title={dialogObject.id ? "Editar Diâmetro" : "Criar Diâmetro"}
+      key={dialogObject?.id}
+      open={openModals.includes(_dialogName)}
+      title={dialogObject?.id ? "Editar Diâmetro" : "Criar Diâmetro"}
       onClose={handleClose}
       onSubmit={handleSubmit(onSubmit)}
       onReset={handleReset}
-      onDelete={dialogObject.id ? handleDestroy : null}
+      onDelete={dialogObject?.id ? handleDestroy : null}
     >
       <TextField
         label="Nome"

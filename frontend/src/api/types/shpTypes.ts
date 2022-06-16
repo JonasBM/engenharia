@@ -1,3 +1,23 @@
+export const CalcType = {
+  VAZAO_MINIMA: { value: "VM", name: "Vazão mínima" },
+  VAZAO_RESIDUAL: { value: "VR", name: "Vazão Residual" },
+};
+
+export const CalcTypes = [CalcType.VAZAO_MINIMA, CalcType.VAZAO_RESIDUAL];
+
+export const PressureType = {
+  GRAVITACIONAL: { value: "GR", name: "Gravitacional" },
+  BOMBA: { value: "BO", name: "Bomba" },
+};
+
+export const PressureTypes = [PressureType.GRAVITACIONAL, PressureType.BOMBA];
+export interface ConfigSerializer {
+  id: 1;
+  calc_type: "VM" | "VR";
+  pressure_type: "GR" | "BO";
+  material: any;
+  fixture: any;
+}
 export interface MaterialSerializer {
   id?: number;
   name: string;
@@ -42,11 +62,6 @@ export interface ReductionSerializer {
   outlet_diameter: any;
 }
 
-export interface ReductionResponseSerializer {
-  material: number;
-  reductions: ReductionSerializer[];
-}
-
 export interface MaterialConnectionSerializer {
   id?: number;
   inlet_material?: number;
@@ -71,8 +86,8 @@ export interface FixtureSerializer {
   minimum_flow_rate: number;
   material?: any;
   inlet_diameter?: any;
-  reductions?: any[];
-  fittings?: any[];
+  reductions_ids?: number[];
+  fittings_ids?: number[];
 }
 
 export const fixtureType = {
@@ -97,7 +112,7 @@ export interface FileInfoSerializer {
 export interface MaterialFileSerializer {
   fileinfo: FileInfoSerializer;
   material: MaterialSerializer;
-  reductions: ReductionResponseSerializer;
+  reductions: ReductionSerializer;
   diameters: DiameterSerializer[];
   fittings: FittingSerializer[];
   fittingdiameters: FittingDiameterResponseSerializer;
@@ -145,8 +160,8 @@ export interface SHPCalcPathSerializer {
 export interface SHPCalcSerializer {
   fileinfo: FileInfoSerializer;
   name: string;
-  pressure_type: "gravitacional" | "bomba";
-  calc_type: "vazao_minima" | "vazao_residual";
+  calc_type: "VM" | "VR";
+  pressure_type: "GR" | "BO";
   pump_node?: string;
   material_id: number;
   diameter_id: number;

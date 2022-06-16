@@ -1,228 +1,179 @@
 import {
-  Box,
-  Button,
-  Grid,
-  IconButton,
-  Paper,
-  Stack,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  TextField,
-  Typography,
-} from "@mui/material";
+  DataGrid,
+  GridActionsCellItem,
+  GridColDef,
+  GridColumns,
+  GridRowId,
+  GridToolbarContainer,
+  GridValueGetterParams,
+} from "@mui/x-data-grid";
+import { Grid, Stack, Typography } from "@mui/material";
+import { MaterialSerializer, ReductionSerializer } from "api/types/shpTypes";
 import {
-  DiameterSerializer,
-  FittingDiameterResponseSerializer,
-  MaterialSerializer,
-} from "api/types/shpTypes";
-import React, { useEffect, useState } from "react";
-import { useAppDispatch, useAppSelector } from "redux/utils";
+  destroyReduction,
+  showReductionDialog,
+} from "Components/DialogForm/ReductionDialogForm";
 
-import { FittingDiameterCRUDAction } from "api/shp";
-import { SettingsBackupRestore } from "@mui/icons-material";
-import { showDiameterDialog } from "Components/DialogForm/DiameterDialogForm";
-import { showFittingDialog } from "Components/DialogForm/FittingDialogForm";
+import AddIcon from "@mui/icons-material/Add";
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import DeleteIcon from "@mui/icons-material/DeleteOutlined";
+import EditIcon from "@mui/icons-material/Edit";
+import React from "react";
+import { useAppSelector } from "redux/utils";
 
-const FittingDiameter = ({ material }: { material: MaterialSerializer }) => {
-  const dispatch = useAppDispatch();
-  const diameters = useAppSelector((state) => state.shp.diameters);
-  const fittings = useAppSelector((state) => state.shp.fittings);
-  const fittingDiameters = useAppSelector(
-    (state) => state.shp.fittingDiameters
-  );
-
-  const [currentDiameters, setCurrentDiameters] = useState<
-    DiameterSerializer[]
-  >([]);
-  const [currentFittingdiameters, setCurrentFittingdiameters] =
-    useState<FittingDiameterResponseSerializer>(null);
-
-  useEffect(() => {
-    const current = fittingDiameters.find((el) => el.material === material.id);
-    if (current) {
-      setCurrentFittingdiameters({
-        ...current,
-        fitting_diameter_array: [
-          ...current.fitting_diameter_array.map((o) => {
-            return { ...o };
-          }),
-        ],
-      });
-    }
-  }, [fittingDiameters, material]);
-
-  useEffect(() => {
-    setCurrentDiameters(
-      diameters
-        .filter((d) => d.material === material.id)
-        .sort((a, b) => a.internal_diameter - b.internal_diameter)
-    );
-  }, [diameters, material]);
-
-  const onSubmit = () => {
-    dispatch(FittingDiameterCRUDAction.create(currentFittingdiameters));
-  };
-
-  const handleReset = () => {
-    const current = fittingDiameters.find((el) => el.material === material.id);
-    if (current) {
-      setCurrentFittingdiameters({
-        ...current,
-        fitting_diameter_array: [
-          ...current.fitting_diameter_array.map((o) => {
-            return { ...o };
-          }),
-        ],
-      });
-    }
-  };
-
+function EditToolbar({ material }: { material: MaterialSerializer }) {
   return (
-    <TableContainer
-      component={Paper}
-      variant="outlined"
-      sx={{ marginTop: 2 }}
-      key={material.id}
-    >
-      <Box>
-        <Table sx={{ minWidth: 650 }} size="small">
-          <caption>
-            <Stack
-              direction="row"
-              justifyContent="space-between"
-              alignItems="center"
-            >
-              <Grid
-                container
-                direction="row"
-                justifyContent="center"
-                alignItems="center"
-              >
-                <Grid item xs>
-                  <Typography>
-                    Tabela de perdas de cargas das conexões
-                  </Typography>
-                </Grid>
-                <Grid item xs={2}>
-                  <IconButton onClick={handleReset} color="warning">
-                    <SettingsBackupRestore />
-                  </IconButton>
-                </Grid>
-                <Grid item xs={2}>
-                  <Button onClick={onSubmit}>Salvar</Button>
-                </Grid>
-              </Grid>
-            </Stack>
-          </caption>
-          <TableHead>
-            <TableRow>
-              <TableCell width="30%" variant="head">
-                Conexão
-              </TableCell>
-              {currentDiameters.map((_diameter) => (
-                <TableCell
-                  key={_diameter.id}
-                  align="center"
-                  sx={{ width: `${70 / currentDiameters.length}%` }}
-                >
-                  <Button
-                    variant="text"
-                    onClick={() => {
-                      showDiameterDialog(_diameter);
-                    }}
-                    style={{ textTransform: "none" }}
-                  >
-                    {_diameter.name} ({_diameter.internal_diameter} mm)
-                  </Button>
-                </TableCell>
-              ))}
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {currentFittingdiameters &&
-              fittings &&
-              currentDiameters &&
-              fittings.map((_fitting) => (
-                <TableRow key={_fitting.id}>
-                  <TableCell component="th" scope="row">
-                    <Button
-                      variant="text"
-                      onClick={() => {
-                        showFittingDialog(_fitting);
-                      }}
-                      style={{ textTransform: "none" }}
-                    >
-                      {_fitting.name}
-                    </Button>
-                  </TableCell>
-                  {currentDiameters.map((_diameter) => (
-                    <TableCell key={_diameter.id} align="center">
-                      <TextField
-                        type="number"
-                        variant="standard"
-                        inputProps={{
-                          style: { textAlign: "center" },
-                          step: "0.01",
-                        }}
-                        value={
-                          currentFittingdiameters.fitting_diameter_array.find(
-                            (fd) =>
-                              fd.fitting === _fitting.id &&
-                              fd.diameter === _diameter.id
-                          )?.equivalent_length || ""
-                        }
-                        onChange={(event) => {
-                          let current =
-                            currentFittingdiameters.fitting_diameter_array.find(
-                              (fd) =>
-                                fd.fitting === _fitting.id &&
-                                fd.diameter === _diameter.id
-                            );
-                          const parserValue = event.target.value;
-                          if (current) {
-                            current.equivalent_length = parserValue;
-                            setCurrentFittingdiameters({
-                              ...currentFittingdiameters,
-                              fitting_diameter_array: [
-                                ...currentFittingdiameters.fitting_diameter_array.map(
-                                  (o) =>
-                                    o.fitting === current.fitting &&
-                                    o.diameter === current.diameter
-                                      ? { ...current }
-                                      : o
-                                ),
-                              ],
-                            });
-                          } else {
-                            setCurrentFittingdiameters({
-                              ...currentFittingdiameters,
-                              fitting_diameter_array: [
-                                ...currentFittingdiameters.fitting_diameter_array,
-                                {
-                                  id: 0,
-                                  equivalent_length: parserValue,
-                                  material: material.id,
-                                  fitting: _fitting.id,
-                                  diameter: _diameter.id,
-                                },
-                              ],
-                            });
-                          }
-                        }}
-                      />
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))}
-          </TableBody>
-        </Table>
-      </Box>
-    </TableContainer>
+    <GridToolbarContainer>
+      <Grid
+        container
+        direction="row"
+        justifyContent="center"
+        alignItems="center"
+      >
+        <Grid item xs={1} />
+        <Grid item xs>
+          <Typography variant="h6">Tabela de Reduções e Ampliações</Typography>
+        </Grid>
+        <Grid item xs={4}>
+          <Button
+            startIcon={<AddIcon />}
+            onClick={() => {
+              showReductionDialog({ material: material.id });
+            }}
+            sx={{ margin: 1 }}
+          >
+            Redução/Ampliação
+          </Button>
+        </Grid>
+      </Grid>
+    </GridToolbarContainer>
+  );
+}
+
+const CustomNoRowsOverlay = () => {
+  return (
+    <Stack height="100%" alignItems="center" justifyContent="center">
+      <Typography>Sem redução/ampliação cadastrado.</Typography>
+    </Stack>
   );
 };
 
-export default FittingDiameter;
+const Reduction = ({ material }: { material: MaterialSerializer }) => {
+  const diameters = useAppSelector((state) => state.shp.diameters);
+  const reductions = useAppSelector((state) =>
+    [...state.shp.reductions]
+      .filter((r) => r.material === material.id)
+      .sort((a, b) => a.name.localeCompare(b.name))
+  );
+
+  const handleEditClick = (id: GridRowId) => {
+    if (id) {
+      const reduction = reductions.find((row) => row.id === id);
+      showReductionDialog(reduction);
+    }
+  };
+
+  const handleDeleteClick = (id: GridRowId) => {
+    if (id) {
+      const reduction = reductions.find((row) => row.id === id);
+      destroyReduction(reduction);
+    }
+  };
+
+  const getDiameterName = (
+    params: GridValueGetterParams<number, ReductionSerializer>
+  ): string => {
+    const diameter = diameters.find((m) => m.id === params.value);
+    if (diameter) {
+      return `${diameter.name} (${diameter.internal_diameter} mm)`;
+    }
+    return params.value.toString();
+  };
+
+  const CommonFieldAttributes: GridColDef = {
+    field: "",
+    flex: 1,
+    editable: false,
+    sortable: false,
+    align: "center",
+    headerAlign: "center",
+  };
+
+  const columns: GridColumns = [
+    {
+      ...CommonFieldAttributes,
+      field: "name",
+      headerName: "Name",
+      align: "left",
+    },
+    {
+      ...CommonFieldAttributes,
+      field: "equivalent_length",
+      headerName: "Comprimento Equivalente (m)",
+    },
+    {
+      ...CommonFieldAttributes,
+      field: "inlet_diameter",
+      headerName: "Diâmetro de Entrada",
+      valueGetter: getDiameterName,
+    },
+    {
+      ...CommonFieldAttributes,
+      field: "outlet_diameter",
+      headerName: "Diâmetro de Saída",
+      valueGetter: getDiameterName,
+    },
+    {
+      field: "actions",
+      type: "actions",
+      headerName: "",
+      width: 100,
+      cellClassName: "actions",
+      getActions: ({ id }) => {
+        return [
+          <GridActionsCellItem
+            icon={<EditIcon />}
+            label="Edit"
+            className="textPrimary"
+            onClick={() => {
+              handleEditClick(id);
+            }}
+            color="warning"
+          />,
+          <GridActionsCellItem
+            icon={<DeleteIcon />}
+            label="Delete"
+            onClick={() => {
+              handleDeleteClick(id);
+            }}
+            color="error"
+          />,
+        ];
+      },
+    },
+  ];
+
+  return (
+    <Box width="100%">
+      <DataGrid
+        autoHeight
+        rows={reductions}
+        columns={columns}
+        components={{
+          Toolbar: EditToolbar,
+          NoRowsOverlay: CustomNoRowsOverlay,
+        }}
+        componentsProps={{
+          toolbar: { material: material },
+        }}
+        rowHeight={50}
+        hideFooter
+        disableColumnMenu
+        disableColumnFilter
+        disableColumnSelector
+      />
+    </Box>
+  );
+};
+export default Reduction;
