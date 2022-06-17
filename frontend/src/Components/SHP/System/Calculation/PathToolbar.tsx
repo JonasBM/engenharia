@@ -1,4 +1,4 @@
-import { AppBar, Button, MenuItem, Stack, Toolbar } from "@mui/material";
+import { AppBar, Box, Button, MenuItem, Stack, Toolbar } from "@mui/material";
 import {
   Controller,
   UseFieldArrayAppend,
@@ -12,6 +12,7 @@ import { useAppDispatch, useAppSelector } from "redux/utils";
 import { Add } from "@mui/icons-material";
 import { SHPCalcSerializer } from "api/types/shpTypes";
 import { StyledTextField } from ".";
+import { showSHPCalcDialog } from "Components/SHP/DialogForm/CalcDialogForm";
 
 const PathToolbar = ({
   append,
@@ -21,6 +22,7 @@ const PathToolbar = ({
   const dispatch = useAppDispatch();
   const { control, getValues, setValue } = useFormContext<SHPCalcSerializer>();
   const materials = useAppSelector((state) => state.shp.materials);
+  const config = useAppSelector((state) => state.shp.configs[0]);
   const diameters = useAppSelector((state) =>
     [...state.shp.diameters].sort(
       (a, b) => a.internal_diameter - b.internal_diameter
@@ -30,10 +32,14 @@ const PathToolbar = ({
   const diameter_id = useWatch({ control, name: "diameter_id" });
 
   useEffect(() => {
-    if (!material_id && materials.length > 0) {
-      setValue("material_id", materials[0].id);
+    if (!material_id && materials.length > 0 && config) {
+      if (config.material) {
+        setValue("material_id", config.material);
+      } else {
+        setValue("material_id", materials[0].id);
+      }
     }
-  }, [materials, material_id, setValue]);
+  }, [materials, material_id, setValue, config]);
 
   useEffect(() => {
     const _diameter = diameters.find((d) => d.id === diameter_id);
@@ -139,6 +145,15 @@ const PathToolbar = ({
             title={"Iniciar um cálculo limpo"}
           >
             Limpar
+          </Button>
+          <Box sx={{ flexGrow: 1 }} />
+          <Button
+            color="success"
+            onClick={() => {
+              showSHPCalcDialog();
+            }}
+          >
+            Criar novo cálculo
           </Button>
         </Stack>
       </Toolbar>

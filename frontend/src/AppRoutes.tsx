@@ -7,7 +7,7 @@ import Logout from "./Components/Accounts/Logout";
 import NotFound from "./Components/Common/NotFound";
 import PrivateRoute from "./Components/Common/PrivateRoute";
 import Profile from "Components/Accounts/Profile";
-import SHP from "./Components/SHP";
+import SHP from "./Components/SHP/System";
 import SPDA from "Components/SPDA";
 
 const AppRoutes = () => {

@@ -16,15 +16,16 @@ import {
 
 import Alerts from "./Components/Alerts/Alerts";
 import AppRoutes from "./AppRoutes";
+import CalcDialogForm from "Components/SHP/DialogForm/CalcDialogForm";
 import { Container } from "@mui/system";
-import DiameterDialogForm from "Components/DialogForm/DiameterDialogForm";
-import FittingDialogForm from "Components/DialogForm/FittingDialogForm";
-import FixtureDialogForm from "Components/DialogForm/FixtureDialogForm";
+import DiameterDialogForm from "Components/SHP/DialogForm/DiameterDialogForm";
+import FittingDialogForm from "Components/SHP/DialogForm/FittingDialogForm";
+import FixtureDialogForm from "Components/SHP/DialogForm/FixtureDialogForm";
 import Header from "./Components/Main/Header";
 import { LoadingIndicator } from "redux-simplified";
-import MaterialConnectionDialogForm from "Components/DialogForm/MaterialConnectionDialogForm";
-import MaterialDialogForm from "./Components/DialogForm/MaterialDialogForm";
-import ReductionDialogForm from "Components/DialogForm/ReductionDialogForm";
+import MaterialConnectionDialogForm from "Components/SHP/DialogForm/MaterialConnectionDialogForm";
+import MaterialDialogForm from "./Components/SHP/DialogForm/MaterialDialogForm";
+import ReductionDialogForm from "Components/SHP/DialogForm/ReductionDialogForm";
 import SnackbarCloseButton from "./Components/Alerts/SnackbarCloseButton";
 import { SnackbarProvider } from "notistack";
 import { documentTitles } from "myConstants";
@@ -93,6 +94,7 @@ function App() {
         <ReductionDialogForm />
         <MaterialConnectionDialogForm />
         <FixtureDialogForm />
+        <CalcDialogForm />
         <LoadingIndicator fetching={fetching} />
         <Container maxWidth={false} sx={{ marginTop: 3, marginBottom: 5 }}>
           <AppRoutes />

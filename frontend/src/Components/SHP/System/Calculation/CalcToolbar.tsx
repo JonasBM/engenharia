@@ -22,6 +22,7 @@ import { useAppSelector } from "redux/utils";
 
 const CalcToolbar = () => {
   const fixtures = useAppSelector((state) => state.shp.fixtures);
+  const config = useAppSelector((state) => state.shp.configs[0]);
 
   const {
     register,
@@ -31,9 +32,9 @@ const CalcToolbar = () => {
     formState: { isDirty },
   } = useFormContext<SHPCalcSerializer>();
 
-  const pressure_type = useWatch({
+  const calc_type = useWatch({
     control,
-    name: "pressure_type",
+    name: "calc_type",
   });
 
   const fixture_id = useWatch({
@@ -41,11 +42,40 @@ const CalcToolbar = () => {
     name: "fixture_id",
   });
 
+  const pressure_type = useWatch({
+    control,
+    name: "pressure_type",
+  });
+
   useEffect(() => {
-    if (!fixture_id && fixtures.length > 0) {
-      setValue("fixture_id", fixtures[0].id);
+    if (!calc_type && CalcTypes.length > 0 && config) {
+      if (config.calc_type) {
+        setValue("calc_type", config.calc_type);
+      } else {
+        setValue("calc_type", CalcTypes[0].value);
+      }
     }
-  }, [fixtures, fixture_id, setValue]);
+  }, [calc_type, setValue, config]);
+
+  useEffect(() => {
+    if (!fixture_id && fixtures.length > 0 && config) {
+      if (config.fixture) {
+        setValue("fixture_id", config.fixture);
+      } else {
+        setValue("fixture_id", fixtures[0].id);
+      }
+    }
+  }, [fixtures, fixture_id, setValue, config]);
+
+  useEffect(() => {
+    if (!pressure_type && PressureTypes.length > 0 && config) {
+      if (config.pressure_type) {
+        setValue("pressure_type", config.pressure_type);
+      } else {
+        setValue("pressure_type", PressureTypes[0].value);
+      }
+    }
+  }, [pressure_type, setValue, config]);
 
   return (
     <Toolbar sx={{ minWidth: 800 }}>

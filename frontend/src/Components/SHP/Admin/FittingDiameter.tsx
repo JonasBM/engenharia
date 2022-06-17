@@ -24,8 +24,8 @@ import { useAppDispatch, useAppSelector } from "redux/utils";
 
 import { FittingDiameterCRUDAction } from "api/shp";
 import { SettingsBackupRestore } from "@mui/icons-material";
-import { showDiameterDialog } from "Components/DialogForm/DiameterDialogForm";
-import { showFittingDialog } from "Components/DialogForm/FittingDialogForm";
+import { showDiameterDialog } from "Components/SHP/DialogForm/DiameterDialogForm";
+import { showFittingDialog } from "Components/SHP/DialogForm/FittingDialogForm";
 
 const FittingDiameter = ({ material }: { material: MaterialSerializer }) => {
   const dispatch = useAppDispatch();

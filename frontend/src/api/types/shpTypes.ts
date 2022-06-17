@@ -160,8 +160,8 @@ export interface SHPCalcPathSerializer {
 export interface SHPCalcSerializer {
   fileinfo: FileInfoSerializer;
   name: string;
-  calc_type: "VM" | "VR";
-  pressure_type: "GR" | "BO";
+  calc_type: string;
+  pressure_type: string;
   pump_node?: string;
   material_id: number;
   diameter_id: number;

@@ -109,8 +109,8 @@ export const getSHPCalc = () => {
 export const initialState = {
   fileinfo: getNewFileInfo(),
   name: "",
-  pressure_type: PressureType.GRAVITACIONAL.value,
-  calc_type: CalcType.VAZAO_MINIMA.value,
+  pressure_type: null,
+  calc_type: null,
   pump_node: "",
   material_id: null,
   diameter_id: null,

@@ -26,7 +26,7 @@ import React, { useState } from "react";
 import {
   destroyMaterial,
   showMaterialDialog,
-} from "Components/DialogForm/MaterialDialogForm";
+} from "Components/SHP/DialogForm/MaterialDialogForm";
 import { useAppDispatch, useAppSelector } from "redux/utils";
 
 import { Container } from "@mui/system";
@@ -34,8 +34,8 @@ import FittingDiameter from "./FittingDiameter";
 import { MaterialFileSerializer } from "api/types/shpTypes";
 import Reduction from "./Reduction";
 import { saveSHPMaterial } from "utils";
-import { showDiameterDialog } from "Components/DialogForm/DiameterDialogForm";
-import { showFittingDialog } from "Components/DialogForm/FittingDialogForm";
+import { showDiameterDialog } from "Components/SHP/DialogForm/DiameterDialogForm";
+import { showFittingDialog } from "Components/SHP/DialogForm/FittingDialogForm";
 
 const Material = () => {
   const dispatch = useAppDispatch();

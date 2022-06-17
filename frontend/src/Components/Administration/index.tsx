@@ -2,7 +2,7 @@ import { Box, Container, Tab, Tabs } from "@mui/material";
 import React, { useEffect } from "react";
 
 import IGC from "Components/IGC";
-import SHPAdmin from "./SHPAdmin";
+import SHPAdmin from "../SHP/Admin";
 import SPDA from "Components/SPDA";
 import { documentTitles } from "myConstants";
 

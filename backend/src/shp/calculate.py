@@ -1,113 +1,16 @@
 import logging
-import math
-from dataclasses import asdict, dataclass
-from typing import Union
+from dataclasses import asdict
 
-
+from .dataclasses import SHPCalc, SHPCalcPath
 from .exceptions import (MoreThenOneReservoir, NoActiveFixtureFound,
                          NoFixtureError, NoInitialDataError, NoReservoir,
-                         PathNotLeadingToReservoir, ReservoirTooLow)
-from .models import Config, Diameter, Fitting, FittingDiameter, Fixture, Material, MaterialConnection, Reduction
-from .serializers import FixtureSerializer, SHPCalcSerializer
+                         PathNotLeadingToReservoir)
+from .models import (Config, Diameter, Fitting, FittingDiameter, Fixture,
+                     Material, MaterialConnection, Reduction)
+from .serializers import SHPCalcSerializer
+from .utils import format_decimal, get_unit_pressure_drop, sortByEndPressure
 
 logger = logging.getLogger(__name__)
-
-
-@dataclass(kw_only=True)
-class SHPCalcFileInfo:
-    type: str
-    version: str
-    created: str
-    updated: str
-
-
-@dataclass(kw_only=True)
-class SHPCalcFixture:
-    active: bool = False
-    end: str
-    hose_length: float
-    level_difference: float = 0
-    flow: float = 0
-    total_length: float = 0
-    start_pressure: float = 0
-    middle_pressure: float = 0
-    end_pressure: float = 0
-    start_level: float = 0
-    end_level: float = 0
-    minimum_flow: float = 0
-    hose_pressure_drop: float = 0
-    unit_hose_pressure_drop: float = 0
-    pressure_drop: float = 0
-    nozzle_pressure_drop: float = 0
-    unit_pressure_drop: float = 0
-    inlet_material: Material = None
-    inlet_diameter: Diameter = None
-    connection_names: list[str] = None
-
-
-@dataclass(kw_only=True)
-class SHPCalcPath:
-    start: str
-    end: str = None
-    fixture: SHPCalcFixture = None
-    material_id: int
-    material: Material = None
-    diameter_id: int
-    diameter: Diameter = None
-    length: float = 0
-    level_difference: float = 0
-    fittings_ids: list[int] = None
-    fittings: list[Fitting] = None
-    connection_names: list[str] = None
-    extra_equivalent_length: float = 0
-    equivalent_length: float = 0
-    has_fixture: bool = False
-    has_active_fixture: bool = False
-    flow: float = 0
-    speed: float = 0
-    total_length: float = 0
-    start_pressure: float = 0
-    end_pressure: float = 0
-    pressure_drop: float = 0
-    unit_pressure_drop: float = 0
-
-    def __post_init__(self):
-        if self.has_fixture and self.fixture and self.fixture['active']:
-            self.has_active_fixture = True
-            self.fixture = SHPCalcFixture(**self.fixture)
-        else:
-            self.has_active_fixture = False
-
-    def get_speed(self) -> float:
-        if self.flow and self.diameter and self.diameter.internal_diameter:
-            area = (math.pi * math.pow(float(self.diameter.internal_diameter)/float(1000), 2)) / float(4)
-            speed = self.flow/area
-            return speed
-        return 0
-
-
-@dataclass(kw_only=True)
-class SHPCalc:
-    fileinfo: SHPCalcFileInfo
-    name: str
-    pressure_type: str  # PRESSURE_TYPES
-    calc_type: str  # CALC_TYPES
-    pump_node: str
-    material_id: int
-    diameter_id: int
-    fixture_id: int
-    paths: list[SHPCalcPath]
-    paths_with_fixture: list[SHPCalcPath] = None
-    less_favorable_path_fixture_index: int = None
-    reservoir_path: SHPCalcPath = None
-    error: str = None
-
-    def __post_init__(self):
-        self.fileinfo = SHPCalcFileInfo(**self.fileinfo)
-        newPaths = []
-        for path in self.paths:
-            newPaths.append(SHPCalcPath(**path))
-        self.paths = newPaths
 
 
 class SHP():
@@ -166,10 +69,14 @@ class SHP():
         for next_path in paths_after:
             self.print_paths(next_path)
 
-    # self.print_paths(self.shpCalc.reservoir_path)
-
     def __calculate_minimum_height(self) -> SHPCalcSerializer:
         print('START: __calculate_minimum_height')
+        self.shpCalc.reservoir_path.level_difference = 0
+        self.shpCalc.reservoir_path.total_length = (
+            self.shpCalc.reservoir_path.length +
+            self.shpCalc.reservoir_path.equivalent_length -
+            self.shpCalc.reservoir_path.level_difference
+        )
         self.__calculate_fixtures_flow(minimum=True)
         for i in range(100):
             self.shpCalc.reservoir_path.start_pressure = 0
@@ -181,44 +88,41 @@ class SHP():
             self.shpCalc.reservoir_path.level_difference -= (
                 missing_height / (1 - self.shpCalc.reservoir_path.unit_pressure_drop)
             )
-            self.shpCalc.reservoir_path.total_length = (
-                self.shpCalc.reservoir_path.length + self.shpCalc.reservoir_path.equivalent_length - self.shpCalc.reservoir_path.level_difference
-            )
+            if self.shpCalc.calc_type == Config.CalcType.VAZAO_MINIMA:
+                self.shpCalc.reservoir_path.total_length = (
+                    self.shpCalc.reservoir_path.length +
+                    self.shpCalc.reservoir_path.equivalent_length -
+                    self.shpCalc.reservoir_path.level_difference
+                )
+        print('FIM: ', i+1)
+
+    def __calculate_residual_flow(self) -> SHPCalcSerializer:
+        print('START: __calculate_residual_flow')
+        reservoir_level_difference = self.shpCalc.reservoir_path.level_difference
+        self.minimum_flow = self.fixture.minimum_flow_rate_in_m3_p_s
+        for i in range(50):
+            self.__calculate_minimum_height()
+            missing_height = reservoir_level_difference - self.shpCalc.reservoir_path.level_difference
+            if (abs(missing_height) < 0.001):
+                break
+            current_pressure = self.fixture.flow_to_pressure(self.minimum_flow)
+            current_pressure -= missing_height
+            self.minimum_flow = self.fixture.pressure_to_flow(current_pressure)
+        self.shpCalc.reservoir_path.level_difference = reservoir_level_difference
+        print('FIM: ', i + 1)
+
+    def calculate(self) -> SHPCalcSerializer:
+        self.__prepare_calc()
+        if self.shpCalc.calc_type == Config.CalcType.VAZAO_MINIMA:
+            self.minimum_flow = self.fixture.minimum_flow_rate_in_m3_p_s
+            self.__calculate_minimum_height()
+        else:
+            self.__calculate_residual_flow()
         self.__calculate_paths_speed()
         self.shpCalc.reservoir_path.level_difference = '{:.2f}'.format(self.shpCalc.reservoir_path.level_difference)
         self.shpCalc.less_favorable_path_fixture_index = self.shpCalc.paths.index(
             self.shpCalc.paths_with_fixture[0]
         )
-        print('FIM: ', i+1)
-
-    def __calculate_residual_flow(self) -> SHPCalcSerializer:
-        print('START: __calculate_residual_flow')
-        self.shpCalc.reservoir_path.start_pressure = 0
-        self.__calculate_paths_pressure(self.shpCalc.reservoir_path)
-        self.shpCalc.paths_with_fixture.sort(key=sortByEndPressure)
-        self.minimum_flow = self.fixture.pressure_to_flow(self.shpCalc.paths_with_fixture[0].fixture.end_pressure)
-        for i in range(50):
-            self.__calculate_paths_pressure(self.shpCalc.reservoir_path)
-            self.__calculate_reservoir_pressure()
-            missing_height = self.shpCalc.reservoir_path.start_pressure
-            if (abs(missing_height) < 0.001):
-                break
-            self.minimum_flow = self.fixture.pressure_to_flow(
-                self.shpCalc.paths_with_fixture[0].fixture.end_pressure - missing_height
-            )
-            self.__calculate_fixtures_flow()
-        self.__calculate_paths_speed()
-        self.shpCalc.less_favorable_path_fixture_index = self.shpCalc.paths.index(
-            self.shpCalc.paths_with_fixture[0]
-        )
-        print('FIM: ', i + 1)
-
-    def calculate(self) -> SHPCalcSerializer:
-        self.__prepare_calc()
-        if self.shpCalc.calc_type == Config.CalcType.VAZAO_RESIDUAL:
-            self.__calculate_residual_flow()
-        else:
-            self.__calculate_minimum_height()
         return self.serializer_class(data=asdict(self.shpCalc))
 
     def __prepare_calc(self):
@@ -228,22 +132,14 @@ class SHP():
         self.shpCalc.paths_with_fixture = []
         self.shpCalc.reservoir_path = None
 
-        if self.shpCalc.calc_type == Config.CalcType.VAZAO_MINIMA:
-            self.minimum_flow = self.fixture.minimum_flow_rate_in_m3_p_s
-        else:
-            self.minimum_flow = 0
-
         for path in self.shpCalc.paths:
             path.material = Material.objects.get(id=path.material_id)
             path.diameter = Diameter.objects.get(id=path.diameter_id)
 
-            # FIXME: this just works for calc of minimum flow, with gravitational pressure
             if path.start == 'RES':
                 if self.shpCalc.reservoir_path:
                     raise MoreThenOneReservoir()
                 self.shpCalc.reservoir_path = path
-                if self.shpCalc.calc_type == Config.CalcType.VAZAO_MINIMA:
-                    path.level_difference = 0
 
             path.flow = 0
             path.total_length = 0
@@ -283,7 +179,8 @@ class SHP():
                 if (current_material_connection and current_material_connection.equivalent_length):
                     path.equivalent_length += float(current_material_connection.equivalent_length)
                     path.connection_names.append(
-                        f'{current_material_connection.name}: {format_decimal(current_material_connection.equivalent_length)} m'
+                        f'{current_material_connection.name}: '
+                        f'{format_decimal(current_material_connection.equivalent_length)} m'
                     )
                     if current_material_connection.inlet_diameter_id != previous_path.diameter_id:
                         inlet_reduction: Reduction = (
@@ -396,7 +293,8 @@ class SHP():
                         if (fitting_diameter and fitting_diameter.equivalent_length):
                             path.fixture.total_length += float(fitting_diameter.equivalent_length)
                             path.fixture.connection_names.append(
-                                f'{fitting_diameter.fitting.name}: {format_decimal(fitting_diameter.equivalent_length)} m'
+                                f'{fitting_diameter.fitting.name}: '
+                                f'{format_decimal(fitting_diameter.equivalent_length)} m'
                             )
                 # for reduction in self.fixture.reductions.all():
                 #     if (reduction.equivalent_length):
@@ -474,7 +372,10 @@ class SHP():
             path.fixture.start_pressure = path.end_pressure
             path.fixture.middle_pressure = path.fixture.start_pressure - path.fixture.pressure_drop
             path.fixture.end_pressure = (
-                path.fixture.middle_pressure - path.fixture.hose_pressure_drop - path.fixture.nozzle_pressure_drop - path.fixture.level_difference
+                path.fixture.middle_pressure -
+                path.fixture.hose_pressure_drop -
+                path.fixture.nozzle_pressure_drop -
+                path.fixture.level_difference
             )
         paths_after: list[SHPCalcPath] = self.get_paths_after(path)
         for next_path in paths_after:
@@ -495,7 +396,10 @@ class SHP():
         self.__calculate_paths_pressure_drop()
 
         path.fixture.middle_pressure = (
-            path.fixture.end_pressure + path.fixture.nozzle_pressure_drop + path.fixture.hose_pressure_drop + path.fixture.level_difference
+            path.fixture.end_pressure +
+            path.fixture.nozzle_pressure_drop +
+            path.fixture.hose_pressure_drop +
+            path.fixture.level_difference
         )
         path.fixture.start_pressure = path.fixture.middle_pressure + path.fixture.pressure_drop
         path.end_pressure = path.fixture.start_pressure
@@ -523,30 +427,3 @@ class SHP():
                 if path.start == actual_path.end:
                     paths.append(path)
         return paths
-
-
-def sortByEndPressure(path_with_fixture: SHPCalcPath):
-    return path_with_fixture.fixture.end_pressure
-
-
-def get_unit_pressure_drop(flow: float, coefficient: int, diameter: float) -> float:
-    '''
-    returns unit pressure drop in m/m
-    args={
-        flow: flow in m³/s
-        coefficient: Hazen-Williams coefficient
-        diameter: internal diameter in mm
-    }
-    '''
-    if (flow and coefficient and diameter):
-        numerator = 10.641*math.pow(float(flow), 1.85)
-        denominator = math.pow(float(coefficient), 1.85)*math.pow(float(diameter)/float(1000), 4.87)
-        return numerator/denominator
-    print(flow, coefficient, diameter)
-    return 0
-
-
-def format_decimal(number: Union[int, float], decimals=2):
-    if number:
-        return "{:.2f}".format(number).replace('.', ',')
-    return '0,00'

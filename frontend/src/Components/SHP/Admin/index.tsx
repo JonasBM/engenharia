@@ -10,19 +10,15 @@ import {
 } from "api/shp";
 import React, { useEffect } from "react";
 
-import System from "./System";
-import { documentTitles } from "myConstants";
+import Config from "./Config";
+import Fixture from "./Fixture";
+import Material from "./Material";
+import MaterialConnection from "./MaterialConnection";
+import { Stack } from "@mui/material";
 import { useAppDispatch } from "redux/utils";
 
-const SHP = () => {
+const SHPAdmin = () => {
   const dispatch = useAppDispatch();
-
-  useEffect(() => {
-    document.title = "Cálculo de SHP";
-    return () => {
-      document.title = documentTitles.PORTAL;
-    };
-  }, []);
 
   useEffect(() => {
     dispatch(ConfigCRUDAction.list());
@@ -35,7 +31,14 @@ const SHP = () => {
     dispatch(FixtureCRUDAction.list());
   }, [dispatch]);
 
-  return <System />;
+  return (
+    <Stack spacing={2}>
+      <Config />
+      <Material />
+      <MaterialConnection />
+      <Fixture />
+    </Stack>
+  );
 };
 
-export default SHP;
+export default SHPAdmin;

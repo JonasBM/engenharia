@@ -11,7 +11,7 @@ import { Grid, Stack, Typography } from "@mui/material";
 import {
   destroyMaterialConnection,
   showMaterialConnectionDialog,
-} from "Components/DialogForm/MaterialConnectionDialogForm";
+} from "Components/SHP/DialogForm/MaterialConnectionDialogForm";
 
 import AddIcon from "@mui/icons-material/Add";
 import Box from "@mui/material/Box";

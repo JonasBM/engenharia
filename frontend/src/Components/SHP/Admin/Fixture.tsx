@@ -2,17 +2,18 @@ import {
   DataGrid,
   GridActionsCellItem,
   GridColDef,
+  GridColumnHeaderParams,
   GridColumns,
   GridRowId,
   GridToolbarContainer,
   GridValueGetterParams,
 } from "@mui/x-data-grid";
+import { FixtureSerializer, fixtureTypes } from "api/types/shpTypes";
 import { Grid, Stack, Typography } from "@mui/material";
-import { MaterialSerializer, ReductionSerializer } from "api/types/shpTypes";
 import {
-  destroyReduction,
-  showReductionDialog,
-} from "Components/DialogForm/ReductionDialogForm";
+  destroyFixture,
+  showFixtureDialog,
+} from "Components/SHP/DialogForm/FixtureDialogForm";
 
 import AddIcon from "@mui/icons-material/Add";
 import Box from "@mui/material/Box";
@@ -22,7 +23,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import React from "react";
 import { useAppSelector } from "redux/utils";
 
-function EditToolbar({ material }: { material: MaterialSerializer }) {
+function EditToolbar() {
   return (
     <GridToolbarContainer>
       <Grid
@@ -33,17 +34,18 @@ function EditToolbar({ material }: { material: MaterialSerializer }) {
       >
         <Grid item xs={1} />
         <Grid item xs>
-          <Typography variant="h6">Tabela de Reduções e Ampliações</Typography>
+          <Typography variant="h6">Tabela de Hidrantes</Typography>
         </Grid>
         <Grid item xs={4}>
           <Button
             startIcon={<AddIcon />}
             onClick={() => {
-              showReductionDialog({ material: material.id });
+              showFixtureDialog();
             }}
             sx={{ margin: 1 }}
+            title="Adicionar hidrante"
           >
-            Redução/Ampliação
+            Hidrante
           </Button>
         </Grid>
       </Grid>
@@ -54,41 +56,32 @@ function EditToolbar({ material }: { material: MaterialSerializer }) {
 const CustomNoRowsOverlay = () => {
   return (
     <Stack height="100%" alignItems="center" justifyContent="center">
-      <Typography>Sem redução/ampliação cadastrado.</Typography>
+      <Typography>Sem hidrante cadastrado.</Typography>
     </Stack>
   );
 };
 
-const Reduction = ({ material }: { material: MaterialSerializer }) => {
-  const diameters = useAppSelector((state) => state.shp.diameters);
-  const reductions = useAppSelector((state) =>
-    [...state.shp.reductions]
-      .filter((r) => r.material === material.id)
-      .sort((a, b) => a.name.localeCompare(b.name))
-  );
+const Fixture = () => {
+  const fixtures = useAppSelector((state) => state.shp.fixtures);
 
   const handleEditClick = (id: GridRowId) => {
     if (id) {
-      const reduction = reductions.find((row) => row.id === id);
-      showReductionDialog(reduction);
+      const fixture = fixtures.find((row) => row.id === id);
+      showFixtureDialog(fixture);
     }
   };
 
   const handleDeleteClick = (id: GridRowId) => {
     if (id) {
-      const reduction = reductions.find((row) => row.id === id);
-      destroyReduction(reduction);
+      const fixture = fixtures.find((row) => row.id === id);
+      destroyFixture(fixture);
     }
   };
 
-  const getDiameterName = (
-    params: GridValueGetterParams<number, ReductionSerializer>
+  const getFixtureType = (
+    params: GridValueGetterParams<string, FixtureSerializer>
   ): string => {
-    const diameter = diameters.find((m) => m.id === params.value);
-    if (diameter) {
-      return `${diameter.name} (${diameter.internal_diameter} mm)`;
-    }
-    return params.value.toString();
+    return fixtureTypes.find((ft) => ft.value === params.value)?.name;
   };
 
   const CommonFieldAttributes: GridColDef = {
@@ -96,8 +89,8 @@ const Reduction = ({ material }: { material: MaterialSerializer }) => {
     flex: 1,
     editable: false,
     sortable: false,
-    align: "center",
     headerAlign: "center",
+    align: "center",
   };
 
   const columns: GridColumns = [
@@ -109,20 +102,29 @@ const Reduction = ({ material }: { material: MaterialSerializer }) => {
     },
     {
       ...CommonFieldAttributes,
-      field: "equivalent_length",
-      headerName: "Comprimento Equivalente (m)",
+      field: "nozzle_type",
+      headerName: "Tipo de hidrante",
+      valueGetter: getFixtureType,
     },
+    // {
+    //   ...CommonFieldAttributes,
+    //   field: "k_factor",
+    //   headerName: "Fator de Vazão",
+    // },
+    // {
+    //   ...CommonFieldAttributes,
+    //   field: "k_nozzle",
+    //   headerName: "Coeficiente tipico do esguicho",
+    // },
+    // {
+    //   ...CommonFieldAttributes,
+    //   field: "outlet_diameter",
+    //   headerName: "Diâmetro de saída do esguicho (mm)",
+    // },
     {
       ...CommonFieldAttributes,
-      field: "inlet_diameter",
-      headerName: "Diâmetro de Entrada",
-      valueGetter: getDiameterName,
-    },
-    {
-      ...CommonFieldAttributes,
-      field: "outlet_diameter",
-      headerName: "Diâmetro de Saída",
-      valueGetter: getDiameterName,
+      field: "minimum_flow_rate",
+      headerName: "Vazão mínima (l/min)",
     },
     {
       field: "actions",
@@ -140,6 +142,7 @@ const Reduction = ({ material }: { material: MaterialSerializer }) => {
               handleEditClick(id);
             }}
             color="warning"
+            title="Editar hidrante"
           />,
           <GridActionsCellItem
             icon={<DeleteIcon />}
@@ -148,6 +151,7 @@ const Reduction = ({ material }: { material: MaterialSerializer }) => {
               handleDeleteClick(id);
             }}
             color="error"
+            title="Remover hidrante"
           />,
         ];
       },
@@ -158,14 +162,11 @@ const Reduction = ({ material }: { material: MaterialSerializer }) => {
     <Box width="100%">
       <DataGrid
         autoHeight
-        rows={reductions}
+        rows={fixtures}
         columns={columns}
         components={{
           Toolbar: EditToolbar,
           NoRowsOverlay: CustomNoRowsOverlay,
-        }}
-        componentsProps={{
-          toolbar: { material: material },
         }}
         rowHeight={50}
         hideFooter
@@ -176,4 +177,4 @@ const Reduction = ({ material }: { material: MaterialSerializer }) => {
     </Box>
   );
 };
-export default Reduction;
+export default Fixture;
