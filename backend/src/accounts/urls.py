@@ -17,3 +17,5 @@ urlpatterns = [
 
 
 urlpatterns += router.urls
+
+print("URLLLLLLLLLLLLLLL")

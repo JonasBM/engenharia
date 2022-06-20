@@ -101,6 +101,7 @@ class SHP():
                 )
         self.__calculate_paths_pressure(self.shpCalc.reservoir_path)
         print('FIM: ', i+1)
+        return i+1
 
     def __calculate_residual_flow(self) -> SHPCalcSerializer:
         print('START: __calculate_residual_flow')
@@ -119,30 +120,33 @@ class SHP():
                 self.minimum_flow = self.fixture.pressure_to_flow(current_pressure)
         self.shpCalc.reservoir_path.level_difference = reservoir_level_difference
         print('FIM: ', i + 1)
+        return i+1
 
     def __calculate_pump(self) -> SHPCalcSerializer:
         print('START: __calculate_pump')
         self.minimum_flow = self.fixture.minimum_flow_rate_in_m3_p_s
         reservoir_level_difference = self.shpCalc.reservoir_path.level_difference
-        self.__calculate_minimum_height()
+        counter = self.__calculate_minimum_height()
         self.shpCalc.pump.head_height = reservoir_level_difference - self.shpCalc.reservoir_path.level_difference
         self.shpCalc.pump.flow = self.shpCalc.reservoir_path.flow
         RES_BOM_pressure_drop = self.shpCalc.pump.head_height - self.shpCalc.pump_path.end_pressure
         self.shpCalc.pump.NPSHd = 10.33 - 0.238 - RES_BOM_pressure_drop
         self.shpCalc.reservoir_path.level_difference = reservoir_level_difference
         print('FIM: ')
+        return counter
 
     def __calculate_pump_residual_flow(self) -> SHPCalcSerializer:
         print('START: __calculate_pump')
         self.minimum_flow = self.fixture.minimum_flow_rate_in_m3_p_s
         reservoir_level_difference = self.shpCalc.reservoir_path.level_difference
         self.shpCalc.reservoir_path.level_difference = -reservoir_level_difference - self.shpCalc.pump.head_height
-        self.__calculate_residual_flow()
+        counter = self.__calculate_residual_flow()
         self.shpCalc.pump.flow = self.shpCalc.reservoir_path.flow
         RES_BOM_pressure_drop = self.shpCalc.pump.head_height - self.shpCalc.pump_path.end_pressure
         self.shpCalc.pump.NPSHd = 10.33 - 0.238 - RES_BOM_pressure_drop
         self.shpCalc.reservoir_path.level_difference = reservoir_level_difference
         print('FIM: ')
+        return counter
 
     def calculate(self) -> SHPCalcSerializer:
         self.__prepare_calc()

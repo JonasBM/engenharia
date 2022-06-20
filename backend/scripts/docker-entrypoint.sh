@@ -21,6 +21,9 @@ fi
 echo "Starting collectstatic"
 python manage.py collectstatic --noinput
 
+echo "Checking Accounts"
+python manage.py checkaccounts
+
 echo "Starting uwsgi"
 uwsgi --socket :8000 --master --enable-threads --processes 5 --module core.wsgi
 
