@@ -1,7 +1,7 @@
 
-from drf_yasg import openapi
-from drf_yasg.utils import swagger_auto_schema
-from knox.auth import TokenAuthentication
+# from drf_yasg import openapi
+# from drf_yasg.utils import swagger_auto_schema
+# from knox.auth import TokenAuthentication
 from knox.views import LoginView as KnoxLoginView
 from knox.views import LogoutAllView, LogoutView
 from rest_framework import permissions, status, viewsets
@@ -31,28 +31,28 @@ class LoginView(KnoxLoginView):
     '''
     authentication_classes = [BasicAuthenticationNoHeader]
 
-    @swagger_auto_schema(
-        responses={200: LoginResponseSerializer()},
-    )
+    # @swagger_auto_schema(
+    #     responses={200: LoginResponseSerializer()},
+    # )
     def post(self, request, format=None):
         return super().post(request, format)
 
 
 class LogoutView(LogoutView):
 
-    @swagger_auto_schema(
-        responses={204: openapi.Response('')},
-        authentication_classes=[TokenAuthentication]
-    )
+    # @swagger_auto_schema(
+    #     responses={204: openapi.Response('')},
+    #     authentication_classes=[TokenAuthentication]
+    # )
     def post(self, request, format=None):
         return super().post(request, format)
 
 
 class LogoutAllView(LogoutAllView):
 
-    @swagger_auto_schema(
-        responses={204: openapi.Response('')},
-    )
+    # @swagger_auto_schema(
+    #     responses={204: openapi.Response('')},
+    # )
     def post(self, request, format=None):
         return super().post(request, format)
 
@@ -73,10 +73,10 @@ class UserProfileViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(request.user)
         return Response(serializer.data)
 
-    @swagger_auto_schema(
-        request_body=PasswordSerializer,
-        responses={204: openapi.Response('')},
-    )
+    # @swagger_auto_schema(
+    #     request_body=PasswordSerializer,
+    #     responses={204: openapi.Response('')},
+    # )
     @action(detail=False, methods=['post'], url_path="set-password")
     def set_password(self, request, pk=None):
         serializer = PasswordSerializer(data=request.data)
