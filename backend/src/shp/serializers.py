@@ -206,4 +206,4 @@ class SHPCalcSerializer(serializers.Serializer):
         return super().validate(data)
 
 
-generate_ts('./shpTypes.ts', 'shp')
+# generate_ts('./shpTypes.ts', 'shp')

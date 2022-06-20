@@ -70,4 +70,4 @@ class LoginResponseSerializer(serializers.Serializer):
     user = UserProfileSerializer()
 
 
-generate_ts('./accountsTypes.ts', 'accounts')
+# generate_ts('./accountsTypes.ts', 'accounts')
