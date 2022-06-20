@@ -25,6 +25,6 @@ echo "Checking Accounts"
 python manage.py checkaccounts
 
 echo "Starting uwsgi"
-uwsgi --socket :8000 --protocol=http --master --enable-threads --processes 5 --module core.wsgi
+uwsgi --socket :8000 --master --enable-threads --processes 5 --module core.wsgi
 
 exec "$@"
