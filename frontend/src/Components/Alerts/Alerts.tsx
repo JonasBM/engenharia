@@ -11,11 +11,31 @@ const Alerts = () => {
   const { enqueueSnackbar } = useSnackbar();
 
   const cutEnqueueSnackbar = useCallback(
-    (message: SnackbarMessage, options: OptionsObject) => {
+    (
+      message: SnackbarMessage,
+      options: OptionsObject,
+      key: string = undefined
+    ) => {
       if (typeof message === "string") {
-        enqueueSnackbar(message.substring(0, 200), options);
+        if (key) {
+          enqueueSnackbar(`${key}: ${message.substring(0, 200)}`, options);
+        } else {
+          enqueueSnackbar(message.substring(0, 200), options);
+        }
+      } else if (typeof message === "object") {
+        if (Array.isArray(message) && message.length === 1) {
+          enqueueSnackbar(`${key}: ${message[0].substring(0, 200)}`, options);
+        } else {
+          for (const _key in message) {
+            cutEnqueueSnackbar(
+              (message as any)[_key],
+              { variant: "error" },
+              `${key}.${_key}`
+            );
+          }
+        }
       } else {
-        enqueueSnackbar(message, options);
+        console.log("sssss: ", message, key);
       }
     },
     [enqueueSnackbar]
@@ -42,9 +62,11 @@ const Alerts = () => {
                     variant: "error",
                   });
                 } else {
-                  cutEnqueueSnackbar(key + ": " + (errors.detail as any)[key], {
-                    variant: "error",
-                  });
+                  cutEnqueueSnackbar(
+                    errors.detail[key],
+                    { variant: "error" },
+                    key
+                  );
                 }
               }
             }

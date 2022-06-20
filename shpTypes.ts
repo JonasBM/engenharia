@@ -95,42 +95,49 @@ export interface MaterialFileSerializer {
 }
 
 export interface SHPCalcFixtureSerializer {
-    active?: boolean;
+    active?: boolean | null;
     end: string;
-    hose_length?: number;
-    level_difference?: number;
-    flow?: number;
-    total_length?: number;
-    start_pressure?: number;
-    middle_pressure?: number;
-    end_pressure?: number;
-    hose_pressure_drop?: number;
-    unit_hose_pressure_drop?: number;
-    pressure_drop?: number;
-    unit_pressure_drop?: number;
-    connection_names?: string[];
+    hose_length?: number | null;
+    level_difference?: number | null;
+    flow?: number | null;
+    total_length?: number | null;
+    start_pressure?: number | null;
+    middle_pressure?: number | null;
+    end_pressure?: number | null;
+    hose_pressure_drop?: number | null;
+    unit_hose_pressure_drop?: number | null;
+    pressure_drop?: number | null;
+    unit_pressure_drop?: number | null;
+    connection_names?: string[] | null;
 }
 
 export interface SHPCalcPathSerializer {
     start: string;
     end: string | null;
-    fixture?: SHPCalcFixtureSerializer;
+    fixture?: SHPCalcFixtureSerializer | null;
     material_id: number;
     diameter_id: number;
-    length?: number;
-    level_difference?: number;
-    fittings_ids?: number[];
-    extra_equivalent_length?: number;
-    equivalent_length?: number;
-    total_length?: number;
-    has_fixture?: boolean;
-    connection_names?: string[];
-    flow?: number;
-    speed?: number;
-    start_pressure?: number;
-    end_pressure?: number;
-    pressure_drop?: number;
-    unit_pressure_drop?: number;
+    length?: number | null;
+    level_difference?: number | null;
+    fittings_ids?: number[] | null;
+    has_fixture?: boolean | null;
+    extra_equivalent_length?: number | null;
+    equivalent_length?: number | null;
+    total_length?: number | null;
+    connection_names?: string[] | null;
+    flow?: number | null;
+    speed?: number | null;
+    start_pressure?: number | null;
+    end_pressure?: number | null;
+    pressure_drop?: number | null;
+    unit_pressure_drop?: number | null;
+}
+
+export interface SHPCalcPumpSerializer {
+    node?: string | null;
+    head_height?: number | null;
+    flow?: number | null;
+    NPSHd?: number | null;
 }
 
 export interface SHPCalcSerializer {
@@ -138,12 +145,13 @@ export interface SHPCalcSerializer {
     name?: string | null;
     pressure_type: GR | BO;
     calc_type: VM | VR;
-    pump_node?: string;
+    pump: SHPCalcPumpSerializer;
     material_id: number;
     diameter_id: number;
     fixture_id: number;
     paths: SHPCalcPathSerializer[];
     error?: string | null;
     less_favorable_path_fixture_index?: number | null;
+    calculated_at?: string | null;
 }
 

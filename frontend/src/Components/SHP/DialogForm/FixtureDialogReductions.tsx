@@ -28,8 +28,8 @@ import {
 } from "@mui/material";
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 import {
-  FittingDiameterSerializer,
   FixtureSerializer,
+  ReductionSerializer,
   SHPCalcSerializer,
 } from "api/types/shpTypes";
 import React, { useEffect, useState } from "react";
@@ -40,9 +40,9 @@ import store from "redux/store";
 import { useAppSelector } from "redux/utils";
 import { useFormContext } from "react-hook-form";
 
-const _dialogName = "DIALOG_FITTINGSFIXTURE";
+const _dialogName = "DIALOG_REDUCTIONSFIXTURE";
 
-export const showDialogFixtureFittings = () => {
+export const showDialogFixtureReductions = () => {
   store.dispatch(
     openDialog({
       dialogName: _dialogName,
@@ -51,17 +51,14 @@ export const showDialogFixtureFittings = () => {
   );
 };
 
-export const closeDialogFixtureFittings = () => {
+export const closeDialogFixtureReductions = () => {
   store.dispatch(closeDialog(_dialogName));
 };
 
-const FixtureDialogFittings = () => {
+const FixtureDialogReductions = () => {
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down("md"));
-  const fittings = useAppSelector((state) => state.shp.fittings);
-  const fittingDiameters = useAppSelector(
-    (state) => state.shp.fittingDiameters
-  );
+  const reductions = useAppSelector((state) => state.shp.reductions);
 
   const openModals = useAppSelector((state) => state.modal.openModals);
 
@@ -69,59 +66,54 @@ const FixtureDialogFittings = () => {
 
   const material_id = watch("material");
   const diameter_id = watch("inlet_diameter");
-  const fittings_ids = watch("fittings_ids");
-  const fittings_equivalent_length = watch("fittings_equivalent_length");
+  const reductions_ids = watch("reductions_ids");
+  const reductions_equivalent_length = watch("reductions_equivalent_length");
 
-  const [currentFittingDiameters, setCurrentFittingDiameters] = useState<
-    FittingDiameterSerializer[]
+  const [currentReductions, setCurrentReductions] = useState<
+    ReductionSerializer[]
   >([]);
 
   useEffect(() => {
-    setCurrentFittingDiameters(
-      fittingDiameters.find((d) => d.material === material_id)
-        ?.fitting_diameter_array
-    );
-  }, [fittingDiameters, material_id]);
+    setCurrentReductions(reductions.filter((r) => r.material === material_id));
+  }, [reductions, material_id]);
 
-  const getEquivalentLengthString = (_fitting_id: number): string => {
-    const fittingDiameter = currentFittingDiameters?.find(
-      (fd) => fd.diameter === diameter_id && fd.fitting === _fitting_id
-    );
-    if (fittingDiameter?.equivalent_length) {
-      return ` (${fittingDiameter?.equivalent_length} m)`;
+  const getEquivalentLengthString = (_reduction_id: number): string => {
+    const reduction = currentReductions?.find((r) => r.id === _reduction_id);
+    if (reduction?.equivalent_length) {
+      return ` (${reduction?.equivalent_length} m)`;
     }
     return "";
   };
 
   useEffect(() => {
     let newEquivalentLength = 0;
-    if (fittings_ids?.length > 0) {
-      for (const _fitting_id of fittings_ids) {
-        const _fitting = currentFittingDiameters?.find(
-          (fd) => fd.diameter === diameter_id && fd.fitting === _fitting_id
+    if (reductions_ids?.length > 0) {
+      for (const _reduction_id of reductions_ids) {
+        const _reduction = currentReductions?.find(
+          (r) => r.id === _reduction_id
         );
-        if (_fitting && _fitting.equivalent_length) {
+        if (_reduction && _reduction.equivalent_length) {
           newEquivalentLength += parseFloat(
-            _fitting.equivalent_length.toString()
+            _reduction.equivalent_length.toString()
           );
         }
       }
     }
-    setValue("fittings_equivalent_length", newEquivalentLength);
-  }, [currentFittingDiameters, diameter_id, fittings_ids, setValue]);
+    setValue("reductions_equivalent_length", newEquivalentLength);
+  }, [currentReductions, reductions_ids, setValue]);
 
   const handleOnDragEnd = (result: any) => {
     if (!result.destination) return;
     if (result.source.index !== result.destination.index) {
-      const newArray = [...fittings_ids];
+      const newArray = [...reductions_ids];
       const element = newArray.splice(result.source.index, 1)[0];
       newArray.splice(result.destination.index, 0, element);
-      setValue("fittings_ids", newArray);
+      setValue("reductions_ids", newArray);
     }
   };
 
   const handleClose = () => {
-    closeDialogFixtureFittings();
+    closeDialogFixtureReductions();
   };
 
   const onClose = (
@@ -142,7 +134,7 @@ const FixtureDialogFittings = () => {
     >
       <Box>
         <DialogTitle>
-          Adicione as conexões do Hidrante
+          Adicione as reduções ou ampliações do Hidrante
           <IconButton
             onClick={handleClose}
             sx={{
@@ -172,24 +164,24 @@ const FixtureDialogFittings = () => {
               justifyContent="center"
               height={60}
             >
-              {`Comprimento equivalente das conexões: ${
-                decimalFormatter(fittings_equivalent_length) || "0,00"
+              {`Comprimento equivalente das reduções/ampliações: ${
+                decimalFormatter(reductions_equivalent_length) || "0,00"
               } m`}
             </Grid>
             <Grid item xs={5} height={"100%"}>
               <List dense component={Paper}>
-                {fittings &&
-                  fittings.map((_fitting) => (
+                {currentReductions &&
+                  currentReductions.map((_reduction) => (
                     <ListItemButton
-                      key={_fitting.id}
+                      key={_reduction.id}
                       onClick={() => {
-                        setValue("fittings_ids", [
-                          ...fittings_ids,
-                          _fitting.id,
+                        setValue("reductions_ids", [
+                          ...reductions_ids,
+                          _reduction.id,
                         ]);
                       }}
                     >
-                      <ListItemText primary={_fitting.name} />
+                      <ListItemText primary={_reduction.name} />
                       <ListItemSecondaryAction>
                         <IconButton edge="end">
                           <ArrowForward />
@@ -201,7 +193,7 @@ const FixtureDialogFittings = () => {
             </Grid>
             <Grid item xs={7}>
               <DragDropContext onDragEnd={handleOnDragEnd}>
-                <Droppable droppableId="fittings_ids">
+                <Droppable droppableId="reductions_ids">
                   {(provided) => (
                     <List
                       dense
@@ -209,11 +201,13 @@ const FixtureDialogFittings = () => {
                       {...provided.droppableProps}
                       ref={provided.innerRef}
                     >
-                      {fittings && fittings_ids && fittings_ids.length > 0 ? (
-                        fittings_ids.map((_fitting_id, _index) => (
+                      {currentReductions &&
+                      reductions_ids &&
+                      reductions_ids.length > 0 ? (
+                        reductions_ids.map((_reduction_id, _index) => (
                           <Draggable
                             key={_index}
-                            draggableId={`fittings_ids-${_index}`}
+                            draggableId={`reductions_ids-${_index}`}
                             index={_index}
                           >
                             {(provided) => (
@@ -238,8 +232,8 @@ const FixtureDialogFittings = () => {
                                       sx={{ flexGrow: 1 }}
                                     >
                                       {
-                                        fittings.find(
-                                          (f) => f.id === _fitting_id
+                                        reductions.find(
+                                          (f) => f.id === _reduction_id
                                         )?.name
                                       }
                                     </Typography>
@@ -249,7 +243,7 @@ const FixtureDialogFittings = () => {
                                       noWrap
                                       textAlign="end"
                                     >
-                                      {getEquivalentLengthString(_fitting_id)}
+                                      {getEquivalentLengthString(_reduction_id)}
                                     </Typography>
                                   </Stack>
                                 </ListItemText>
@@ -257,9 +251,14 @@ const FixtureDialogFittings = () => {
                                   <IconButton
                                     edge="end"
                                     onClick={() => {
-                                      const newFittings_ids = [...fittings_ids];
-                                      newFittings_ids.splice(_index, 1);
-                                      setValue("fittings_ids", newFittings_ids);
+                                      const newReductions_ids = [
+                                        ...reductions_ids,
+                                      ];
+                                      newReductions_ids.splice(_index, 1);
+                                      setValue(
+                                        "reductions_ids",
+                                        newReductions_ids
+                                      );
                                     }}
                                   >
                                     <Delete />
@@ -288,4 +287,4 @@ const FixtureDialogFittings = () => {
   );
 };
 
-export default FixtureDialogFittings;
+export default FixtureDialogReductions;

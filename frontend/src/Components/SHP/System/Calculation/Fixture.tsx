@@ -142,7 +142,7 @@ const Fixture = ({
       <TableCell align="center">-</TableCell>
       <StyledTableCellBorderLeft align="center">
         {decimalFormatter(
-          flow_to_l_p_min(getValues(`paths.${index}.flow`)),
+          flow_to_l_p_min(getValues(`paths.${index}.fixture.flow`)),
           2
         ) || "-"}
       </StyledTableCellBorderLeft>

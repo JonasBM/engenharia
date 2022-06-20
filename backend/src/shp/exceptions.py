@@ -34,6 +34,12 @@ class MoreThenOneReservoir(APIException):
     default_code = 'invalid'
 
 
+class MoreThenOnePump(APIException):
+    status_code = status.HTTP_400_BAD_REQUEST
+    default_detail = "Mais de um ponto de bomba encontrado"
+    default_code = 'invalid'
+
+
 class NoReservoir(APIException):
     status_code = status.HTTP_400_BAD_REQUEST
     default_detail = 'Nenhum reservatório encontrado'
@@ -43,4 +49,10 @@ class NoReservoir(APIException):
 class ReservoirTooLow(APIException):
     status_code = status.HTTP_400_BAD_REQUEST
     default_detail = 'Reservatório baixo demais'
+    default_code = 'invalid'
+
+
+class CalculeNotImplemented(APIException):
+    status_code = status.HTTP_400_BAD_REQUEST
+    default_detail = 'Este cálculo ainda não foi implementado'
     default_code = 'invalid'

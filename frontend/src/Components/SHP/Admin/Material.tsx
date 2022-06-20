@@ -33,7 +33,7 @@ import { Container } from "@mui/system";
 import FittingDiameter from "./FittingDiameter";
 import { MaterialFileSerializer } from "api/types/shpTypes";
 import Reduction from "./Reduction";
-import { saveSHPMaterial } from "utils";
+import { saveSHPMaterial } from "../System/Calculation/utils";
 import { showDiameterDialog } from "Components/SHP/DialogForm/DiameterDialogForm";
 import { showFittingDialog } from "Components/SHP/DialogForm/FittingDialogForm";
 

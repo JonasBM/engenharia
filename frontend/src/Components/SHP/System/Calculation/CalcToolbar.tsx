@@ -1,14 +1,6 @@
-import {
-  Box,
-  Button,
-  MenuItem,
-  Stack,
-  TextField,
-  Toolbar,
-} from "@mui/material";
+import { Box, Button, MenuItem, Stack, Toolbar } from "@mui/material";
 import {
   CalcTypes,
-  PressureType,
   PressureTypes,
   SHPCalcSerializer,
 } from "api/types/shpTypes";
@@ -17,7 +9,7 @@ import { Controller, useFormContext, useWatch } from "react-hook-form";
 import React, { useEffect } from "react";
 
 import { StyledTextField } from ".";
-import { saveSHPCalc } from "utils";
+import { saveSHPCalc } from "./utils";
 import { useAppSelector } from "redux/utils";
 
 const CalcToolbar = () => {
@@ -25,7 +17,6 @@ const CalcToolbar = () => {
   const config = useAppSelector((state) => state.shp.configs[0]);
 
   const {
-    register,
     control,
     setValue,
     getValues,
@@ -148,14 +139,6 @@ const CalcToolbar = () => {
             </StyledTextField>
           )}
         />
-        {pressure_type === PressureType.BOMBA.value && (
-          <TextField
-            label="Nome do ponto da Bomba"
-            InputLabelProps={{ shrink: true }}
-            fullWidth={false}
-            {...register("pump_node")}
-          />
-        )}
         <Box sx={{ flexGrow: 1 }} />
         <Button
           startIcon={<Save />}

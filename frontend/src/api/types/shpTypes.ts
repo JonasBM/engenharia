@@ -88,6 +88,8 @@ export interface FixtureSerializer {
   inlet_diameter?: any;
   reductions_ids?: number[];
   fittings_ids?: number[];
+  fittings_equivalent_length?: number;
+  reductions_equivalent_length?: number;
 }
 
 export const fixtureType = {
@@ -157,16 +159,24 @@ export interface SHPCalcPathSerializer {
   unit_pressure_drop?: number;
 }
 
+export interface SHPCalcPumpSerializer {
+  node?: string | null;
+  head_height?: number | null;
+  flow?: number | null;
+  NPSHd?: number | null;
+}
+
 export interface SHPCalcSerializer {
   fileinfo: FileInfoSerializer;
   name: string;
   calc_type: string;
   pressure_type: string;
-  pump_node?: string;
+  pump: SHPCalcPumpSerializer;
   material_id: number;
   diameter_id: number;
   fixture_id: number;
   paths: SHPCalcPathSerializer[];
   error?: string | null;
   less_favorable_path_fixture_index?: number | null;
+  calculated_at?: string | null;
 }

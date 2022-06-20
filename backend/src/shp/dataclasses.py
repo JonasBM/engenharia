@@ -1,6 +1,7 @@
 
 import math
 from dataclasses import dataclass
+from datetime import datetime
 
 from .models import Diameter, Fitting, Material
 
@@ -79,12 +80,19 @@ class SHPCalcPath:
 
 
 @dataclass(kw_only=True)
+class SHPCalcPump:
+    node: str
+    head_height: float
+    flow: float
+    NPSHd: float
+
+
+@dataclass(kw_only=True)
 class SHPCalc:
     fileinfo: SHPCalcFileInfo
     name: str
-    pressure_type: str  # PRESSURE_TYPES
-    calc_type: str  # CALC_TYPES
-    pump_node: str
+    pressure_type: str
+    calc_type: str
     material_id: int
     diameter_id: int
     fixture_id: int
@@ -92,10 +100,14 @@ class SHPCalc:
     paths_with_fixture: list[SHPCalcPath] = None
     less_favorable_path_fixture_index: int = None
     reservoir_path: SHPCalcPath = None
+    pump_path: SHPCalcPath = None
+    pump: SHPCalcPump = None
     error: str = None
+    calculated_at: datetime
 
     def __post_init__(self):
         self.fileinfo = SHPCalcFileInfo(**self.fileinfo)
+        self.pump = SHPCalcPump(**self.pump)
         newPaths = []
         for path in self.paths:
             newPaths.append(SHPCalcPath(**path))

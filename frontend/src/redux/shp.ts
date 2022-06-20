@@ -111,7 +111,7 @@ export const initialState = {
   name: "",
   pressure_type: null,
   calc_type: null,
-  pump_node: "",
+  pump: {},
   material_id: null,
   diameter_id: null,
   fixture_id: null,

@@ -2,44 +2,19 @@ import * as yup from "yup";
 
 import {
   Button,
-  Container,
   Grid,
   MenuItem,
   Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
   TextField,
   Typography,
-  alpha,
-  styled,
-  tableBodyClasses,
-  tableCellClasses,
 } from "@mui/material";
-import {
-  CalcTypes,
-  ConfigSerializer,
-  PressureTypes,
-  SHPCalcSerializer,
-} from "api/types/shpTypes";
-import { ConfigCRUDAction, calculateSHP } from "api/shp";
-import {
-  Controller,
-  FormProvider,
-  useFieldArray,
-  useForm,
-  useWatch,
-} from "react-hook-form";
-import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
+import { CalcTypes, ConfigSerializer, PressureTypes } from "api/types/shpTypes";
+import { Controller, useForm } from "react-hook-form";
 import React, { useEffect } from "react";
-import { addServerErrors, saveSHPCalc } from "utils";
-import { getNewPath, initialState } from "redux/shp";
 import { useAppDispatch, useAppSelector } from "redux/utils";
 
-import { documentTitles } from "myConstants";
+import { ConfigCRUDAction } from "api/shp";
+import { addServerErrors } from "utils";
 import { yupResolver } from "@hookform/resolvers/yup";
 
 const validationSchema = () =>
@@ -89,7 +64,7 @@ const Config = () => {
         <Grid item xs={12}>
           <Typography variant="h6">Valores padrões do cálculo</Typography>
         </Grid>
-        <Grid item xs={3}>
+        <Grid item xs={2}>
           {CalcTypes?.length > 0 && (
             <Controller
               control={control}
@@ -113,7 +88,7 @@ const Config = () => {
             />
           )}
         </Grid>
-        <Grid item xs={3}>
+        <Grid item xs={2}>
           {PressureTypes?.length > 0 && (
             <Controller
               control={control}
@@ -141,7 +116,7 @@ const Config = () => {
           )}
         </Grid>
 
-        <Grid item xs={3}>
+        <Grid item xs={4}>
           {materials?.length > 0 && (
             <Controller
               control={control}
@@ -165,7 +140,7 @@ const Config = () => {
             />
           )}
         </Grid>
-        <Grid item xs={3}>
+        <Grid item xs={4}>
           {fixtures?.length > 0 && (
             <Controller
               control={control}

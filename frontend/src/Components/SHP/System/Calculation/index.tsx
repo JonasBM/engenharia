@@ -23,19 +23,19 @@ import {
   useWatch,
 } from "react-hook-form";
 import React, { useEffect } from "react";
+import { cleanCalc, saveSHPCalc } from "./utils";
 import { getNewPath, initialState } from "redux/shp";
 import { useAppDispatch, useAppSelector } from "redux/utils";
 
-import CalcResult from "./CalcResult";
 import CalcToolbar from "./CalcToolbar";
 import DialogFittings from "./DialogFittings";
 import FileToolbar from "./FileToolbar";
 import Path from "./Path";
 import PathToolbar from "./PathToolbar";
+import PumpToolbar from "./PumpToolbar";
 import { SHPCalcSerializer } from "api/types/shpTypes";
 import { calculateSHP } from "api/shp";
 import { documentTitles } from "myConstants";
-import { saveSHPCalc } from "utils";
 import { yupResolver } from "@hookform/resolvers/yup";
 
 const StyledTable = styled(Table)(({ theme }) => ({
@@ -101,7 +101,8 @@ const SHP = () => {
     control,
     reset,
     getValues,
-    formState: { errors },
+    setValue,
+    formState: { errors, isDirty },
   } = formMethods;
   const {
     fields: paths,
@@ -139,6 +140,12 @@ const SHP = () => {
   }, [reset, shpCalc]);
 
   useEffect(() => {
+    if (isDirty) {
+      cleanCalc(getValues(), setValue);
+    }
+  }, [getValues, isDirty, setValue]);
+
+  useEffect(() => {
     if (Object.entries(errors).length) {
       console.log(errors);
     }
@@ -169,6 +176,7 @@ const SHP = () => {
         <Container maxWidth="xl">
           <FileToolbar />
           <CalcToolbar />
+          <PumpToolbar />
           <PathToolbar append={append} />
           <TableContainer component={Paper} sx={{ minWidth: 800 }}>
             <StyledTable size="small" aria-label="a dense table">

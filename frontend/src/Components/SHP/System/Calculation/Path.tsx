@@ -71,6 +71,7 @@ const Path = ({
   const fixture = useWatch({ control, name: `paths.${index}.fixture` });
   const fixture_id = useWatch({ control, name: `fixture_id` });
   const fittings_ids = watch(`paths.${index}.fittings_ids`);
+
   const equivalent_length = useWatch({
     control,
     name: `paths.${index}.equivalent_length`,
@@ -388,6 +389,7 @@ const Path = ({
             </IconButton>
           </Box>
         </TableCell>
+
         <StyledTableCellBorderLeft align="center">
           {decimalFormatter(
             flow_to_l_p_min(getValues(`paths.${index}.flow`)),

@@ -17,19 +17,22 @@ import { Controller, FormProvider, useForm, useWatch } from "react-hook-form";
 import FixtureDialogFittings, {
   showDialogFixtureFittings,
 } from "./FixtureDialogFittings";
+import FixtureDialogReductions, {
+  showDialogFixtureReductions,
+} from "./FixtureDialogReductions";
 import {
   FixtureSerializer,
   fixtureType,
   fixtureTypes,
 } from "api/types/shpTypes";
 import React, { useEffect, useState } from "react";
+import { addServerErrors, decimalFormatter } from "utils";
 import { closeDialog, openDialog } from "redux/modal";
 import { useAppDispatch, useAppSelector } from "redux/utils";
 
 import { Add } from "@mui/icons-material";
 import BaseDialogForm from "./BaseDialogForm";
 import { FixtureCRUDAction } from "api/shp";
-import { addServerErrors } from "utils";
 import store from "redux/store";
 import { yupResolver } from "@hookform/resolvers/yup";
 
@@ -131,6 +134,14 @@ const FixtureDialogForm = () => {
   } = formMethods;
   const material_id = useWatch({ control, name: "material" });
   const k_factor = useWatch({ control, name: "k_factor" });
+  const fittings_equivalent_length = useWatch({
+    control,
+    name: "fittings_equivalent_length",
+  });
+  const reductions_equivalent_length = useWatch({
+    control,
+    name: "reductions_equivalent_length",
+  });
 
   useEffect(() => {
     reset(dialogObject);
@@ -222,6 +233,7 @@ const FixtureDialogForm = () => {
     >
       <FormProvider {...formMethods}>
         <FixtureDialogFittings />
+        <FixtureDialogReductions />
       </FormProvider>
       <Grid container spacing={1}>
         <Grid item xs={6}>
@@ -344,7 +356,6 @@ const FixtureDialogForm = () => {
             helperText={errors.hose_internal_diameter?.message}
             {...register("hose_internal_diameter")}
           />
-
           {materials.length > 0 && (
             <Controller
               control={control}
@@ -369,7 +380,6 @@ const FixtureDialogForm = () => {
               )}
             />
           )}
-
           {diameters.length > 0 && (
             <Controller
               control={control}
@@ -401,89 +411,40 @@ const FixtureDialogForm = () => {
               )}
             />
           )}
-
-          {/* {reductions.length > 0 && (
-            <Controller
-              control={control}
-              name="reductions_ids"
-              render={({ field: { value, onChange } }) => (
-                <TextField
-                  select
-                  SelectProps={{
-                    multiple: true,
-                  }}
-                  label="Reduções"
-                  value={value || []}
-                  onChange={(event) => {
-                    onChange(event.target.value || []);
-                  }}
-                  error={errors.reductions_ids ? true : false}
-                  helperText={errors.reductions_ids?.join(", ")}
-                >
-                  {reductions.map((_reduction) => (
-                    <MenuItem
-                      key={_reduction.id}
-                      value={_reduction.id}
-                      sx={{
-                        display:
-                          _reduction.material === material_id ? "" : "none",
-                      }}
-                    >
-                      {_reduction.name}
-                    </MenuItem>
-                  ))}
-                </TextField>
-              )}
-            />
-          )} */}
-
           <Box sx={{ display: "flex", alignItems: "flex-end" }}>
             <TextField
-              type="number"
+              label="Conexões"
               disabled
-              sx={{ width: "100px" }}
+              sx={{ width: "200px" }}
               variant="standard"
-              inputProps={{ style: { textAlign: "center" } }}
-              value={0}
+              value={decimalFormatter(fittings_equivalent_length) || "0,00"}
             />
             <IconButton
               onClick={() => {
                 showDialogFixtureFittings();
               }}
-              title="Alterar conexões no trecho"
+              title="Alterar conexões do hidrante"
             >
               <Add />
             </IconButton>
           </Box>
-
-          {/* {fittings.length > 0 && (
-            <Controller
-              control={control}
-              name="fittings"
-              render={({ field: { value, onChange } }) => (
-                <TextField
-                  select
-                  SelectProps={{
-                    multiple: true,
-                  }}
-                  label="Conexões"
-                  value={value || []}
-                  onChange={(event) => {
-                    onChange(event.target.value || []);
-                  }}
-                  error={errors.fittings ? true : false}
-                  helperText={errors.fittings?.join(", ")}
-                >
-                  {fittings.map((_fitting) => (
-                    <MenuItem key={_fitting.id} value={_fitting.id}>
-                      {_fitting.name}
-                    </MenuItem>
-                  ))}
-                </TextField>
-              )}
+          <Box sx={{ display: "flex", alignItems: "flex-end" }}>
+            <TextField
+              label="Reduções/Ampliações"
+              disabled
+              sx={{ width: "200px" }}
+              variant="standard"
+              value={decimalFormatter(reductions_equivalent_length) || "0,00"}
             />
-          )} */}
-
+            <IconButton
+              onClick={() => {
+                showDialogFixtureReductions();
+              }}
+              title="Alterar reduções ou ampliações do hidrante"
+            >
+              <Add />
+            </IconButton>
+          </Box>
           <TextField
             type="number"
             inputProps={{ step: "0.01" }}

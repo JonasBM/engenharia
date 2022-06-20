@@ -100,6 +100,10 @@ class FixtureSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+custom_not_required_blank = {'allow_blank': True, 'allow_null': True, 'required': False}
+custom_not_required = {'allow_null': True, 'required': False}
+
+
 @ts_interface('shp')
 class FileInfoSerializer(serializers.Serializer):
     type = serializers.CharField()
@@ -113,29 +117,29 @@ class MaterialFileSerializer(serializers.Serializer):
 
     fileinfo = FileInfoSerializer(required=True)
     material = MaterialSerializer(required=True)
-    reductions = ReductionSerializer(many=True)
-    diameters = DiameterSerializer(many=True)
-    fittings = FittingSerializer(many=True)
+    reductions = ReductionSerializer(required=True, many=True)
+    diameters = DiameterSerializer(required=True, many=True)
+    fittings = FittingSerializer(required=True, many=True)
     fittingdiameters = FittingDiameterResponseSerializer()
 
 
 @ts_interface('shp')
 class SHPCalcFixtureSerializer(serializers.Serializer):
 
-    active = serializers.BooleanField(default=False)
+    active = serializers.BooleanField(default=False, **custom_not_required)
     end = serializers.CharField(required=True)
-    hose_length = serializers.FloatField(default=0)
-    level_difference = serializers.FloatField(default=0)
-    flow = serializers.FloatField(default=0)
-    total_length = serializers.FloatField(default=0)
-    start_pressure = serializers.FloatField(default=0)
-    middle_pressure = serializers.FloatField(default=0)
-    end_pressure = serializers.FloatField(default=0)
-    hose_pressure_drop = serializers.FloatField(default=0)
-    unit_hose_pressure_drop = serializers.FloatField(default=0)
-    pressure_drop = serializers.FloatField(default=0)
-    unit_pressure_drop = serializers.FloatField(default=0)
-    connection_names = serializers.ListField(child=serializers.CharField(), default=[])
+    hose_length = serializers.FloatField(default=0, **custom_not_required)
+    level_difference = serializers.FloatField(default=0, **custom_not_required)
+    flow = serializers.FloatField(default=0, **custom_not_required)
+    total_length = serializers.FloatField(default=0, **custom_not_required)
+    start_pressure = serializers.FloatField(default=0, **custom_not_required)
+    middle_pressure = serializers.FloatField(default=0, **custom_not_required)
+    end_pressure = serializers.FloatField(default=0, **custom_not_required)
+    hose_pressure_drop = serializers.FloatField(default=0, **custom_not_required)
+    unit_hose_pressure_drop = serializers.FloatField(default=0, **custom_not_required)
+    pressure_drop = serializers.FloatField(default=0, **custom_not_required)
+    unit_pressure_drop = serializers.FloatField(default=0, **custom_not_required)
+    connection_names = serializers.ListField(child=serializers.CharField(), default=[], **custom_not_required)
 
 
 @ts_interface('shp')
@@ -143,23 +147,23 @@ class SHPCalcPathSerializer(serializers.Serializer):
 
     start = serializers.CharField(required=True)
     end = serializers.CharField(allow_null=True, required=True)
-    fixture = SHPCalcFixtureSerializer(default={})
+    fixture = SHPCalcFixtureSerializer(default={}, **custom_not_required)
     material_id = serializers.IntegerField(required=True)
     diameter_id = serializers.IntegerField(required=True)
-    length = serializers.FloatField(default=0)
-    level_difference = serializers.FloatField(default=0)
-    fittings_ids = serializers.ListField(child=serializers.IntegerField(), default=[])
-    extra_equivalent_length = serializers.FloatField(default=0)
-    equivalent_length = serializers.FloatField(default=0)
-    total_length = serializers.FloatField(default=0)
-    has_fixture = serializers.BooleanField(default=False)
-    connection_names = serializers.ListField(child=serializers.CharField(), default=[])
-    flow = serializers.FloatField(default=0)
-    speed = serializers.FloatField(default=0)
-    start_pressure = serializers.FloatField(default=0)
-    end_pressure = serializers.FloatField(default=0)
-    pressure_drop = serializers.FloatField(default=0)
-    unit_pressure_drop = serializers.FloatField(default=0)
+    length = serializers.FloatField(default=0, **custom_not_required)
+    level_difference = serializers.FloatField(default=0, **custom_not_required)
+    fittings_ids = serializers.ListField(child=serializers.IntegerField(), default=[], **custom_not_required)
+    has_fixture = serializers.BooleanField(default=False, **custom_not_required)
+    extra_equivalent_length = serializers.FloatField(default=0, **custom_not_required)
+    equivalent_length = serializers.FloatField(default=0, **custom_not_required)
+    total_length = serializers.FloatField(default=0, **custom_not_required)
+    connection_names = serializers.ListField(child=serializers.CharField(), default=[], **custom_not_required)
+    flow = serializers.FloatField(default=0, **custom_not_required)
+    speed = serializers.FloatField(default=0, **custom_not_required)
+    start_pressure = serializers.FloatField(default=0, **custom_not_required)
+    end_pressure = serializers.FloatField(default=0, **custom_not_required)
+    pressure_drop = serializers.FloatField(default=0, **custom_not_required)
+    unit_pressure_drop = serializers.FloatField(default=0, **custom_not_required)
 
     def validate(self, data):
         if data.get('has_fixture') and not data.get('fixture'):
@@ -170,29 +174,29 @@ class SHPCalcPathSerializer(serializers.Serializer):
 
 
 @ts_interface('shp')
+class SHPCalcPumpSerializer(serializers.Serializer):
+
+    node = serializers.CharField(**custom_not_required_blank)
+    head_height = serializers.FloatField(**custom_not_required)
+    flow = serializers.FloatField(**custom_not_required)
+    NPSHd = serializers.FloatField(**custom_not_required)
+
+
+@ts_interface('shp')
 class SHPCalcSerializer(serializers.Serializer):
 
-    # PRESSURE_TYPES = [
-    #     ('gravitacional', 'Gravitacional'),
-    #     ('bomba', 'Bomba'),
-    # ]
-
-    # CALC_TYPES = [
-    #     ('vazao_minima', 'Vazão mínima'),
-    #     ('vazao_residual', 'Vazão Residual')
-    # ]
-
     fileinfo = FileInfoSerializer(required=True)
-    name = serializers.CharField(required=False, allow_null=True, allow_blank=True)
+    name = serializers.CharField(**custom_not_required_blank)
     pressure_type = serializers.ChoiceField(choices=Config.PressureType, required=True)
     calc_type = serializers.ChoiceField(choices=Config.CalcType, required=True)
-    pump_node = serializers.CharField(allow_blank=True, default=None)
+    pump = SHPCalcPumpSerializer()
     material_id = serializers.IntegerField(required=True)
     diameter_id = serializers.IntegerField(required=True)
     fixture_id = serializers.IntegerField(required=True)
     paths = SHPCalcPathSerializer(required=True, many=True)
-    error = serializers.CharField(default=None, allow_null=True)
-    less_favorable_path_fixture_index = serializers.IntegerField(required=False, allow_null=True)
+    error = serializers.CharField(default=None, **custom_not_required_blank)
+    less_favorable_path_fixture_index = serializers.IntegerField(**custom_not_required)
+    calculated_at = serializers.DateTimeField(**custom_not_required)
 
     def validate(self, data):
         if data.get('pressure_type') == 'bomba' and not data.get('pump_node'):
