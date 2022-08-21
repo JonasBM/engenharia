@@ -30,6 +30,11 @@ CORS_ALLOW_ALL_ORIGINS = True
 # if CORS_ALLOWED_ORIGINS_ENV:
 #     CORS_ALLOWED_ORIGINS.extend(CORS_ALLOWED_ORIGINS_ENV.split(","))
 
+CORS_EXPOSE_HEADERS = (
+    'content-length',
+    'content-count',
+    'Content-Disposition'
+)
 
 LOCAL_INSTALLED_APPS = [
     'accounts',
@@ -106,7 +111,7 @@ ROOT_URLCONF = 'core.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates'), ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -167,8 +172,8 @@ USE_TZ = True
 STATIC_URL = "static/"
 MEDIA_URL = "media/"
 
-STATIC_ROOT = "/static/"
-MEDIA_ROOT = "/media/"
+STATIC_ROOT = "backend/src/static/"
+MEDIA_ROOT = "backend/src/media/"
 
 # STATIC_URL = '/static/'
 

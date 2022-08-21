@@ -69,7 +69,7 @@ export const getNewFixture = (
   return {
     active: false,
     end: getNewFixtureString(state),
-    hose_length: 0,
+    hose_length: 30,
     level_difference: 0,
   };
 };

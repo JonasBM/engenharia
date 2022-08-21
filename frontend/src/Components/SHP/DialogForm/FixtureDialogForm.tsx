@@ -293,14 +293,14 @@ const FixtureDialogForm = () => {
                       }}
                     />
                   }
-                  label="O Fator de vazão inclue a perda de carga na mangueira"
+                  label="O Fator de vazão inclui a perda de carga na mangueira"
                 />
               )}
             />
             <TextField
               type="number"
               inputProps={{ step: "0.01" }}
-              label="Coeficiente tipico do esguicho (adimensional)"
+              label="Coeficiente típico do esguicho (adimensional)"
               error={errors.k_nozzle ? true : false}
               helperText={errors.k_nozzle?.message}
               {...register("k_nozzle")}

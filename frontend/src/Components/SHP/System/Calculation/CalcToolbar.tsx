@@ -4,20 +4,24 @@ import {
   PressureTypes,
   SHPCalcSerializer,
 } from "api/types/shpTypes";
-import { Calculate, Save } from "@mui/icons-material";
+import { Calculate, Print, Save } from "@mui/icons-material";
 import { Controller, useFormContext, useWatch } from "react-hook-form";
 import React, { useEffect } from "react";
+import { useAppDispatch, useAppSelector } from "redux/utils";
 
+// import { MyDocument } from "Components/SHP/Print";
 import { StyledTextField } from ".";
+import { downloadPDFAction } from "api/shp";
 import { saveSHPCalc } from "./utils";
-import { useAppSelector } from "redux/utils";
 
 const CalcToolbar = () => {
+  const dispatch = useAppDispatch();
   const fixtures = useAppSelector((state) => state.shp.fixtures);
   const config = useAppSelector((state) => state.shp.configs[0]);
 
   const {
     control,
+    reset,
     setValue,
     getValues,
     formState: { isDirty },
@@ -67,6 +71,10 @@ const CalcToolbar = () => {
       }
     }
   }, [pressure_type, setValue, config]);
+
+  const downloadPDF = (data: SHPCalcSerializer) => {
+    dispatch(downloadPDFAction(saveSHPCalc(data)));
+  };
 
   return (
     <Toolbar sx={{ minWidth: 800 }}>
@@ -152,6 +160,15 @@ const CalcToolbar = () => {
         </Button>
         <Button color="success" startIcon={<Calculate />} type="submit">
           Calcular
+        </Button>
+        <Button
+          color="warning"
+          startIcon={<Print />}
+          onClick={() => {
+            downloadPDF(getValues());
+          }}
+        >
+          Imprimir
         </Button>
       </Stack>
     </Toolbar>

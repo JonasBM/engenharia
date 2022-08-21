@@ -1,0 +1,54 @@
+@page {
+  size: A4 portrait; /* can use also 'landscape' for orientation */
+  margin: 35mm 20mm 20mm 30mm;
+
+  @top-left {
+    content: element(header);
+  }
+
+  @bottom-right {
+    content: counter(page) "/" counter(pages);
+  }
+
+  @bottom-left {
+    content: element(footer);
+  }
+}
+
+header {
+  position: running(header);
+  height: 30mm;
+  width: 160mm;
+}
+header hr {
+  position: absolute;
+  top: 30mm;
+  width: 160mm;
+  border: 0.1mm solid black;
+}
+header div {
+  padding-top: 15mm;
+  background-color: blue;
+  /* height: 15mm; */
+}
+
+footer {
+  position: running(footer);
+  height: 19mm;
+  width: 160mm;
+}
+footer hr {
+  border: 0.1mm solid black;
+}
+footer div {
+  font-size: xx-small;
+  height: 15mm;
+}
+
+body {
+  /* background-color: blue; */
+}
+
+body div {
+  /* background-color: brown; */
+}

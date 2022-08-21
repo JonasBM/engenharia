@@ -1,19 +1,23 @@
 import logging
 
+from django.contrib.staticfiles.storage import staticfiles_storage
 from django.db import IntegrityError, transaction
-from .calculate import SHP
+from django.http import HttpResponse
+from django.template.loader import render_to_string
 from rest_framework import permissions, status, views, viewsets
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
+from weasyprint import CSS, HTML
 
-from .models import (Config, Diameter, Fitting, FittingDiameter, Fixture, Material,
-                     MaterialConnection, Reduction)
+from .calculate import SHP
+from .models import (Config, Diameter, Fitting, FittingDiameter, Fixture,
+                     Material, MaterialConnection, Reduction)
 from .serializers import (ConfigSerializer, DiameterSerializer,
                           FittingDiameterResponseSerializer,
                           FittingDiameterSerializer, FittingSerializer,
                           FixtureSerializer, MaterialConnectionSerializer,
                           MaterialFileSerializer, MaterialSerializer,
-                          ReductionSerializer)
+                          ReductionSerializer, SHPCalcSerializer)
 
 '''
 TODO:
@@ -234,14 +238,36 @@ class Calculate(views.APIView):
     permission_classes = [permissions.IsAdminUser]
 
     def post(self, request, format=None) -> Response:
-
-        serializer = SHP(request.data).calculate()
-        # print(serializer)
-        if serializer.is_valid():
-            error = serializer.data.pop('error', None)
-            if error:
-                return Response({'detail': error}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
-            return Response(serializer.data)
-        print(serializer.errors)
-
-        return Response({'detail': 'Problemas ao calcular os dados enviados'}, status=status.HTTP_400_BAD_REQUEST)
+        download = request.query_params.get('download')
+        if download == 'pdf':
+            serializer = SHPCalcSerializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            calculated_at = serializer.data.get('calculated_at')
+            less_favorable_path_fixture_index = serializer.data.get('less_favorable_path_fixture_index')
+            if not calculated_at or not less_favorable_path_fixture_index:
+                return Response(
+                    {'detail': 'Só é possivel imprimir sistemas cálculados'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            try:
+                html_string = render_to_string('shp/printshp.html', serializer.data)
+                css = CSS(staticfiles_storage.path('shp/css/printshp.css'))
+                pdf_file = HTML(string=html_string, base_url=request.build_absolute_uri()).write_pdf(stylesheets=[css])
+                filename = 'Cálculo SHP_server.pdf'
+                response = HttpResponse(pdf_file, content_type='application/pdf')
+                response['Content-Disposition'] = f'attachment; filename={filename}'
+                return response
+            except Exception as e:
+                logger.error(e)
+                return Response(
+                    {'detail': 'Problemas ao imprimir o cálculo enviado'},
+                    status=status.HTTP_400_BAD_REQUEST)
+        else:
+            serializer = SHP(request.data).calculate()
+            if serializer.is_valid():
+                error = serializer.data.pop('error', None)
+                if error:
+                    return Response({'detail': error}, status=status.HTTP_400_BAD_REQUEST)
+                else:
+                    return Response(serializer.data)
+            return Response({'detail': 'Problemas ao calcular os dados enviados'}, status=status.HTTP_400_BAD_REQUEST)

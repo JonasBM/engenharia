@@ -84,5 +84,8 @@
     "setupFilesAfterEnv": [
       "<rootDir>/src/setupTests.js"
     ]
+  },
+  "devDependencies": {
+    "@types/react-pdf": "^5.7.2"
   }
 }

@@ -19,3 +19,4 @@ django-typomatic
 
 # ########## EXTRAS ##########
 dataclasses
+weasyprint

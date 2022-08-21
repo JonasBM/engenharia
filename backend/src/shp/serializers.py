@@ -198,6 +198,11 @@ class SHPCalcSerializer(serializers.Serializer):
     less_favorable_path_fixture_index = serializers.IntegerField(**custom_not_required)
     calculated_at = serializers.DateTimeField(**custom_not_required)
 
+    def to_internal_value(self, data):
+        if data.get('pressure_type') == 'GR':
+            data['pump'] = {}
+        return super().to_internal_value(data)
+
     def validate(self, data):
         if data.get('pressure_type') == 'bomba' and not data.get('pump_node'):
             raise ValidationError(

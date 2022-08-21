@@ -120,3 +120,48 @@ export const calculateSHP = (object: SHPCalcSerializer) => {
       });
   };
 };
+
+export const downloadPDFAction = (object: SHPCalcSerializer) => {
+  return (dispatch: Dispatch): Promise<SHPCalcSerializer> => {
+    const token = store.getState().auth.token;
+    const config: AxiosRequestConfig = {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Token ${token}`,
+      },
+      responseType: "blob",
+    };
+    dispatch(startFetching());
+    let url = new URL(
+      "shp/calculate/?download=pdf",
+      process.env.REACT_APP_API_URL
+    );
+    return axios
+      .post(url.toString(), object, config)
+      .then((res) => {
+        const contentDisposition = res.headers["content-disposition"];
+        const filename =
+          contentDisposition
+            ?.replace("attachment; filename=", "")
+            .replace("filename=", "") ?? "Cálculo SHP.pdf";
+
+        const file = new Blob([res.data], {
+          type: res.headers["content-type"],
+        });
+        const fileURL = URL.createObjectURL(file);
+        var fileLink = document.createElement("a");
+        fileLink.href = fileURL;
+        fileLink.download = filename;
+        fileLink.click();
+        URL.revokeObjectURL(fileURL);
+        dispatch(finishFetching());
+        return res.data;
+      })
+      .catch(async (error) => {
+        error.response.data = JSON.parse(await error.response.data.text());
+        dispatch(returnError(error));
+        dispatch(finishFetching());
+        throw error;
+      });
+  };
+};

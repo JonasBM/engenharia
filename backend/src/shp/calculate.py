@@ -24,6 +24,8 @@ class SHP():
 
     def __pre_init__(self, data):
         paths = data.get('paths')
+        if data.get('pressure_type') == 'GR':
+            data['pump'] = {}
         attrToZero = ['length', 'level_difference', 'extra_equivalent_length']
         for path in paths:
             for attr, value in path.items():

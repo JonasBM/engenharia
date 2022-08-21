@@ -34,5 +34,6 @@ if settings.ENVIRONMENT != 'production' and settings.DEBUG:
     urlpatterns += [
         path('silk/', include('silk.urls', namespace='silk')),
     ]
+    print(settings.STATIC_ROOT)
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -71,7 +71,7 @@ const Config = () => {
               name="calc_type"
               render={({ field: { value, onChange } }) => (
                 <TextField
-                  label="Tipo de cálculo padrão"
+                  label="Tipo de cálculo"
                   select
                   value={value || ""}
                   onChange={(event) => {
@@ -95,7 +95,7 @@ const Config = () => {
               name="pressure_type"
               render={({ field: { value, onChange } }) => (
                 <TextField
-                  label="Tipo de cálculo padrão"
+                  label="Tipo de pressurização"
                   select
                   value={value || ""}
                   onChange={(event) => {
@@ -123,7 +123,7 @@ const Config = () => {
               name="material"
               render={({ field: { value, onChange } }) => (
                 <TextField
-                  label="Material padrão"
+                  label="Material"
                   select
                   value={value || ""}
                   onChange={(event) => {
@@ -147,7 +147,7 @@ const Config = () => {
               name="fixture"
               render={({ field: { value, onChange } }) => (
                 <TextField
-                  label="Hidrante padrão"
+                  label="Hidrante"
                   select
                   value={value || ""}
                   onChange={(event) => {
