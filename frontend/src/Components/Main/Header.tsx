@@ -80,7 +80,7 @@ const Header = () => {
               display: { xs: "none", md: "flex" },
             }}
             alt=""
-            src={process.env.PUBLIC_URL + "/brand.png"}
+            src={"/brand.png"}
           />
 
           <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}>
@@ -137,7 +137,7 @@ const Header = () => {
                 height: 60,
               }}
               alt=""
-              src={process.env.PUBLIC_URL + "/brand.png"}
+              src={"/brand.png"}
             />
           </Box>
           <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
@@ -182,7 +182,6 @@ const Header = () => {
                 <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
                   <Avatar
                     alt={getUserFullName(auth.user)}
-                    src="/static/images/avatar/2.jpg"
                     sx={{ backgroundColor: "success.main" }}
                   >
                     {getUserInitials(auth.user)}

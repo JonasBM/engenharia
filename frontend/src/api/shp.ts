@@ -20,32 +20,34 @@ import {
 import axios, { AxiosRequestConfig } from "axios";
 
 import { Dispatch } from "@reduxjs/toolkit";
-import store from "redux/store";
+import { RootState } from "redux/store";
+// import { RootState } from "redux/store";
+// import store from "redux/store";
 
 export const ConfigCRUDAction = new CRUDAction<ConfigSerializer>(
   "shp/configs",
-  new URL("/shp/configs/", process.env.REACT_APP_API_URL).href
+  new URL("/shp/configs/", import.meta.env.VITE_APP_API_URL).href
 );
 
 export const MaterialCRUDAction = new CRUDAction<MaterialSerializer>(
   "shp/materials",
-  new URL("/shp/materials/", process.env.REACT_APP_API_URL).href
+  new URL("/shp/materials/", import.meta.env.VITE_APP_API_URL).href
 );
 
 export const DiameterCRUDAction = new CRUDAction<DiameterSerializer>(
   "shp/diameters",
-  new URL("/shp/diameters/", process.env.REACT_APP_API_URL).href
+  new URL("/shp/diameters/", import.meta.env.VITE_APP_API_URL).href
 );
 
 export const FittingCRUDAction = new CRUDAction<FittingSerializer>(
   "shp/fittings",
-  new URL("/shp/fittings/", process.env.REACT_APP_API_URL).href
+  new URL("/shp/fittings/", import.meta.env.VITE_APP_API_URL).href
 );
 
 export const FittingDiameterCRUDAction =
   new CRUDAction<FittingDiameterResponseSerializer>(
     "shp/fittingdiameter",
-    new URL("/shp/fittingdiameter/", process.env.REACT_APP_API_URL).href,
+    new URL("/shp/fittingdiameter/", import.meta.env.VITE_APP_API_URL).href,
     {
       payloadIdName: "material",
       actionMessages: { create: "Conexões salvas com sucesso!" },
@@ -54,23 +56,24 @@ export const FittingDiameterCRUDAction =
 
 export const ReductionCRUDAction = new CRUDAction<ReductionSerializer>(
   "shp/reductions",
-  new URL("/shp/reductions/", process.env.REACT_APP_API_URL).href
+  new URL("/shp/reductions/", import.meta.env.VITE_APP_API_URL).href
 );
 
 export const MaterialConnectionCRUDAction =
   new CRUDAction<MaterialConnectionSerializer>(
     "shp/materialconnections",
-    new URL("/shp/materialconnections/", process.env.REACT_APP_API_URL).href
+    new URL("/shp/materialconnections/", import.meta.env.VITE_APP_API_URL).href
   );
 
 export const FixtureCRUDAction = new CRUDAction<FixtureSerializer>(
   "shp/fixtures",
-  new URL("/shp/fixtures/", process.env.REACT_APP_API_URL).href
+  new URL("/shp/fixtures/", import.meta.env.VITE_APP_API_URL).href
 );
 
 export const loadMaterialBackup = (object: MaterialFileSerializer) => {
-  return (dispatch: Dispatch): Promise<any> => {
-    const token = store.getState().auth.token;
+  return (dispatch: Dispatch,getState:() => RootState): Promise<any> => {
+    
+    const token = getState().auth.token;
     const config: AxiosRequestConfig = {
       headers: {
         "Content-Type": "application/json",
@@ -78,7 +81,7 @@ export const loadMaterialBackup = (object: MaterialFileSerializer) => {
       },
     };
     dispatch(startFetching());
-    let url = new URL("shp/loadmaterialbackup/", process.env.REACT_APP_API_URL);
+    let url = new URL("shp/loadmaterialbackup/", import.meta.env.VITE_APP_API_URL);
     return axios
       .post(url.toString(), object, config)
       .then((res) => {
@@ -95,8 +98,8 @@ export const loadMaterialBackup = (object: MaterialFileSerializer) => {
 };
 
 export const calculateSHP = (object: SHPCalcSerializer) => {
-  return (dispatch: Dispatch): Promise<SHPCalcSerializer> => {
-    const token = store.getState().auth.token;
+  return (dispatch: Dispatch,getState:() => RootState ): Promise<SHPCalcSerializer> => {
+    const token = getState().auth.token;
     const config: AxiosRequestConfig = {
       headers: {
         "Content-Type": "application/json",
@@ -104,7 +107,7 @@ export const calculateSHP = (object: SHPCalcSerializer) => {
       },
     };
     dispatch(startFetching());
-    let url = new URL("shp/calculate/", process.env.REACT_APP_API_URL);
+    let url = new URL("shp/calculate/", import.meta.env.VITE_APP_API_URL);
     return axios
       .post(url.toString(), object, config)
       .then((res) => {
@@ -122,8 +125,8 @@ export const calculateSHP = (object: SHPCalcSerializer) => {
 };
 
 export const downloadPDFAction = (object: SHPCalcSerializer) => {
-  return (dispatch: Dispatch): Promise<SHPCalcSerializer> => {
-    const token = store.getState().auth.token;
+  return (dispatch: Dispatch,getState:() => RootState): Promise<SHPCalcSerializer> => {
+    const token = getState().auth.token;
     const config: AxiosRequestConfig = {
       headers: {
         "Content-Type": "application/json",
@@ -134,7 +137,7 @@ export const downloadPDFAction = (object: SHPCalcSerializer) => {
     dispatch(startFetching());
     let url = new URL(
       "shp/calculate/?download=pdf",
-      process.env.REACT_APP_API_URL
+      import.meta.env.VITE_APP_API_URL
     );
     return axios
       .post(url.toString(), object, config)

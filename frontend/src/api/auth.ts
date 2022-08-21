@@ -22,7 +22,7 @@ export const authLogin = createAppAsyncThunk(
         Authorization: `Basic ${btoa(object.username + ":" + object.password)}`,
       },
     };
-    let url = new URL("accounts/auth/login/", process.env.REACT_APP_API_URL);
+    let url = new URL("accounts/auth/login/", import.meta.env.VITE_APP_API_URL);
     return axios
       .post(url.toString(), null, config)
       .then((res) => {
@@ -48,7 +48,7 @@ export const authLoadProfile = createAppAsyncThunk(
     };
     let url = new URL(
       "accounts/userprofiles/my-profile/",
-      process.env.REACT_APP_API_URL
+      import.meta.env.VITE_APP_API_URL
     );
     return axios
       .get(url.toString(), config)
@@ -73,7 +73,7 @@ export const authLogout = createAppAsyncThunk(
         Authorization: `Token ${token}`,
       },
     };
-    let url = new URL("accounts/auth/logout/", process.env.REACT_APP_API_URL);
+    let url = new URL("accounts/auth/logout/", import.meta.env.VITE_APP_API_URL);
     return axios
       .post(url.toString(), null, config)
       .then((res) => {
@@ -99,7 +99,7 @@ export const authLogoutAll = createAppAsyncThunk(
     };
     let url = new URL(
       "accounts/auth/logoutall/",
-      process.env.REACT_APP_API_URL
+      import.meta.env.VITE_APP_API_URL
     );
     return axios
       .post(url.toString(), null, config)
