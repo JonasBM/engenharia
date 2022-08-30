@@ -4,6 +4,7 @@ from django.contrib.staticfiles.storage import staticfiles_storage
 from django.db import IntegrityError, transaction
 from django.http import HttpResponse
 from django.template.loader import render_to_string
+from django.utils.dateparse import parse_datetime
 from rest_framework import permissions, status, views, viewsets
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
@@ -129,17 +130,13 @@ class FittingDiameterViewSet(viewsets.ViewSet):
 
 
 class ReductionViewSet(viewsets.ModelViewSet):
-    permission_classes = [
-        permissions.IsAdminUser,
-    ]
+    permission_classes = [permissions.IsAdminUser, ]
     serializer_class = ReductionSerializer
     queryset = Reduction.objects.all()
 
 
 class MaterialConnectionViewSet(viewsets.ModelViewSet):
-    permission_classes = [
-        permissions.IsAdminUser,
-    ]
+    permission_classes = [permissions.IsAdminUser, ]
     serializer_class = MaterialConnectionSerializer
     queryset = MaterialConnection.objects.all()
 
@@ -250,9 +247,27 @@ class Calculate(views.APIView):
                     status=status.HTTP_400_BAD_REQUEST
                 )
             try:
-                html_string = render_to_string('shp/printshp.html', serializer.data)
-                css = CSS(staticfiles_storage.path('shp/css/printshp.css'))
-                pdf_file = HTML(string=html_string, base_url=request.build_absolute_uri()).write_pdf(stylesheets=[css])
+                context = {
+                    'calculated_at': parse_datetime(calculated_at),
+                    'calc': serializer.data,
+                    'fixture': Fixture.objects.get(id=serializer.data.get('fixture_id')),
+                    'reservoir_path': next(
+                        filter(lambda path: path.get('start') == 'RES', serializer.data.get('paths')), None
+                    ),
+                    'less_favorable_path_fixture': serializer.data.get('paths')[
+                        serializer.data.get('less_favorable_path_fixture_index')
+                    ],
+                }
+                html_string = render_to_string('shp/printshp.html', context)
+                # css = CSS(staticfiles_storage.path('css/printshp.css'))
+                # pdf_file = HTML(
+                #     string=html_string,
+                #     base_url=request.build_absolute_uri()
+                # ).write_pdf(stylesheets=[css])
+                pdf_file = HTML(
+                    string=html_string,
+                    base_url=request.build_absolute_uri()
+                ).write_pdf()
                 filename = 'Cálculo SHP_server.pdf'
                 response = HttpResponse(pdf_file, content_type='application/pdf')
                 response['Content-Disposition'] = f'attachment; filename={filename}'
@@ -271,3 +286,77 @@ class Calculate(views.APIView):
                 else:
                     return Response(serializer.data)
             return Response({'detail': 'Problemas ao calcular os dados enviados'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+def teste(request):
+    from django.shortcuts import render
+
+    serializer = SHPCalcSerializer(data=calc)
+    serializer.is_valid(raise_exception=True)
+    calculated_at = serializer.data.get('calculated_at')
+    less_favorable_path_fixture_index = serializer.data.get('less_favorable_path_fixture_index')
+    context = {
+        'calculated_at': parse_datetime(calculated_at),
+        'calc': serializer.data,
+        'fixture': Fixture.objects.get(id=serializer.data.get('fixture_id'))
+    }
+    return render(request, 'shp/printshp.html', context)
+
+
+calc = {
+    'fileinfo':
+    {'type': 'shp_calc', 'version': '1.0.0', 'created': '2022-08-21T18:39:21Z',
+     'updated': '2022-08-29 20:16:10-03:00'},
+    'name': '', 'pressure_type': 'GR', 'calc_type': 'VM', 'pump': {},
+    'material_id': 3, 'diameter_id': 1, 'fixture_id': 3,
+    'paths':
+    [{'start': 'RES', 'end': 'A',
+      'fixture':
+      {'active': False, 'end': 'H1', 'hose_length': 30, 'level_difference': 0, 'flow': None, 'total_length': None,
+       'start_pressure': 0, 'middle_pressure': 0, 'end_pressure': None, 'hose_pressure_drop': None,
+       'unit_hose_pressure_drop': None, 'pressure_drop': None, 'unit_pressure_drop': None, 'connection_names': None},
+      'material_id': 3, 'diameter_id': 1, 'length': 2, 'level_difference': -4.68, 'fittings_ids': [],
+      'has_fixture': False, 'extra_equivalent_length': 0, 'equivalent_length': 0, 'total_length': 6.677900715359367,
+      'connection_names': ['Comprimento extra: 0,00 m'],
+      'flow': 0.002333847702399978, 'speed': 0.7486891373355892, 'start_pressure': 8.129173586546301e-05,
+      'end_pressure': 4.581758148598465, 'pressure_drop': 0.09622385849676751, 'unit_pressure_drop':
+      0.014409297561949346},
+     {'start': 'A', 'end': 'B',
+      'fixture':
+      {'active': False, 'end': 'H2', 'hose_length': 30, 'level_difference': 0, 'flow': None, 'total_length': None,
+       'start_pressure': 0, 'middle_pressure': 0, 'end_pressure': None, 'hose_pressure_drop': None,
+       'unit_hose_pressure_drop': None, 'pressure_drop': None, 'unit_pressure_drop': None, 'connection_names': None},
+      'material_id': 3, 'diameter_id': 1, 'length': 3, 'level_difference': -2, 'fittings_ids': [],
+      'has_fixture': False, 'extra_equivalent_length': 0, 'equivalent_length': 0, 'total_length': 7.16,
+      'connection_names': ['Comprimento extra: 0,00 m', 'Te Bilateral: 4.16 m'],
+      'flow': 0.002333847702399978, 'speed': 0.7486891373355892, 'start_pressure': 4.581758148598465, 'end_pressure':
+      6.478587578054907, 'pressure_drop': 0.10317057054355733, 'unit_pressure_drop': 0.014409297561949346},
+     {'start': 'B', 'end': None,
+      'fixture':
+      {'active': True, 'end': 'H3', 'hose_length': 30, 'level_difference': 1, 'flow': 0.001167181035733311,
+       'total_length': 9.760000000000002, 'start_pressure': 6.462592941899916, 'middle_pressure': 6.423566029681738,
+       'end_pressure': 4.599541033538344, 'hose_pressure_drop': 0.8240249961433936, 'unit_hose_pressure_drop':
+       0.027467499871446456, 'pressure_drop': 0.03902691221817784, 'unit_pressure_drop': 0.003998659038747729,
+       'connection_names':
+       ['Comprimento extra: 0,00 m', 'Joelho 90: 2.35 m', 'Joelho 90: 2.35 m', 'Registro de Gaveta Aberto: 0.40 m',
+        'Te Bilateral: 4.16 m', 'Ampliação 2" > 2 1/2": 0.50 m']},
+      'material_id': 3, 'diameter_id': 1, 'length': 4, 'level_difference': 0, 'fittings_ids': [],
+      'has_fixture': True, 'extra_equivalent_length': 0, 'equivalent_length': 0, 'total_length': 4,
+      'connection_names': ['Comprimento extra: 0,00 m'],
+      'flow': 0.001167181035733311, 'speed': 0.37442707245164947, 'start_pressure': 6.478587578054907, 'end_pressure':
+      6.462592941899916, 'pressure_drop': 0.015994636154990916, 'unit_pressure_drop': 0.003998659038747729},
+     {'start': 'B', 'end': None,
+      'fixture':
+      {'active': True, 'end': 'H4', 'hose_length': 30, 'level_difference': 1, 'flow': 0.001166666666666667,
+       'total_length': 9.760000000000002, 'start_pressure': 6.458610580000424, 'middle_pressure': 6.419615479798073,
+       'end_pressure': 4.596262171337066, 'hose_pressure_drop': 0.8233533084610071, 'unit_hose_pressure_drop':
+       0.02744511028203357, 'pressure_drop': 0.03899510020235159, 'unit_pressure_drop': 0.003995399610896679,
+       'connection_names':
+       ['Comprimento extra: 0,00 m', 'Joelho 90: 2.35 m', 'Joelho 90: 2.35 m', 'Registro de Gaveta Aberto: 0.40 m',
+        'Te Bilateral: 4.16 m', 'Ampliação 2" > 2 1/2": 0.50 m']},
+      'material_id': 3, 'diameter_id': 1, 'length': 5, 'level_difference': 0, 'fittings_ids': [],
+      'has_fixture': True, 'extra_equivalent_length': 0, 'equivalent_length': 0, 'total_length': 5,
+      'connection_names': ['Comprimento extra: 0,00 m'],
+      'flow': 0.001166666666666667, 'speed': 0.37426206488393976, 'start_pressure': 6.478587578054907, 'end_pressure':
+      6.458610580000424, 'pressure_drop': 0.019976998054483393, 'unit_pressure_drop': 0.003995399610896679}],
+    'error': None, 'less_favorable_path_fixture_index': 3, 'calculated_at': '2022-08-29T23:14:35.055029Z'}

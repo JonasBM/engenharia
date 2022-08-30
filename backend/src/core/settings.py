@@ -172,8 +172,14 @@ USE_TZ = True
 STATIC_URL = "static/"
 MEDIA_URL = "media/"
 
-STATIC_ROOT = "backend/src/static/"
-MEDIA_ROOT = "backend/src/media/"
+# STATIC_ROOT = "backend/src/static/"
+# MEDIA_ROOT = "backend/src/media/"
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+]
 
 # STATIC_URL = '/static/'
 
@@ -207,4 +213,11 @@ LOGGING = {
         'handlers': ['console'],
         'propagate': True,
     },
+    'loggers': {
+        'fontTools': {
+            'level': 'ERROR',
+            'handlers': ['console'],
+            'propagate': True,
+        },
+    }
 }

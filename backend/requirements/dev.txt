@@ -6,6 +6,8 @@
 #
 asgiref==3.5.2
     # via django
+astroid==2.12.4
+    # via pylint
 autopep8==1.6.0
     # via
     #   -r backend/requirements/dev.in
@@ -34,6 +36,8 @@ cssselect2==0.6.0
     # via weasyprint
 dataclasses==0.6
     # via -r backend/requirements/base.in
+dill==0.3.5.1
+    # via pylint
 django==3.2.13
     # via
     #   -r backend/requirements/base.in
@@ -87,20 +91,28 @@ idna==3.3
     # via requests
 inflection==0.5.1
     # via drf-yasg
+isort==5.10.1
+    # via pylint
 itypes==1.2.0
     # via coreapi
 jinja2==3.1.2
     # via
     #   coreschema
     #   django-silk
+lazy-object-proxy==1.7.1
+    # via astroid
 markupsafe==2.1.1
     # via jinja2
 mccabe==0.6.1
-    # via flake8
+    # via
+    #   flake8
+    #   pylint
 packaging==21.3
     # via drf-yasg
 pillow==9.2.0
     # via weasyprint
+platformdirs==2.5.2
+    # via pylint
 psycopg2==2.9.3
     # via -r backend/requirements/base.in
 pycodestyle==2.8.0
@@ -113,6 +125,14 @@ pydyf==0.2.0
     # via weasyprint
 pyflakes==2.4.0
     # via flake8
+pylint==2.15.0
+    # via
+    #   pylint-django
+    #   pylint-plugin-utils
+pylint-django==2.5.3
+    # via -r backend/requirements/dev.in
+pylint-plugin-utils==0.7
+    # via pylint-django
 pyparsing==3.0.9
     # via packaging
 pyphen==0.12.0
@@ -150,6 +170,10 @@ tinycss2==1.1.1
     #   weasyprint
 toml==0.10.2
     # via autopep8
+tomli==2.0.1
+    # via pylint
+tomlkit==0.11.4
+    # via pylint
 uritemplate==4.1.1
     # via
     #   -r backend/requirements/dev.in
@@ -166,5 +190,7 @@ webencodings==0.5.1
     #   cssselect2
     #   html5lib
     #   tinycss2
+wrapt==1.14.1
+    # via astroid
 zopfli==0.2.1
     # via fonttools

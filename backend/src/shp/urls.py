@@ -1,8 +1,10 @@
-
-from rest_framework import routers
-from .views import (Calculate, ConfigViewSet, FixtureViewSet, LoadMaterialBackup, MaterialViewSet, DiameterViewSet,
-                    FittingViewSet, ReductionViewSet, MaterialConnectionViewSet, FittingDiameterViewSet)
 from django.urls import path
+from rest_framework import routers
+
+from .views import (Calculate, ConfigViewSet, DiameterViewSet,
+                    FittingDiameterViewSet, FittingViewSet, FixtureViewSet,
+                    LoadMaterialBackup, MaterialConnectionViewSet,
+                    MaterialViewSet, ReductionViewSet, teste)
 
 app_name = 'shp'
 
@@ -19,6 +21,7 @@ router.register(r'fixtures', FixtureViewSet, 'fixtures')
 urlpatterns = [
     path(r'loadmaterialbackup/', LoadMaterialBackup.as_view(), name='loadmaterialbackup'),
     path(r'calculate/', Calculate.as_view(), name='calculate'),
+    path('teste/', teste)
 ]
 
 urlpatterns += router.urls

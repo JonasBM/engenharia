@@ -1,13 +1,18 @@
 {
+  "version": "0.2.0",
   "configurations": [
     {
-      "name": "Python: Django",
+      "name": "Django",
       "type": "python",
       "request": "launch",
       "program": "${workspaceFolder}/backend/src/manage.py",
-      "args": ["runserver", "0.0.0.0:8000", "--noreload"],
+      "args": [
+        "runserver",
+        "0.0.0.0:8000",
+        "--noreload"
+      ],
       "django": true,
       "justMyCode": true
-    }
-  ]
+    },
+  ],
 }

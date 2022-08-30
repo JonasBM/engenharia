@@ -1,0 +1,55 @@
+version: "3.8"
+
+services:
+  app:
+    build:
+      context: ..
+      dockerfile: .devcontainer/Dockerfile
+      args:
+        # Update 'VARIANT' to pick a version of Python: 3, 3.10, 3.9, 3.8, 3.7, 3.6
+        # Append -bullseye or -buster to pin to an OS version.
+        # Use -bullseye variants on local arm64/Apple Silicon.
+        VARIANT: "3.10-bullseye"
+        # Optional Node.js version to install
+        NODE_VERSION: "16"
+
+    volumes:
+      - ..:/workspace:cached
+      - engenharia-bashhistory:/commandhistory
+
+    # Overrides default command so things don't shut down after the process ends.
+    command: sleep infinity
+
+    # Runs app on the same network as the database container, allows "forwardPorts" in devcontainer.json function.
+    # network_mode: service:redis
+    extra_hosts:
+        host.docker.internal: host-gateway
+    # Uncomment the next line to use a non-root user for all processes.
+    # user: vscode
+
+    # Use "forwardPorts" in **devcontainer.json** to forward an app port locally.
+    # (Adding the "ports" property to this file will not forward from a Codespace.)
+
+  # db:
+  #   image: mysql:5.7
+  #   restart: unless-stopped
+  #   volumes:
+  #     # - postgres-data:/var/lib/postgresql/data
+  #     - mysql-data:/var/lib/mysql
+  #   environment:
+  #     MYSQL_DATABASE: 'pricesurvey'
+  #     #  MYSQL_USER: "price"
+  #     MYSQL_PASSWORD: 'pass'
+  #     MYSQL_ROOT_PASSWORD: 'jonas'
+  #   # Add "forwardPorts": ["5432"] to **devcontainer.json** to forward PostgreSQL locally.
+  #   # (Adding the "ports" property to this file will not forward from a Codespace.)
+
+  # redis:
+  #   image: "redis:3.2.0"
+  #   volumes:
+  #     - "engenharia-redisdata:/data"
+
+volumes:
+  # mysql-data: null
+  # engenharia-redisdata: null
+  engenharia-bashhistory: null

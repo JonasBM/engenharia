@@ -10,6 +10,7 @@ django-silk
 # Linting and Auto-formatting
 flake8
 autopep8
+pylint-django
 
 # Documentation
 pyyaml

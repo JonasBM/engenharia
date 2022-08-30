@@ -326,7 +326,7 @@ const FixtureDialogForm = () => {
               opção de "O Fator de vazão inclue a perda de carga na mangueira".
               <br />
               Caso nenhum valor seja fornecido para o "Coeficiente tipico do
-              esguicho" a perda de carga no esguicho desconsiderada.
+              esguicho" a perda de carga no esguicho será desconsiderada.
             </FormHelperText>
           </Paper>
         </Grid>
