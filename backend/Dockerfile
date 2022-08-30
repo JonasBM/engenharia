@@ -1,4 +1,4 @@
-FROM python:3.10-slim
+FROM python:3.10-slim-bullseye
 
 ENV PATH="/scripts:${PATH}"
 
@@ -8,6 +8,7 @@ RUN set -ex \
     mime-support \
     postgresql-client \
     locales locales-all \
+    libpango-1.0-0 libpangoft2-1.0-0 \
     " \
     && seq 1 8 | xargs -I{} mkdir -p /usr/share/man/man{} \
     && apt-get update && apt-get install -y --no-install-recommends $RUN_DEPS \
