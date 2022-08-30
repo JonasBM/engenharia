@@ -60,7 +60,11 @@
           <h4 class="nomargin">Informações da Bomba:</h4>
           <lu>
             <li class="ml-5">Ponto da Bomba: {{ calc.pump.node }}</li>
-            <li class="ml-5 alert">Altura Manométrica: {{ calc.pump.head_height }} m.c.a.</li>
+            {% if calc.calc_type|is_residual %}
+              <li class="ml-5">Altura Manométrica existente: {{ calc.pump.head_height }} m.c.a.</li>
+            {% else %}
+              <li class="ml-5 alert">Altura Manométrica calculada: {{ calc.pump.head_height }} m.c.a.</li>
+            {% endif %}
             <li class="ml-5 alert">Vazão: {{ calc.pump.flow|format_flow }}</li>
             <li class="ml-5">NPSH disponível p/ 1 atm e 20°C: {{ calc.pump.NPSHd|floatformat:2 }} m.c.a.</li>
           </lu>
@@ -71,9 +75,9 @@
           <h4 class="nomargin">Informações do reservatório:</h4>
           <lu>
             {% if calc.calc_type|is_residual %}
-              <li class="ml-5">Altura: {{ reservoir_path.level_difference|format_reservoir_level }}</li>
+              <li class="ml-5">Altura existente: {{ reservoir_path.level_difference|format_reservoir_level }}</li>
             {% else %}
-              <li class="ml-5 alert">Altura cálculada: {{ reservoir_path.level_difference|format_reservoir_level }}</li>
+              <li class="ml-5 alert">Altura calculada: {{ reservoir_path.level_difference|format_reservoir_level }}</li>
             {% endif %}
             <li class="ml-5">Material da tubulação: {{ reservoir_path.material_id|get_material_title }}</li>
             <li class="ml-5">Diâmetro da tubulação: {{ reservoir_path.diameter_id|get_diameter_title }}</li>
