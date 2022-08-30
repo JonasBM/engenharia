@@ -174,9 +174,9 @@ const Fixture = ({
           }}
         >
           <ConnectionsPopover
-            connectionNames={getValues(
-              `paths.${index}.fixture.connection_names`
-            )}
+            connectionNames={
+              getValues(`paths.${index}.fixture.connection_names`) || []
+            }
           />
         </Popover>
       </StyledTableCellBorderLeft>

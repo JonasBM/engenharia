@@ -79,7 +79,7 @@ const FixtureDialogFittings = () => {
   useEffect(() => {
     setCurrentFittingDiameters(
       fittingDiameters.find((d) => d.material === material_id)
-        ?.fitting_diameter_array
+        ?.fitting_diameter_array || []
     );
   }, [fittingDiameters, material_id]);
 
@@ -95,7 +95,7 @@ const FixtureDialogFittings = () => {
 
   useEffect(() => {
     let newEquivalentLength = 0;
-    if (fittings_ids?.length > 0) {
+    if (fittings_ids && fittings_ids.length > 0) {
       for (const _fitting_id of fittings_ids) {
         const _fitting = currentFittingDiameters?.find(
           (fd) => fd.diameter === diameter_id && fd.fitting === _fitting_id
@@ -113,7 +113,7 @@ const FixtureDialogFittings = () => {
   const handleOnDragEnd = (result: any) => {
     if (!result.destination) return;
     if (result.source.index !== result.destination.index) {
-      const newArray = [...fittings_ids];
+      const newArray = [...(fittings_ids || [])];
       const element = newArray.splice(result.source.index, 1)[0];
       newArray.splice(result.destination.index, 0, element);
       setValue("fittings_ids", newArray);
@@ -183,10 +183,12 @@ const FixtureDialogFittings = () => {
                     <ListItemButton
                       key={_fitting.id}
                       onClick={() => {
-                        setValue("fittings_ids", [
-                          ...fittings_ids,
-                          _fitting.id,
-                        ]);
+                        if (_fitting.id) {
+                          setValue("fittings_ids", [
+                            ...(fittings_ids || []),
+                            _fitting.id,
+                          ]);
+                        }
                       }}
                     >
                       <ListItemText primary={_fitting.name} />

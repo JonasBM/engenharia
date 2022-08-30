@@ -12,12 +12,12 @@ export type ActionTypes = {
 };
 
 export type actionMessages = {
-  reset?: string;
-  list?: string;
-  create?: string;
-  retrieve?: string;
-  update?: string;
-  destroy?: string;
+  reset?: string | null;
+  list?: string | null;
+  create?: string | null;
+  retrieve?: string | null;
+  update?: string | null;
+  destroy?: string | null;
 };
 
 export type Config = ActionConfig & {

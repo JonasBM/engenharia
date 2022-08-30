@@ -22,7 +22,7 @@ export interface BaseDialogFormProps {
   onClose: () => void;
   onSubmit: () => void;
   onReset: () => void;
-  onDelete: () => void;
+  onDelete?: () => void;
   canDelete?: boolean;
   maxWidth?: DialogProps["maxWidth"];
 }

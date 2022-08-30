@@ -74,14 +74,14 @@ const Fixture = () => {
   const handleDeleteClick = (id: GridRowId) => {
     if (id) {
       const fixture = fixtures.find((row) => row.id === id);
-      destroyFixture(fixture);
+      if (fixture) destroyFixture(fixture);
     }
   };
 
   const getFixtureType = (
     params: GridValueGetterParams<string, FixtureSerializer>
   ): string => {
-    return fixtureTypes.find((ft) => ft.value === params.value)?.name;
+    return fixtureTypes.find((ft) => ft.value === params.value)?.name || "";
   };
 
   const CommonFieldAttributes: GridColDef = {

@@ -31,7 +31,7 @@ const FileToolbar = () => {
     const reader = new FileReader();
     reader.onload = (e) => {
       const _calcFile = JSON.parse(
-        e.target.result.toString()
+        e.target?.result?.toString() || ""
       ) as SHPCalcSerializer;
       if (
         _calcFile.fileinfo.type === "shp_calc" &&
@@ -109,7 +109,9 @@ const FileToolbar = () => {
               accept=".shpcalc"
               hidden
               onChange={(e) => {
-                handleLoadCalcFile(e.target.files[0]);
+                if (e.target.files) {
+                  handleLoadCalcFile(e.target.files[0]);
+                }
               }}
             />
           </Button>

@@ -71,7 +71,7 @@ export const closeFixtureDialog = () => {
   store.dispatch(closeDialog(_dialogName));
 };
 
-export const destroyFixture = (_fixture: FixtureSerializer) => {
+export const destroyFixture = (_fixture?: FixtureSerializer | null) => {
   if (_fixture && _fixture.id) {
     let newLine = "\r\n";
     let confirm_alert = "Tem certeza que deseja remover este Hidrante?";
@@ -228,7 +228,7 @@ const FixtureDialogForm = () => {
       onClose={handleClose}
       onSubmit={handleSubmit(onSubmit)}
       onReset={handleReset}
-      onDelete={dialogObject?.id ? handleDestroy : null}
+      onDelete={dialogObject?.id ? handleDestroy : undefined}
       maxWidth="lg"
     >
       <FormProvider {...formMethods}>

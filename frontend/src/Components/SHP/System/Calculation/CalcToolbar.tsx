@@ -57,7 +57,7 @@ const CalcToolbar = () => {
       if (config.fixture) {
         setValue("fixture_id", config.fixture);
       } else {
-        setValue("fixture_id", fixtures[0].id);
+        setValue("fixture_id", fixtures[0].id || null);
       }
     }
   }, [fixtures, fixture_id, setValue, config]);

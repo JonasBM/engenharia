@@ -55,8 +55,8 @@ const getNewStrings = (
 const getNewFixtureString = (state: SHPCalcSerializer): string => {
   let lastNumber = 0;
   for (const path of state.paths) {
-    if (path.fixture.end) {
-      const current = parseInt(path.fixture.end.match(/\d+/).shift());
+    if (path.fixture && path.fixture.end) {
+      const current = parseInt(path.fixture.end.match(/\d+/)?.shift() || "");
       lastNumber = current > lastNumber ? current : lastNumber;
     }
   }

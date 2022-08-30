@@ -40,7 +40,7 @@ export const closeMaterialDialog = () => {
   store.dispatch(closeDialog(_dialogName));
 };
 
-export const destroyMaterial = (_material: MaterialSerializer) => {
+export const destroyMaterial = (_material?: MaterialSerializer | null) => {
   if (_material && _material.id) {
     let newLine = "\r\n";
     let confirm_alert = "Tem certeza que deseja remover este Material?";
@@ -137,7 +137,7 @@ const MaterialDialogForm = () => {
       onClose={handleClose}
       onSubmit={handleSubmit(onSubmit)}
       onReset={handleReset}
-      onDelete={dialogObject?.id ? handleDestroy : null}
+      onDelete={dialogObject?.id ? handleDestroy : undefined}
     >
       <TextField
         label="Nome"
@@ -168,7 +168,7 @@ const MaterialDialogForm = () => {
               error={errors.one_outlet_connection ? true : false}
               helperText={errors.one_outlet_connection?.message}
             >
-              <MenuItem value={null}>Sem conexão</MenuItem>
+              <MenuItem value={""}>Sem conexão</MenuItem>
               {fittings.map((_fitting) => (
                 <MenuItem key={_fitting.id} value={_fitting.id}>
                   {_fitting.name}
@@ -193,7 +193,7 @@ const MaterialDialogForm = () => {
               error={errors.two_outlet_connection ? true : false}
               helperText={errors.two_outlet_connection?.message}
             >
-              <MenuItem value={null}>Sem conexão</MenuItem>
+              <MenuItem value={""}>Sem conexão</MenuItem>
               {fittings.map((_fitting) => (
                 <MenuItem key={_fitting.id} value={_fitting.id}>
                   {_fitting.name}
@@ -218,7 +218,7 @@ const MaterialDialogForm = () => {
               error={errors.three_outlet_connection ? true : false}
               helperText={errors.three_outlet_connection?.message}
             >
-              <MenuItem value={null}>Sem conexão</MenuItem>
+              <MenuItem value={""}>Sem conexão</MenuItem>
               {fittings.map((_fitting) => (
                 <MenuItem key={_fitting.id} value={_fitting.id}>
                   {_fitting.name}
@@ -244,7 +244,7 @@ const MaterialDialogForm = () => {
               error={errors.one_outlet_connection ? true : false}
               helperText={errors.one_outlet_connection?.message}
             >
-              <MenuItem value={null}>Sem Diâmetro</MenuItem>
+              <MenuItem value={""}>Sem Diâmetro</MenuItem>
               {diameters.map((_diameter) => (
                 <MenuItem
                   key={_diameter.id}

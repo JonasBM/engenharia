@@ -35,7 +35,7 @@ export const closeFittingDialog = () => {
   store.dispatch(closeDialog(_dialogName));
 };
 
-export const destroyFitting = (_fitting: FittingSerializer) => {
+export const destroyFitting = (_fitting?: FittingSerializer | null) => {
   if (_fitting && _fitting.id) {
     let newLine = "\r\n";
     let confirm_alert = "Tem certeza que deseja remover esta Conexão?";
@@ -127,7 +127,7 @@ const FittingDialogForm = () => {
       onClose={handleClose}
       onSubmit={handleSubmit(onSubmit)}
       onReset={handleReset}
-      onDelete={dialogObject?.id ? handleDestroy : null}
+      onDelete={dialogObject?.id ? handleDestroy : undefined}
     >
       <Typography>A conexão criada vale para todos os materiais</Typography>
       <TextField

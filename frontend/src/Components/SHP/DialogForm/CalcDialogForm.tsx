@@ -17,9 +17,9 @@ import { yupResolver } from "@hookform/resolvers/yup";
 const _dialogName = "DIALOG_SHPCALC";
 
 export interface SHPCalcCreator {
-  material: number;
-  diameter: number;
-  fixtures: number;
+  material: number | null;
+  diameter: number | null;
+  fixtures: number | null;
   level_diference: number;
 }
 
@@ -68,7 +68,7 @@ const CalcDialogForm = () => {
   const diameter_id = useWatch({ control, name: "diameter" });
 
   useEffect(() => {
-    if (!material_id && materials.length > 0 && config) {
+    if (!material_id && materials.length > 0 && materials[0].id && config) {
       if (config.material) {
         setValue("material", config.material);
       } else {
@@ -95,7 +95,7 @@ const CalcDialogForm = () => {
       } else {
         setValue(
           "diameter",
-          diameters.find((d) => d.material === material_id)?.id,
+          diameters.find((d) => d.material === material_id)?.id || null,
           { shouldValidate: true }
         );
       }
@@ -117,22 +117,26 @@ const CalcDialogForm = () => {
     RESPath.end = "R0";
     RROPath.start = "R0";
     RROPath.end = "A";
-    fixPath.start = "A";
-    fixPath.has_fixture = true;
-    fixPath.fixture.active = true;
-    fixPath.fixture.end = "H1";
-    for (let i = 1; i < data.fixtures; i++) {
-      const path = getNewPath(newCalc);
-      if (data.level_diference) {
-        path.length = data.level_diference;
-        path.level_difference = -data.level_diference;
-      }
-      newCalc.paths.push(path);
-      const fixPath = getNewPath(newCalc);
+    if (fixPath && fixPath.fixture && data.fixtures) {
+      fixPath.start = "A";
       fixPath.has_fixture = true;
       fixPath.fixture.active = true;
-      fixPath.fixture.end = `H${i + 1}`;
-      newCalc.paths.push(fixPath);
+      fixPath.fixture.end = "H1";
+      for (let i = 1; i < data.fixtures; i++) {
+        const path = getNewPath(newCalc);
+        if (data.level_diference) {
+          path.length = data.level_diference;
+          path.level_difference = -data.level_diference;
+        }
+        newCalc.paths.push(path);
+        const fixPath = getNewPath(newCalc);
+        if (fixPath && fixPath.fixture) {
+          fixPath.has_fixture = true;
+          fixPath.fixture.active = true;
+          fixPath.fixture.end = `H${i + 1}`;
+          newCalc.paths.push(fixPath);
+        }
+      }
     }
     dispatch(setCalc(newCalc));
     handleClose();
@@ -153,7 +157,7 @@ const CalcDialogForm = () => {
       onClose={handleClose}
       onSubmit={handleSubmit(onSubmit)}
       onReset={handleReset}
-      onDelete={null}
+      onDelete={undefined}
     >
       <Typography variant="body2">
         O novo cálculo irá substituir o cálculo atual

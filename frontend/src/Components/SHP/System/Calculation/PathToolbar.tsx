@@ -34,9 +34,9 @@ const PathToolbar = ({
   useEffect(() => {
     if (!material_id && materials.length > 0 && config) {
       if (config.material) {
-        setValue("material_id", config.material);
+        setValue("material_id", config.material || null);
       } else {
-        setValue("material_id", materials[0].id);
+        setValue("material_id", materials[0].id || null);
       }
     }
   }, [materials, material_id, setValue, config]);
@@ -57,7 +57,7 @@ const PathToolbar = ({
       } else {
         setValue(
           "diameter_id",
-          diameters.find((d) => d.material === material_id)?.id
+          diameters.find((d) => d.material === material_id)?.id || null
         );
       }
     }

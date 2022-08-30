@@ -31,7 +31,7 @@ const modalSlice = createSlice({
       }
     },
     closeDialog(state, action?: PayloadAction<string>) {
-      if (action.payload) {
+      if (action && action.payload) {
         state.openModals.splice(state.openModals.indexOf(action.payload), 1);
         delete state.dialogObjects[action.payload];
       } else {

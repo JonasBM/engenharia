@@ -91,7 +91,7 @@ const MaterialConnection = () => {
   const getMaterialName = (
     params: GridValueGetterParams<number, MaterialConnectionSerializer>
   ): string => {
-    return materials.find((m) => m.id === params.value)?.name;
+    return materials.find((m) => m.id === params.value)?.name || "";
   };
 
   const getDiameterName = (
@@ -101,7 +101,7 @@ const MaterialConnection = () => {
     if (diameter) {
       return `${diameter.name} (${diameter.internal_diameter} mm)`;
     }
-    return params.value.toString();
+    return params.value?.toString() || "";
   };
 
   const CommonFieldAttributes: GridColDef = {

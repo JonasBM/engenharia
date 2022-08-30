@@ -39,7 +39,7 @@ export const closeReductionDialog = () => {
   store.dispatch(closeDialog(_dialogName));
 };
 
-export const destroyReduction = (_reduction: ReductionSerializer) => {
+export const destroyReduction = (_reduction?: ReductionSerializer | null) => {
   if (_reduction && _reduction.id) {
     let newLine = "\r\n";
     let confirm_alert =
@@ -202,7 +202,7 @@ const ReductionDialogForm = () => {
       onClose={handleClose}
       onSubmit={handleSubmit(onSubmit)}
       onReset={handleReset}
-      onDelete={dialogObject?.id ? handleDestroy : null}
+      onDelete={dialogObject?.id ? handleDestroy : undefined}
     >
       <TextField
         label="Nome"

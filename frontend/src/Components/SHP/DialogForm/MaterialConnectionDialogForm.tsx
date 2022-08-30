@@ -41,7 +41,7 @@ export const closeMaterialConnectionDialog = () => {
 };
 
 export const destroyMaterialConnection = (
-  _materialConnection: MaterialConnectionSerializer
+  _materialConnection?: MaterialConnectionSerializer | null
 ) => {
   if (_materialConnection && _materialConnection.id) {
     let newLine = "\r\n";
@@ -219,7 +219,7 @@ const MaterialConnectionDialogForm = () => {
       onClose={handleClose}
       onSubmit={handleSubmit(onSubmit)}
       onReset={handleReset}
-      onDelete={dialogObject?.id ? handleDestroy : null}
+      onDelete={dialogObject?.id ? handleDestroy : undefined}
     >
       <TextField
         label="Nome"

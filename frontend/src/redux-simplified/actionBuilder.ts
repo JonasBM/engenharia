@@ -173,7 +173,7 @@ export class CRUDAction<T extends object, S = T[]> {
   };
 
   // LIST
-  list = (object: object | undefined = undefined, _config?: ActionConfig) => {
+  list = (object?: object | null, _config?: ActionConfig) => {
     return (dispatch: Dispatch) => {
       const _showLoading = this.getShowLoading(_config);
       const _contentHeader = this.getContentHeader(_config);

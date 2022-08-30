@@ -21,17 +21,12 @@ import {
   ListItemText,
   Paper,
   Stack,
-  TextField,
   Typography,
   useMediaQuery,
   useTheme,
 } from "@mui/material";
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
-import {
-  FixtureSerializer,
-  ReductionSerializer,
-  SHPCalcSerializer,
-} from "api/types/shpTypes";
+import { FixtureSerializer, ReductionSerializer } from "api/types/shpTypes";
 import React, { useEffect, useState } from "react";
 import { closeDialog, openDialog } from "redux/modal";
 
@@ -87,8 +82,8 @@ const FixtureDialogReductions = () => {
 
   useEffect(() => {
     let newEquivalentLength = 0;
-    if (reductions_ids?.length > 0) {
-      for (const _reduction_id of reductions_ids) {
+    if (reductions_ids?.length || 0 > 0) {
+      for (const _reduction_id of reductions_ids || []) {
         const _reduction = currentReductions?.find(
           (r) => r.id === _reduction_id
         );
@@ -105,7 +100,7 @@ const FixtureDialogReductions = () => {
   const handleOnDragEnd = (result: any) => {
     if (!result.destination) return;
     if (result.source.index !== result.destination.index) {
-      const newArray = [...reductions_ids];
+      const newArray = [...(reductions_ids || [])];
       const element = newArray.splice(result.source.index, 1)[0];
       newArray.splice(result.destination.index, 0, element);
       setValue("reductions_ids", newArray);
@@ -175,10 +170,12 @@ const FixtureDialogReductions = () => {
                     <ListItemButton
                       key={_reduction.id}
                       onClick={() => {
-                        setValue("reductions_ids", [
-                          ...reductions_ids,
-                          _reduction.id,
-                        ]);
+                        if (_reduction.id) {
+                          setValue("reductions_ids", [
+                            ...(reductions_ids || []),
+                            _reduction.id,
+                          ]);
+                        }
                       }}
                     >
                       <ListItemText primary={_reduction.name} />

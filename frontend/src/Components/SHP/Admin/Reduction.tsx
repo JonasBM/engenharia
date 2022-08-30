@@ -88,7 +88,7 @@ const Reduction = ({ material }: { material: MaterialSerializer }) => {
     if (diameter) {
       return `${diameter.name} (${diameter.internal_diameter} mm)`;
     }
-    return params.value.toString();
+    return params.value?.toString() || "";
   };
 
   const CommonFieldAttributes: GridColDef = {

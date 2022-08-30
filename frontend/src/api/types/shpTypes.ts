@@ -21,7 +21,7 @@ export interface ConfigSerializer {
 export interface MaterialSerializer {
   id?: number;
   name: string;
-  hazen_williams_coefficient: number;
+  hazen_williams_coefficient: number | null;
   one_outlet_connection?: any;
   two_outlet_connection?: any;
   three_outlet_connection?: any;
@@ -56,7 +56,7 @@ export interface FittingDiameterResponseSerializer {
 export interface ReductionSerializer {
   id?: number;
   name: string;
-  equivalent_length: number;
+  equivalent_length: number | null;
   material: any;
   inlet_diameter: any;
   outlet_diameter: any;
@@ -64,10 +64,10 @@ export interface ReductionSerializer {
 
 export interface MaterialConnectionSerializer {
   id?: number;
-  inlet_material?: number;
-  outlet_material?: number;
+  inlet_material?: number | null;
+  outlet_material?: number | null;
   name: string;
-  equivalent_length: number;
+  equivalent_length: number | null;
   inlet_diameter: any;
   outlet_diameter: any;
 }
@@ -76,14 +76,14 @@ export interface FixtureSerializer {
   id?: number;
   name: string;
   nozzle_type: "TC" | "RE" | "MA" | "";
-  extra_equivalent_length: number;
-  hose_hazen_williams_coefficient: number;
-  hose_internal_diameter: number;
+  extra_equivalent_length: number | null;
+  hose_hazen_williams_coefficient: number | null;
+  hose_internal_diameter: number | null;
   k_factor: number;
   k_factor_includes_hose?: boolean;
   k_nozzle?: number;
   outlet_diameter: number;
-  minimum_flow_rate: number;
+  minimum_flow_rate: number | null;
   material?: any;
   inlet_diameter?: any;
   reductions_ids?: number[];
@@ -114,49 +114,49 @@ export interface FileInfoSerializer {
 export interface MaterialFileSerializer {
   fileinfo: FileInfoSerializer;
   material: MaterialSerializer;
-  reductions: ReductionSerializer;
+  reductions?: ReductionSerializer;
   diameters: DiameterSerializer[];
   fittings: FittingSerializer[];
-  fittingdiameters: FittingDiameterResponseSerializer;
+  fittingdiameters?: FittingDiameterResponseSerializer;
 }
 
 export interface SHPCalcFixtureSerializer {
-  active?: boolean;
+  active?: boolean | null;
   end: string;
-  hose_length?: number;
-  level_difference?: number;
-  flow?: number;
-  total_length?: number;
-  start_pressure?: number;
-  middle_pressure?: number;
-  end_pressure?: number;
-  hose_pressure_drop?: number;
-  unit_hose_pressure_drop?: number;
-  pressure_drop?: number;
-  unit_pressure_drop?: number;
-  connection_names?: string[];
+  hose_length?: number | null;
+  level_difference?: number | null;
+  flow?: number | null;
+  total_length?: number | null;
+  start_pressure?: number | null;
+  middle_pressure?: number | null;
+  end_pressure?: number | null;
+  hose_pressure_drop?: number | null;
+  unit_hose_pressure_drop?: number | null;
+  pressure_drop?: number | null;
+  unit_pressure_drop?: number | null;
+  connection_names?: string[] | null;
 }
 
 export interface SHPCalcPathSerializer {
   start: string;
   end: string;
-  fixture?: SHPCalcFixtureSerializer;
-  material_id: number;
-  diameter_id: number;
-  length?: number;
-  level_difference?: number;
-  fittings_ids?: number[];
-  extra_equivalent_length?: number;
-  equivalent_length?: number;
-  total_length?: number;
-  has_fixture?: boolean;
-  connection_names?: string[];
-  flow?: number;
-  speed?: number;
-  start_pressure?: number;
-  end_pressure?: number;
-  pressure_drop?: number;
-  unit_pressure_drop?: number;
+  fixture?: SHPCalcFixtureSerializer | null;
+  material_id: number | null;
+  diameter_id: number | null;
+  length?: number | null;
+  level_difference?: number | null;
+  fittings_ids?: number[] | null;
+  extra_equivalent_length?: number | null;
+  equivalent_length?: number | null;
+  total_length?: number | null;
+  has_fixture?: boolean | null;
+  connection_names?: string[] | null;
+  flow?: number | null;
+  speed?: number | null;
+  start_pressure?: number | null;
+  end_pressure?: number | null;
+  pressure_drop?: number | null;
+  unit_pressure_drop?: number | null;
 }
 
 export interface SHPCalcPumpSerializer {
@@ -169,12 +169,12 @@ export interface SHPCalcPumpSerializer {
 export interface SHPCalcSerializer {
   fileinfo: FileInfoSerializer;
   name: string;
-  calc_type: string;
-  pressure_type: string;
+  calc_type: string | null;
+  pressure_type: string | null;
   pump: SHPCalcPumpSerializer;
-  material_id: number;
-  diameter_id: number;
-  fixture_id: number;
+  material_id: number | null;
+  diameter_id: number | null;
+  fixture_id: number | null;
   paths: SHPCalcPathSerializer[];
   error?: string | null;
   less_favorable_path_fixture_index?: number | null;

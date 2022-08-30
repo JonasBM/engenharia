@@ -1,7 +1,7 @@
 import { UserProfileSerializer } from "./api/types/accountsTypes";
 
 export const decimalFormatter = (
-  value: string | number,
+  value?: string | number | null,
   decimals: number = 2
 ) => {
   return value?.toLocaleString("pt-BR", {

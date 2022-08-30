@@ -86,7 +86,7 @@ const DialogFittings = () => {
   useEffect(() => {
     setCurrentFittingDiameters(
       fittingDiameters.find((d) => d.material === material_id)
-        ?.fitting_diameter_array
+        ?.fitting_diameter_array || []
     );
   }, [fittingDiameters, material_id]);
 
@@ -102,7 +102,7 @@ const DialogFittings = () => {
 
   const handleOnDragEnd = (result: any) => {
     if (!result.destination) return;
-    if (result.source.index !== result.destination.index) {
+    if (result.source.index !== result.destination.index && fittings_ids) {
       const newArray = [...fittings_ids];
       const element = newArray.splice(result.source.index, 1)[0];
       newArray.splice(result.destination.index, 0, element);
@@ -133,7 +133,7 @@ const DialogFittings = () => {
       <Box>
         <DialogTitle>
           {`Adicione as conexões no trecho ${start} - ${
-            has_fixture ? fixture.end : end
+            has_fixture ? fixture?.end : end
           }`}
           <IconButton
             onClick={handleClose}
@@ -181,10 +181,12 @@ const DialogFittings = () => {
                     <ListItemButton
                       key={_fitting.id}
                       onClick={() => {
-                        setValue(`paths.${index}.fittings_ids`, [
-                          ...fittings_ids,
-                          _fitting.id,
-                        ]);
+                        if (fittings_ids && _fitting.id) {
+                          setValue(`paths.${index}.fittings_ids`, [
+                            ...fittings_ids,
+                            _fitting.id,
+                          ]);
+                        }
                       }}
                     >
                       <ListItemText primary={_fitting.name} />

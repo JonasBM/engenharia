@@ -47,7 +47,7 @@ const Material = () => {
     const reader = new FileReader();
     reader.onload = (e) => {
       const materialFile = JSON.parse(
-        e.target.result.toString()
+        e.target?.result?.toString() || ""
       ) as MaterialFileSerializer;
       if (
         materialFile.fileinfo.type === "shp_material" &&
@@ -144,7 +144,9 @@ const Material = () => {
               accept=".shpmat"
               hidden
               onChange={(e) => {
-                handleLoadMaterialFile(e.target.files[0]);
+                if (e.target.files) {
+                  handleLoadMaterialFile(e.target.files[0]);
+                }
               }}
             />
           </Button>
@@ -221,7 +223,7 @@ const Material = () => {
                         <Button
                           startIcon={<Save />}
                           onClick={() => {
-                            saveSHPMaterial(_material.id);
+                            if (_material.id) saveSHPMaterial(_material.id);
                           }}
                           title="Baixar arquivo de backup do material"
                         >

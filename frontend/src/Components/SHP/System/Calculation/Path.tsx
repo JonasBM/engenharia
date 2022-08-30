@@ -105,13 +105,13 @@ const Path = ({
   useEffect(() => {
     setCurrentFittingDiameters(
       fittingDiameters.find((d) => d.material === material_id)
-        ?.fitting_diameter_array
+        ?.fitting_diameter_array || []
     );
   }, [fittingDiameters, material_id]);
 
   useEffect(() => {
     if (materials?.length > 0 && !material_id) {
-      setValue(`paths.${index}.material_id`, materials[0].id);
+      setValue(`paths.${index}.material_id`, materials[0].id || null);
     }
   }, [material_id, materials, setValue, index]);
 
@@ -131,16 +131,17 @@ const Path = ({
       } else {
         setValue(
           `paths.${index}.diameter_id`,
-          diameters.find((d) => d.material === material_id)?.id
+          diameters.find((d) => d.material === material_id)?.id || null
         );
       }
     }
   }, [diameters, material_id, diameter_id, materials, setValue, index]);
 
   useEffect(() => {
-    let newEquivalentLength =
-      parseFloat(extra_equivalent_length?.toString()) || 0;
-    if (fittings_ids?.length > 0) {
+    let newEquivalentLength = parseFloat(
+      extra_equivalent_length?.toString() || "0"
+    );
+    if (fittings_ids && fittings_ids?.length > 0) {
       for (const _fitting_id of fittings_ids) {
         const _fitting = currentFittingDiameters?.find(
           (fd) => fd.diameter === diameter_id && fd.fitting === _fitting_id
@@ -246,11 +247,11 @@ const Path = ({
                   if (event.target.checked) {
                     setValue(
                       `paths.${index}.material_id`,
-                      currentFixture.material
+                      currentFixture?.material
                     );
                     setValue(
                       `paths.${index}.diameter_id`,
-                      currentFixture.inlet_diameter
+                      currentFixture?.inlet_diameter
                     );
                   }
                   onChange(event.target.checked);
@@ -276,7 +277,7 @@ const Path = ({
                   onChange={(event) => {
                     onChange(event.target.value);
                   }}
-                  disabled={has_fixture}
+                  disabled={has_fixture || false}
                 >
                   {materials.map((_material) => (
                     <MenuItem key={_material.id} value={_material.id}>
@@ -302,7 +303,7 @@ const Path = ({
                   onChange={(event) => {
                     onChange(event.target.value);
                   }}
-                  disabled={has_fixture}
+                  disabled={has_fixture || false}
                 >
                   {diameters.map((_diameter) => (
                     <MenuItem
@@ -423,7 +424,9 @@ const Path = ({
             }}
           >
             <ConnectionsPopover
-              connectionNames={getValues(`paths.${index}.connection_names`)}
+              connectionNames={
+                getValues(`paths.${index}.connection_names`) || []
+              }
             />
           </Popover>
         </StyledTableCellBorderLeft>

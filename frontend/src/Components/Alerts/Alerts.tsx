@@ -14,7 +14,7 @@ const Alerts = () => {
     (
       message: SnackbarMessage,
       options: OptionsObject,
-      key: string = undefined
+      key: String | undefined = undefined
     ) => {
       if (typeof message === "string") {
         if (key) {

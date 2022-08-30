@@ -39,7 +39,7 @@ const FittingDiameter = ({ material }: { material: MaterialSerializer }) => {
     DiameterSerializer[]
   >([]);
   const [currentFittingdiameters, setCurrentFittingdiameters] =
-    useState<FittingDiameterResponseSerializer>(null);
+    useState<FittingDiameterResponseSerializer | null>(null);
 
   useEffect(() => {
     const current = fittingDiameters.find((el) => el.material === material.id);
@@ -64,7 +64,9 @@ const FittingDiameter = ({ material }: { material: MaterialSerializer }) => {
   }, [diameters, material]);
 
   const onSubmit = () => {
-    dispatch(FittingDiameterCRUDAction.create(currentFittingdiameters));
+    if (currentFittingdiameters) {
+      dispatch(FittingDiameterCRUDAction.create(currentFittingdiameters));
+    }
   };
 
   const handleReset = () => {
@@ -190,6 +192,7 @@ const FittingDiameter = ({ material }: { material: MaterialSerializer }) => {
                               fitting_diameter_array: [
                                 ...currentFittingdiameters.fitting_diameter_array.map(
                                   (o) =>
+                                    current &&
                                     o.fitting === current.fitting &&
                                     o.diameter === current.diameter
                                       ? { ...current }

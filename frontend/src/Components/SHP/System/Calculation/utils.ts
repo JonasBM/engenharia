@@ -6,11 +6,14 @@ import { UseFormSetValue } from "react-hook-form";
 import { formatInTimeZone } from "date-fns-tz";
 import store from "redux/store";
 
-export const flow_to_l_p_min = (flow: number): number => {
-  if (typeof flow === "number") {
-    return flow * 60000;
+export const flow_to_l_p_min = (flow?: number | null): number | undefined => {
+  if (flow) {
+    if (typeof flow === "number") {
+      return flow * 60000;
+    }
+    return flow;
   }
-  return flow;
+  return undefined;
 };
 
 export const saveFileSHPCalc = (data: SHPCalcSerializer) => {
@@ -51,24 +54,26 @@ export const saveSHPMaterial = (_material_id: number) => {
     "America/Sao_Paulo",
     "yyyy-MM-dd HH:mm:ssXXX"
   );
-
-  const data: MaterialFileSerializer = {
-    fileinfo: {
-      type: "shp_material",
-      version: "1.0.0",
-      created: todayString,
-      updated: todayString,
-    },
-    material: shpState.materials.find((m) => m.id === _material_id),
-    reductions: shpState.reductions.find((r) => r.material === _material_id),
-    diameters: shpState.diameters.filter((d) => d.material === _material_id),
-    fittings: shpState.fittings,
-    fittingdiameters: shpState.fittingDiameters.find(
-      (fd) => fd.material === _material_id
-    ),
-  };
-  const jsonData = JSON.stringify(data);
-  saveFile(jsonData, `${data.material.name}.shpmat`, "application/json");
+  const material = shpState.materials.find((m) => m.id === _material_id);
+  if (material) {
+    const data: MaterialFileSerializer = {
+      fileinfo: {
+        type: "shp_material",
+        version: "1.0.0",
+        created: todayString,
+        updated: todayString,
+      },
+      material: material,
+      reductions: shpState.reductions.find((r) => r.material === _material_id),
+      diameters: shpState.diameters.filter((d) => d.material === _material_id),
+      fittings: shpState.fittings,
+      fittingdiameters: shpState.fittingDiameters.find(
+        (fd) => fd.material === _material_id
+      ),
+    };
+    const jsonData = JSON.stringify(data);
+    saveFile(jsonData, `${data.material.name}.shpmat`, "application/json");
+  }
 };
 
 export const cleanCalc = (

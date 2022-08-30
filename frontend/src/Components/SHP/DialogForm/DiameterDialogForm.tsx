@@ -37,7 +37,7 @@ export const closeDiameterDialog = () => {
   store.dispatch(closeDialog(_dialogName));
 };
 
-export const destroyDiameter = (_diameter: DiameterSerializer) => {
+export const destroyDiameter = (_diameter?: DiameterSerializer | null) => {
   if (_diameter && _diameter.id) {
     let newLine = "\r\n";
     let confirm_alert = "Tem certeza que deseja remover este Diâmetro?";
@@ -133,7 +133,7 @@ const DiameterDialogForm = () => {
       onClose={handleClose}
       onSubmit={handleSubmit(onSubmit)}
       onReset={handleReset}
-      onDelete={dialogObject?.id ? handleDestroy : null}
+      onDelete={dialogObject?.id ? handleDestroy : undefined}
     >
       <TextField
         label="Nome"
