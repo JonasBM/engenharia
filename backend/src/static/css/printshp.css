@@ -56,9 +56,8 @@ footer {
 footer hr {
   border: 0.1mm solid black;
 }
-footer div {
-  font-size: xx-small;
-  height: 15mm;
+footer img {
+  width: 90%;
 }
 
 body .title {
