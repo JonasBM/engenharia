@@ -1,10 +1,4 @@
-import {
-  CRUDAction,
-  createMessage,
-  finishFetching,
-  returnError,
-  startFetching,
-} from "redux-simplified";
+import { CRUDAction, createMessage, finishFetching, returnError, startFetching } from "redux-simplified";
 import {
   ConfigSerializer,
   DiameterSerializer,
@@ -21,6 +15,7 @@ import axios, { AxiosRequestConfig } from "axios";
 
 import { Dispatch } from "@reduxjs/toolkit";
 import { RootState } from "redux/store";
+import { sanitizeFilename } from "utils";
 // import { RootState } from "redux/store";
 // import store from "redux/store";
 
@@ -44,26 +39,24 @@ export const FittingCRUDAction = new CRUDAction<FittingSerializer>(
   new URL("/shp/fittings/", import.meta.env.VITE_APP_API_URL).href
 );
 
-export const FittingDiameterCRUDAction =
-  new CRUDAction<FittingDiameterResponseSerializer>(
-    "shp/fittingdiameter",
-    new URL("/shp/fittingdiameter/", import.meta.env.VITE_APP_API_URL).href,
-    {
-      payloadIdName: "material",
-      actionMessages: { create: "Conexões salvas com sucesso!" },
-    }
-  );
+export const FittingDiameterCRUDAction = new CRUDAction<FittingDiameterResponseSerializer>(
+  "shp/fittingdiameter",
+  new URL("/shp/fittingdiameter/", import.meta.env.VITE_APP_API_URL).href,
+  {
+    payloadIdName: "material",
+    actionMessages: { create: "Conexões salvas com sucesso!" },
+  }
+);
 
 export const ReductionCRUDAction = new CRUDAction<ReductionSerializer>(
   "shp/reductions",
   new URL("/shp/reductions/", import.meta.env.VITE_APP_API_URL).href
 );
 
-export const MaterialConnectionCRUDAction =
-  new CRUDAction<MaterialConnectionSerializer>(
-    "shp/materialconnections",
-    new URL("/shp/materialconnections/", import.meta.env.VITE_APP_API_URL).href
-  );
+export const MaterialConnectionCRUDAction = new CRUDAction<MaterialConnectionSerializer>(
+  "shp/materialconnections",
+  new URL("/shp/materialconnections/", import.meta.env.VITE_APP_API_URL).href
+);
 
 export const FixtureCRUDAction = new CRUDAction<FixtureSerializer>(
   "shp/fixtures",
@@ -71,8 +64,7 @@ export const FixtureCRUDAction = new CRUDAction<FixtureSerializer>(
 );
 
 export const loadMaterialBackup = (object: MaterialFileSerializer) => {
-  return (dispatch: Dispatch,getState:() => RootState): Promise<any> => {
-    
+  return (dispatch: Dispatch, getState: () => RootState): Promise<any> => {
     const token = getState().auth.token;
     const config: AxiosRequestConfig = {
       headers: {
@@ -98,7 +90,7 @@ export const loadMaterialBackup = (object: MaterialFileSerializer) => {
 };
 
 export const calculateSHP = (object: SHPCalcSerializer) => {
-  return (dispatch: Dispatch,getState:() => RootState ): Promise<SHPCalcSerializer> => {
+  return (dispatch: Dispatch, getState: () => RootState): Promise<SHPCalcSerializer> => {
     const token = getState().auth.token;
     const config: AxiosRequestConfig = {
       headers: {
@@ -125,7 +117,7 @@ export const calculateSHP = (object: SHPCalcSerializer) => {
 };
 
 export const downloadPDFAction = (object: SHPCalcSerializer) => {
-  return (dispatch: Dispatch,getState:() => RootState): Promise<SHPCalcSerializer> => {
+  return (dispatch: Dispatch, getState: () => RootState): Promise<SHPCalcSerializer> => {
     const token = getState().auth.token;
     const config: AxiosRequestConfig = {
       headers: {
@@ -135,18 +127,24 @@ export const downloadPDFAction = (object: SHPCalcSerializer) => {
       responseType: "blob",
     };
     dispatch(startFetching());
-    let url = new URL(
-      "shp/calculate/?download=pdf",
-      import.meta.env.VITE_APP_API_URL
-    );
+    let url = new URL("shp/calculate/?download=pdf", import.meta.env.VITE_APP_API_URL);
     return axios
       .post(url.toString(), object, config)
       .then((res) => {
         const contentDisposition = res.headers["content-disposition"];
-        const filename =
-          contentDisposition
-            ?.replace("attachment; filename=", "")
-            .replace("filename=", "") ?? "Cálculo SHP.pdf";
+
+        console.log(object.name);
+
+        let filename;
+
+        if (object.name) {
+          filename = `Cálculo SHP - ${sanitizeFilename(object.name)}.pdf`;
+        } else {
+          filename = contentDisposition?.replace("attachment; filename=", "").replace("filename=", "");
+        }
+        if (!filename) {
+          filename = "Cálculo SHP.pdf";
+        }
 
         const file = new Blob([res.data], {
           type: res.headers["content-type"],
