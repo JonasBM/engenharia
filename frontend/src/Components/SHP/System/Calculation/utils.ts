@@ -32,11 +32,7 @@ export const saveSHPCalc = (data: SHPCalcSerializer) => {
   if (!data.fileinfo) {
     data.fileinfo = getNewFileInfo();
   } else {
-    data.fileinfo.updated = formatInTimeZone(
-      new Date(),
-      "America/Sao_Paulo",
-      "yyyy-MM-dd HH:mm:ssXXX"
-    );
+    data.fileinfo.updated = formatInTimeZone(new Date(), "America/Sao_Paulo", "yyyy-MM-dd HH:mm:ssXXX");
   }
   store.dispatch(setCalc(data));
   return data;
@@ -49,11 +45,7 @@ export const printSHPCalc = (data: SHPCalcSerializer) => {
 export const saveSHPMaterial = (_material_id: number) => {
   const shpState = store.getState().shp;
 
-  const todayString = formatInTimeZone(
-    new Date(),
-    "America/Sao_Paulo",
-    "yyyy-MM-dd HH:mm:ssXXX"
-  );
+  const todayString = formatInTimeZone(new Date(), "America/Sao_Paulo", "yyyy-MM-dd HH:mm:ssXXX");
   const material = shpState.materials.find((m) => m.id === _material_id);
   if (material) {
     const data: MaterialFileSerializer = {
@@ -67,19 +59,14 @@ export const saveSHPMaterial = (_material_id: number) => {
       reductions: shpState.reductions.find((r) => r.material === _material_id),
       diameters: shpState.diameters.filter((d) => d.material === _material_id),
       fittings: shpState.fittings,
-      fittingdiameters: shpState.fittingDiameters.find(
-        (fd) => fd.material === _material_id
-      ),
+      fittingdiameters: shpState.fittingDiameters.find((fd) => fd.material === _material_id),
     };
     const jsonData = JSON.stringify(data);
     saveFile(jsonData, `${data.material.name}.shpmat`, "application/json");
   }
 };
 
-export const cleanCalc = (
-  data: SHPCalcSerializer,
-  setValue: UseFormSetValue<SHPCalcSerializer>
-) => {
+export const cleanCalc = (data: SHPCalcSerializer, setValue: UseFormSetValue<SHPCalcSerializer>) => {
   setValue("calculated_at", null);
   setValue("less_favorable_path_fixture_index", null);
   for (let i = 0; i < data.paths.length; i++) {
@@ -95,6 +82,7 @@ export const cleanCalc = (
       setValue(`paths.${i}.fixture.total_length`, null);
       setValue(`paths.${i}.fixture.pressure_drop`, null);
       setValue(`paths.${i}.fixture.hose_pressure_drop`, null);
+      setValue(`paths.${i}.fixture.nozzle_pressure_drop`, null);
       setValue(`paths.${i}.fixture.unit_pressure_drop`, null);
       setValue(`paths.${i}.fixture.unit_hose_pressure_drop`, null);
       setValue(`paths.${i}.fixture.end_pressure`, null);

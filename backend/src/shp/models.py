@@ -1,3 +1,4 @@
+from typing import Union
 from .constants import GRAVITY
 from django.db import models
 
@@ -245,7 +246,7 @@ class Fixture(models.Model):
                 return math.pow(speed, 2) / (2 * GRAVITY * math.pow(0.97, 2))  # Cd = 0.97
         return None
 
-    def pressure_to_flow(self, pressure: float) -> float:
+    def pressure_to_flow(self, pressure: float) -> Union[float, None]:
         '''
         converts from pressure m.c.a. to flow in m³/s
         '''
@@ -256,7 +257,7 @@ class Fixture(models.Model):
             speed = math.sqrt(2*GRAVITY*pressure)
             if self.outlet_diameter:
                 return self.area * speed * 0.97  # Cd = 0.97
-        return None
+        return 0
 
     def get_fixture_pressure_drop(self, flow: float) -> float:
         '''

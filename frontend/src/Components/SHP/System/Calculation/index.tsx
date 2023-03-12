@@ -16,12 +16,7 @@ import {
   tableCellClasses,
 } from "@mui/material";
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
-import {
-  FormProvider,
-  useFieldArray,
-  useForm,
-  useWatch,
-} from "react-hook-form";
+import { FormProvider, useFieldArray, useForm, useWatch } from "react-hook-form";
 import React, { useEffect } from "react";
 import { cleanCalc, saveSHPCalc } from "./utils";
 import { getNewPath, initialState } from "redux/shp";
@@ -160,6 +155,9 @@ const SHP = () => {
   };
 
   const onSubmit = (data: SHPCalcSerializer) => {
+    if (!data.pump.head_lift) {
+      delete data.pump.head_lift;
+    }
     dispatch(calculateSHP(saveSHPCalc(data)))
       .then((data) => {
         reset(data);
@@ -184,11 +182,7 @@ const SHP = () => {
                 <TableRow>
                   <TableCell align="center" />
                   <TableCell align="center" />
-                  <StyledTableCellBorderLeft
-                    align="center"
-                    width={"50px"}
-                    colSpan={2}
-                  >
+                  <StyledTableCellBorderLeft align="center" width={"50px"} colSpan={2}>
                     TRECHO
                   </StyledTableCellBorderLeft>
                   <StyledTableCellBorderLeft align="center" width={"30px"}>
@@ -197,18 +191,10 @@ const SHP = () => {
                   <StyledTableCellBorderLeft align="center" width={"100px"}>
                     Material
                   </StyledTableCellBorderLeft>
-                  <StyledTableCellBorderLeft align="center">
-                    &empty;
-                  </StyledTableCellBorderLeft>
-                  <StyledTableCellBorderLeft align="center">
-                    Comprimento
-                  </StyledTableCellBorderLeft>
-                  <StyledTableCellBorderLeft align="center">
-                    Desnível
-                  </StyledTableCellBorderLeft>
-                  <StyledTableCellBorderLeft align="center">
-                    Equivalente
-                  </StyledTableCellBorderLeft>
+                  <StyledTableCellBorderLeft align="center">&empty;</StyledTableCellBorderLeft>
+                  <StyledTableCellBorderLeft align="center">Comprimento</StyledTableCellBorderLeft>
+                  <StyledTableCellBorderLeft align="center">Desnível</StyledTableCellBorderLeft>
+                  <StyledTableCellBorderLeft align="center">Equivalente</StyledTableCellBorderLeft>
                   <StyledTableCellBorderLeft align="center">
                     Vazão
                     <br />
@@ -244,24 +230,12 @@ const SHP = () => {
               <DragDropContext onDragEnd={handleOnDragEnd}>
                 <Droppable droppableId="paths">
                   {(provided) => (
-                    <TableBody
-                      {...provided.droppableProps}
-                      ref={provided.innerRef}
-                    >
+                    <TableBody {...provided.droppableProps} ref={provided.innerRef}>
                       {paths.length > 0 &&
                         paths.map((_, _index) => (
-                          <Draggable
-                            key={_index}
-                            draggableId={`paths-${_index}`}
-                            index={_index}
-                          >
+                          <Draggable key={_index} draggableId={`paths-${_index}`} index={_index}>
                             {(provided, snapshot) => (
-                              <Path
-                                index={_index}
-                                remove={remove}
-                                provided={provided}
-                                snapshot={snapshot}
-                              />
+                              <Path index={_index} remove={remove} provided={provided} snapshot={snapshot} />
                             )}
                           </Draggable>
                         ))}

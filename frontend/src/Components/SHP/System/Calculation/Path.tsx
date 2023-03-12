@@ -17,12 +17,7 @@ import {
   PressureType,
   SHPCalcSerializer,
 } from "api/types/shpTypes";
-import {
-  Controller,
-  UseFieldArrayRemove,
-  useFormContext,
-  useWatch,
-} from "react-hook-form";
+import { Controller, UseFieldArrayRemove, useFormContext, useWatch } from "react-hook-form";
 import { DraggableProvided, DraggableStateSnapshot } from "react-beautiful-dnd";
 import React, { useEffect, useState } from "react";
 
@@ -49,9 +44,7 @@ const Path = ({
   const materials = useAppSelector((state) => state.shp.materials);
   const diameters = useAppSelector((state) => state.shp.diameters);
   const fixtures = useAppSelector((state) => state.shp.fixtures);
-  const fittingDiameters = useAppSelector(
-    (state) => state.shp.fittingDiameters
-  );
+  const fittingDiameters = useAppSelector((state) => state.shp.fittingDiameters);
 
   const {
     register,
@@ -81,14 +74,11 @@ const Path = ({
     name: `paths.${index}.extra_equivalent_length`,
   });
 
-  const [currentFittingDiameters, setCurrentFittingDiameters] = useState<
-    FittingDiameterSerializer[]
-  >([]);
+  const [currentFittingDiameters, setCurrentFittingDiameters] = useState<FittingDiameterSerializer[]>([]);
 
   const [currentFixture, setCurrentFixture] = useState<FixtureSerializer>();
 
-  const [anchorPopover, setAnchorPopover] =
-    React.useState<HTMLButtonElement | null>(null);
+  const [anchorPopover, setAnchorPopover] = React.useState<HTMLButtonElement | null>(null);
 
   useEffect(() => {
     if (fixture_id) {
@@ -103,10 +93,7 @@ const Path = ({
   }, [has_fixture, index, setValue]);
 
   useEffect(() => {
-    setCurrentFittingDiameters(
-      fittingDiameters.find((d) => d.material === material_id)
-        ?.fitting_diameter_array || []
-    );
+    setCurrentFittingDiameters(fittingDiameters.find((d) => d.material === material_id)?.fitting_diameter_array || []);
   }, [fittingDiameters, material_id]);
 
   useEffect(() => {
@@ -129,39 +116,25 @@ const Path = ({
       if (material?.default_diameter) {
         setValue(`paths.${index}.diameter_id`, material.default_diameter);
       } else {
-        setValue(
-          `paths.${index}.diameter_id`,
-          diameters.find((d) => d.material === material_id)?.id || null
-        );
+        setValue(`paths.${index}.diameter_id`, diameters.find((d) => d.material === material_id)?.id || null);
       }
     }
   }, [diameters, material_id, diameter_id, materials, setValue, index]);
 
   useEffect(() => {
-    let newEquivalentLength = parseFloat(
-      extra_equivalent_length?.toString() || "0"
-    );
+    let newEquivalentLength = parseFloat(extra_equivalent_length?.toString() || "0");
     if (fittings_ids && fittings_ids?.length > 0) {
       for (const _fitting_id of fittings_ids) {
         const _fitting = currentFittingDiameters?.find(
           (fd) => fd.diameter === diameter_id && fd.fitting === _fitting_id
         );
         if (_fitting && _fitting.equivalent_length) {
-          newEquivalentLength += parseFloat(
-            _fitting.equivalent_length.toString()
-          );
+          newEquivalentLength += parseFloat(_fitting.equivalent_length.toString());
         }
       }
     }
     setValue(`paths.${index}.equivalent_length`, newEquivalentLength);
-  }, [
-    currentFittingDiameters,
-    diameter_id,
-    extra_equivalent_length,
-    fittings_ids,
-    index,
-    setValue,
-  ]);
+  }, [currentFittingDiameters, diameter_id, extra_equivalent_length, fittings_ids, index, setValue]);
 
   return (
     <>
@@ -245,20 +218,12 @@ const Path = ({
                 checked={value || false}
                 onChange={(event) => {
                   if (event.target.checked) {
-                    setValue(
-                      `paths.${index}.material_id`,
-                      currentFixture?.material
-                    );
-                    setValue(
-                      `paths.${index}.diameter_id`,
-                      currentFixture?.inlet_diameter
-                    );
+                    setValue(`paths.${index}.material_id`, currentFixture?.material);
+                    setValue(`paths.${index}.diameter_id`, currentFixture?.inlet_diameter);
                   }
                   onChange(event.target.checked);
                 }}
-                title={`${
-                  has_fixture ? "Remover" : "Adicionar"
-                } hidrante do trecho`}
+                title={`${has_fixture ? "Remover" : "Adicionar"} hidrante do trecho`}
               />
             )}
           />
@@ -310,8 +275,7 @@ const Path = ({
                       key={_diameter.id}
                       value={_diameter.id}
                       sx={{
-                        display:
-                          _diameter.material === material_id ? "" : "none",
+                        display: _diameter.material === material_id ? "" : "none",
                       }}
                     >
                       {_diameter.name} ({_diameter.internal_diameter} mm)
@@ -392,10 +356,7 @@ const Path = ({
         </TableCell>
 
         <StyledTableCellBorderLeft align="center">
-          {decimalFormatter(
-            flow_to_l_p_min(getValues(`paths.${index}.flow`)),
-            2
-          ) || "-"}
+          {decimalFormatter(flow_to_l_p_min(getValues(`paths.${index}.flow`)), 2) || "-"}
         </StyledTableCellBorderLeft>
         <StyledTableCellBorderLeft align="center">
           {decimalFormatter(getValues(`paths.${index}.speed`), 2) || "-"}
@@ -423,30 +384,20 @@ const Path = ({
               horizontal: "left",
             }}
           >
-            <ConnectionsPopover
-              connectionNames={
-                getValues(`paths.${index}.connection_names`) || []
-              }
-            />
+            <ConnectionsPopover connectionNames={getValues(`paths.${index}.connection_names`) || []} />
           </Popover>
         </StyledTableCellBorderLeft>
         <StyledTableCellBorderLeft align="center">
-          {decimalFormatter(
-            getValues(`paths.${index}.unit_pressure_drop`),
-            4
-          ) || "-"}
+          {decimalFormatter(getValues(`paths.${index}.unit_pressure_drop`), 6) || "-"}
         </StyledTableCellBorderLeft>
         <StyledTableCellBorderLeft align="center">
-          {decimalFormatter(getValues(`paths.${index}.pressure_drop`), 3) ||
-            "-"}
+          {decimalFormatter(getValues(`paths.${index}.pressure_drop`), 4) || "-"}
         </StyledTableCellBorderLeft>
         <StyledTableCellBorderLeft align="center">
-          {decimalFormatter(getValues(`paths.${index}.end_pressure`), 3) || "-"}
+          {decimalFormatter(getValues(`paths.${index}.end_pressure`), 4) || "-"}
         </StyledTableCellBorderLeft>
       </TableRow>
-      {has_fixture && fixture && (
-        <Fixture index={index} isDragging={snapshot.isDragging} />
-      )}
+      {has_fixture && fixture && <Fixture index={index} isDragging={snapshot.isDragging} />}
     </>
   );
 };

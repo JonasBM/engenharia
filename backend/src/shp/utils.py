@@ -3,10 +3,8 @@ from typing import Union
 
 from .models import Diameter, Reduction
 
-from .dataclasses import SHPCalcPath
 
-
-def sortByEndPressure(path_with_fixture: SHPCalcPath):
+def sortByEndPressure(path_with_fixture):
     return path_with_fixture.fixture.end_pressure
 
 
@@ -76,4 +74,23 @@ def get_best_reduction(inlet_diameter_id: int, outlet_diameter_id: int) -> list[
 def flow_to_l_p_min(flow: float) -> float:
     if isinstance(flow, float):
         return flow * 60000
+    return None
+
+
+def calculate_k_factor(flow: float, pressure: float):
+    # 𝑄 = 𝐾. √𝑃
+    if flow and pressure:
+        return flow/math.pow(pressure, 0.5)
+    return None
+
+
+def calculate_flow_from_k_factor(k_factor: float, pressure: float):
+    if k_factor and pressure:
+        return k_factor*math.pow(pressure, 0.5)
+    return None
+
+
+def calculate_pressure_from_k_factor(flow: float, k_factor: float):
+    if flow and k_factor:
+        return math.pow(flow/k_factor, 2)
     return None

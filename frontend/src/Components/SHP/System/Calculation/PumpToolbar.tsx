@@ -1,18 +1,5 @@
-import {
-  Box,
-  Button,
-  MenuItem,
-  Stack,
-  TextField,
-  Toolbar,
-} from "@mui/material";
-import {
-  CalcType,
-  CalcTypes,
-  PressureType,
-  PressureTypes,
-  SHPCalcSerializer,
-} from "api/types/shpTypes";
+import { Box, Button, MenuItem, Stack, TextField, Toolbar } from "@mui/material";
+import { CalcType, CalcTypes, PressureType, PressureTypes, SHPCalcSerializer } from "api/types/shpTypes";
 import { Calculate, Save } from "@mui/icons-material";
 import { Controller, useFormContext, useWatch } from "react-hook-form";
 import React, { useEffect } from "react";
@@ -72,7 +59,7 @@ const CalcToolbar = () => {
                 }
               : { step: "0.01" }
           }
-          {...register("pump.head_height")}
+          {...register("pump.head_lift")}
         />
         <TextField
           disabled

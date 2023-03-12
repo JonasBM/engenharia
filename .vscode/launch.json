@@ -6,13 +6,9 @@
       "type": "python",
       "request": "launch",
       "program": "${workspaceFolder}/backend/src/manage.py",
-      "args": [
-        "runserver",
-        "0.0.0.0:8000",
-        "--noreload"
-      ],
+      "args": ["runserver", "0.0.0.0:8000", "--noreload"],
       "django": true,
       "justMyCode": true
-    },
-  ],
+    }
+  ]
 }

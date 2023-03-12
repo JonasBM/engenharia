@@ -14,7 +14,6 @@ SECRET_KEY = env('SECRET_KEY', default='secretkeyissecrete')
 DEBUG = env.bool('DEBUG', default=False)
 ENVIRONMENT = env('ENVIRONMENT', default='production')
 
-print(ENVIRONMENT)
 
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
@@ -221,3 +220,5 @@ LOGGING = {
         },
     }
 }
+
+CALC_LOGGING_DETAIL = env('CALC_LOGGING_DETAIL', default=True)

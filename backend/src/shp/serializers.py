@@ -1,8 +1,9 @@
-from django_typomatic import generate_ts, ts_interface
+from django_typomatic import ts_interface
 from rest_framework import serializers
-
-from .models import (Config, FittingDiameter, Fixture, Material, Diameter, Fitting, Reduction, MaterialConnection)
 from rest_framework.exceptions import ValidationError
+
+from .models import (Config, Diameter, Fitting, FittingDiameter, Fixture,
+                     Material, MaterialConnection, Reduction)
 
 
 @ts_interface('shp')
@@ -136,6 +137,7 @@ class SHPCalcFixtureSerializer(serializers.Serializer):
     middle_pressure = serializers.FloatField(default=0, **custom_not_required)
     end_pressure = serializers.FloatField(default=0, **custom_not_required)
     hose_pressure_drop = serializers.FloatField(default=0, **custom_not_required)
+    nozzle_pressure_drop = serializers.FloatField(default=0, **custom_not_required)
     unit_hose_pressure_drop = serializers.FloatField(default=0, **custom_not_required)
     pressure_drop = serializers.FloatField(default=0, **custom_not_required)
     unit_pressure_drop = serializers.FloatField(default=0, **custom_not_required)
@@ -152,6 +154,7 @@ class SHPCalcPathSerializer(serializers.Serializer):
     diameter_id = serializers.IntegerField(required=True)
     length = serializers.FloatField(default=0, **custom_not_required)
     level_difference = serializers.FloatField(default=0, **custom_not_required)
+    head_lift = serializers.FloatField(default=0, **custom_not_required)
     fittings_ids = serializers.ListField(child=serializers.IntegerField(), default=[], **custom_not_required)
     has_fixture = serializers.BooleanField(default=False, **custom_not_required)
     extra_equivalent_length = serializers.FloatField(default=0, **custom_not_required)
@@ -177,7 +180,7 @@ class SHPCalcPathSerializer(serializers.Serializer):
 class SHPCalcPumpSerializer(serializers.Serializer):
 
     node = serializers.CharField(**custom_not_required_blank)
-    head_height = serializers.FloatField(**custom_not_required)
+    head_lift = serializers.FloatField(**custom_not_required)
     flow = serializers.FloatField(**custom_not_required)
     NPSHd = serializers.FloatField(**custom_not_required)
 
@@ -210,5 +213,5 @@ class SHPCalcSerializer(serializers.Serializer):
             )
         return super().validate(data)
 
-
+# from django_typomatic import generate_ts
 # generate_ts('./shpTypes.ts', 'shp')

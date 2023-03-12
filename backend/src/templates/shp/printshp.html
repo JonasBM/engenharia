@@ -61,9 +61,9 @@
           <lu>
             <li class="ml-5">Ponto da Bomba: {{ calc.pump.node }}</li>
             {% if calc.calc_type|is_residual %}
-              <li class="ml-5">Altura Manométrica existente: {{ calc.pump.head_height }} m.c.a.</li>
+              <li class="ml-5">Altura Manométrica existente: {{ calc.pump.head_lift }} m.c.a.</li>
             {% else %}
-              <li class="ml-5 alert">Altura Manométrica calculada: {{ calc.pump.head_height }} m.c.a.</li>
+              <li class="ml-5 alert">Altura Manométrica calculada: {{ calc.pump.head_lift }} m.c.a.</li>
             {% endif %}
             <li class="ml-5 alert">Vazão: {{ calc.pump.flow|format_flow }}</li>
             <li class="ml-5">NPSH disponível p/ 1 atm e 20°C: {{ calc.pump.NPSHd|floatformat:2 }} m.c.a.</li>
@@ -121,11 +121,14 @@
                 </ol>
               </li>
               <li class="ml-5">Comprimento total da tubulação: {{ path.total_length|floatformat:2 }} m</li>
+              {% if calc.pressure_type|is_pump and path.head_lift %}
+                <li class="ml-5">Pressão adicional (Bomba): {{ path.head_lift|floatformat:3 }} m.c.a.</li>
+              {% endif %}
               <li class="ml-5"> Cálculado:
                 <ol class="nomargin">
                   <li>Vazão: {{ path.flow|format_flow }}</li>
-                  <li>Perda de carga unitária da tubulação: {{ path.unit_pressure_drop|floatformat:4 }} m.c.a./m</li>
-                  <li>Variação da perda de carga da tubulação: {{ path.pressure_drop|floatformat:3 }} m.c.a.</li>
+                  <li>Perda de carga unitária da tubulação: {{ path.unit_pressure_drop|floatformat:6 }} m.c.a./m</li>
+                  <li>Variação da perda de carga da tubulação: {{ path.pressure_drop|floatformat:4 }} m.c.a.</li>
                   <li>Pressão inicial: {{ path.start_pressure|floatformat:3 }} m.c.a.</li>
                   <li>Pressão final: {{ path.end_pressure|floatformat:3 }} m.c.a.</li>
                 </ol>
@@ -155,8 +158,8 @@
               <li class="ml-5"> Cálculado:
                 <ol class="nomargin">
                   <li>Vazão: {{ path.flow|format_flow }}</li>
-                  <li>Perda de carga unitária: {{ path.unit_pressure_drop|floatformat:4 }} m.c.a./m</li>
-                  <li>Variação da perda de carga: {{ path.pressure_drop|floatformat:3 }} m.c.a.</li>
+                  <li>Perda de carga unitária: {{ path.unit_pressure_drop|floatformat:6 }} m.c.a./m</li>
+                  <li>Variação da perda de carga: {{ path.pressure_drop|floatformat:4 }} m.c.a.</li>
                   <li>Pressão inicial: {{ path.start_pressure|floatformat:3 }} m.c.a.</li>
                   <li>Pressão final: {{ path.end_pressure|floatformat:3 }} m.c.a.</li>
                 </ol>
@@ -177,8 +180,8 @@
               <li class="ml-5"> Cálculado:
                 <ol class="nomargin">
                   <li>Vazão: {{ path.fixture.flow|format_flow }}</li>
-                  <li>Perda de carga unitária: {{ path.fixture.unit_pressure_drop|floatformat:4 }} m.c.a./m</li>
-                  <li>Variação da perda de carga: {{ path.fixture.pressure_drop|floatformat:3 }} m.c.a.</li>
+                  <li>Perda de carga unitária: {{ path.fixture.unit_pressure_drop|floatformat:6 }} m.c.a./m</li>
+                  <li>Variação da perda de carga: {{ path.fixture.pressure_drop|floatformat:4 }} m.c.a.</li>
                   <li>Pressão na entrada do Hidrante: {{ path.fixture.start_pressure|floatformat:3 }} m.c.a.</li>
                   <li>Pressão na entrada da mangueira: {{ path.fixture.middle_pressure|floatformat:3 }} m.c.a.</li>
                 </ol>
@@ -186,15 +189,16 @@
             </lu>
           </div>
           <div class="ml-5 mt-2 nobreak">
-            <h4 class="nomargin">Magueira:</h4>
+            <h4 class="nomargin">Magueira e Esguicho:</h4>
             <lu>
               <li class="ml-5">Comprimento da mangueira: {{ path.fixture.hose_length|floatformat:2 }} m</li>
               <li class="ml-5">Desnivel: {{ path.fixture.level_difference|floatformat:2 }} m</li>
               <li class="ml-5"> Cálculado:
                 <ol class="nomargin">
                   <li>Vazão: {{ path.fixture.flow|format_flow }}</li>
-                  <li>Perda de carga unitária: {{ path.fixture.unit_hose_pressure_drop|floatformat:4 }} m.c.a./m</li>
-                  <li>Variação da perda de carga: {{ path.fixture.hose_pressure_drop|floatformat:3 }} m.c.a.</li>
+                  <li>Perda de carga unitária: {{ path.fixture.unit_hose_pressure_drop|floatformat:6 }} m.c.a./m</li>
+                  <li>Variação da perda de carga na mangueira: {{ path.fixture.hose_pressure_drop|floatformat:4 }} m.c.a.</li>
+                  <li>Variação da perda de carga no esguicho: {{ path.fixture.nozzle_pressure_drop|floatformat:4 }} m.c.a.</li>
                   <li>Pressão na entrada da mangueira: {{ path.fixture.middle_pressure|floatformat:3 }} m.c.a.</li>
                   <li>Pressão na saída do esguicho: {{ path.fixture.end_pressure|floatformat:3 }} m.c.a.</li>
                 </ol>

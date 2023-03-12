@@ -3,7 +3,9 @@ import math
 from dataclasses import dataclass
 from datetime import datetime
 
-from .models import Diameter, Fitting, Material
+from shp.utils import get_unit_pressure_drop
+
+from .models import Diameter, Fitting, Fixture, Material
 
 
 @dataclass(kw_only=True)
@@ -37,6 +39,54 @@ class SHPCalcFixture:
     inlet_diameter: Diameter = None
     connection_names: list[str] = None
 
+    def calculate_start_pressure(self, end_pressure: float):
+        assert (self.nozzle_pressure_drop is not None
+                and self.hose_pressure_drop is not None
+                and self.level_difference is not None
+                and self.pressure_drop is not None), (
+                    'You must call `.calculate_pressure_drop()` before calling `.calculate_start_pressure()`.'
+        )
+        self.end_pressure = end_pressure
+        self.middle_pressure = (
+            self.end_pressure +
+            self.hose_pressure_drop +
+            self.nozzle_pressure_drop +
+            self.level_difference
+        )
+        self.start_pressure = self.middle_pressure + self.pressure_drop
+
+    def calculate_end_pressure(self, start_pressure: float):
+        assert (self.nozzle_pressure_drop is not None
+                and self.hose_pressure_drop is not None
+                and self.level_difference is not None
+                and self.pressure_drop is not None), (
+                    'You must call `.calculate_pressure_drop()` before calling `.calculate_start_pressure()`.'
+        )
+        self.start_pressure = start_pressure
+        self.middle_pressure = self.start_pressure - self.pressure_drop
+        self.end_pressure = (
+            self.middle_pressure -
+            self.hose_pressure_drop -
+            self.nozzle_pressure_drop -
+            self.level_difference
+        )
+
+    def calculate_pressure_drop(self, flow: float, fixture: Fixture):
+        self.flow = flow
+        if (fixture.k_factor_includes_hose):
+            self.unit_hose_pressure_drop = 0
+        else:
+            self.unit_hose_pressure_drop = get_unit_pressure_drop(self.flow,
+                                                                  fixture.hose_hazen_williams_coefficient,
+                                                                  fixture.hose_internal_diameter)
+        self.hose_pressure_drop = self.unit_hose_pressure_drop * self.hose_length
+        if self.inlet_material and self.inlet_diameter:
+            self.unit_pressure_drop = get_unit_pressure_drop(self.flow,
+                                                             self.inlet_material.hazen_williams_coefficient,
+                                                             self.inlet_diameter.internal_diameter,)
+            self.nozzle_pressure_drop = fixture.get_fixture_pressure_drop(self.flow)
+            self.pressure_drop = self.unit_pressure_drop * self.total_length
+
 
 @dataclass(kw_only=True)
 class SHPCalcPath:
@@ -49,6 +99,7 @@ class SHPCalcPath:
     diameter: Diameter = None
     length: float = 0
     level_difference: float = 0
+    head_lift: float = 0
     fittings_ids: list[int] = None
     fittings: list[Fitting] = None
     connection_names: list[str] = None
@@ -64,12 +115,17 @@ class SHPCalcPath:
     pressure_drop: float = 0
     unit_pressure_drop: float = 0
 
+    def __str__(self):
+        if self.has_fixture:
+            return f'{self.start} - {self.fixture.end}'
+        return f'{self.start} - {self.end or ""}'
+
     def __post_init__(self):
-        if self.has_fixture and self.fixture and self.fixture['active']:
-            self.has_active_fixture = True
+        self.has_active_fixture = False
+        if self.has_fixture and self.fixture:
             self.fixture = SHPCalcFixture(**self.fixture)
-        else:
-            self.has_active_fixture = False
+            if self.fixture.active:
+                self.has_active_fixture = True
 
     def get_speed(self) -> float:
         if self.flow and self.diameter and self.diameter.internal_diameter:
@@ -78,11 +134,34 @@ class SHPCalcPath:
             return speed
         return 0
 
+    def calculate_start_pressure(self, end_pressure: float):
+        assert (self.pressure_drop is not None and self.level_difference is not None), (
+            'You must call `.calculate_pressure_drop()` before calling `.calculate_start_pressure()`.'
+        )
+        self.end_pressure = end_pressure
+        self.start_pressure = self.end_pressure + self.pressure_drop + self.level_difference - self.head_lift
+
+    def calculate_end_pressure(self, start_pressure: float):
+        assert (self.pressure_drop is not None and self.level_difference is not None), (
+            'You must call `.calculate_pressure_drop()` before calling `.calculate_start_pressure()`.'
+        )
+        self.start_pressure = start_pressure
+        self.end_pressure = self.start_pressure - self.pressure_drop - self.level_difference + self.head_lift
+
+    def calculate_pressure_drop(self, flow: float):
+        self.flow = flow
+        self.unit_pressure_drop = get_unit_pressure_drop(
+            self.flow,
+            self.material.hazen_williams_coefficient,
+            self.diameter.internal_diameter,
+        )
+        self.pressure_drop = self.unit_pressure_drop * self.total_length
+
 
 @dataclass(kw_only=True)
 class SHPCalcPump:
     node: str
-    head_height: float
+    head_lift: float
     flow: float
     NPSHd: float
 

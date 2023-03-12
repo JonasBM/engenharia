@@ -33,13 +33,7 @@ const StyledTableRow = styled(TableRow)<{
       : theme.palette.action.hover,
 }));
 
-const Fixture = ({
-  index,
-  isDragging,
-}: {
-  index: number;
-  isDragging: boolean;
-}) => {
+const Fixture = ({ index, isDragging }: { index: number; isDragging: boolean }) => {
   const { register, control, getValues } = useFormContext<SHPCalcSerializer>();
   const active = useWatch({ control, name: `paths.${index}.fixture.active` });
   const less_favorable_path_fixture_index = useWatch({
@@ -47,16 +41,13 @@ const Fixture = ({
     name: `less_favorable_path_fixture_index`,
   });
 
-  const [anchorPopover, setAnchorPopover] =
-    React.useState<HTMLButtonElement | null>(null);
+  const [anchorPopover, setAnchorPopover] = React.useState<HTMLButtonElement | null>(null);
 
   return (
     <StyledTableRow
       sx={{ visibility: isDragging ? "hidden" : "visible" }}
       active={active ? "true" : "false"}
-      lessfavorable={
-        index === less_favorable_path_fixture_index ? "true" : "false"
-      }
+      lessfavorable={index === less_favorable_path_fixture_index ? "true" : "false"}
     >
       <TableCell>
         <IconButton sx={{ visibility: "hidden" }}>
@@ -141,17 +132,11 @@ const Fixture = ({
       </TableCell>
       <TableCell align="center">-</TableCell>
       <StyledTableCellBorderLeft align="center">
-        {decimalFormatter(
-          flow_to_l_p_min(getValues(`paths.${index}.fixture.flow`)),
-          2
-        ) || "-"}
+        {decimalFormatter(flow_to_l_p_min(getValues(`paths.${index}.fixture.flow`)), 2) || "-"}
       </StyledTableCellBorderLeft>
       <StyledTableCellBorderLeft align="center">-</StyledTableCellBorderLeft>
       <StyledTableCellBorderLeft align="right">
-        {decimalFormatter(
-          getValues(`paths.${index}.fixture.total_length`),
-          2
-        ) || "-"}
+        {decimalFormatter(getValues(`paths.${index}.fixture.total_length`), 2) || "-"}
         <IconButton
           sx={{ marginLeft: 1 }}
           onClick={(event: React.MouseEvent<HTMLButtonElement>) => {
@@ -173,40 +158,25 @@ const Fixture = ({
             horizontal: "left",
           }}
         >
-          <ConnectionsPopover
-            connectionNames={
-              getValues(`paths.${index}.fixture.connection_names`) || []
-            }
-          />
+          <ConnectionsPopover connectionNames={getValues(`paths.${index}.fixture.connection_names`) || []} />
         </Popover>
       </StyledTableCellBorderLeft>
       <StyledTableCellBorderLeft align="center">
-        {decimalFormatter(
-          getValues(`paths.${index}.fixture.unit_pressure_drop`),
-          4
-        ) || "-"}
+        {decimalFormatter(getValues(`paths.${index}.fixture.unit_pressure_drop`), 6) || "-"}
         <br />
-        {decimalFormatter(
-          getValues(`paths.${index}.fixture.unit_hose_pressure_drop`),
-          4
-        ) || "-"}
+        {decimalFormatter(getValues(`paths.${index}.fixture.unit_hose_pressure_drop`), 6) || "-"}
+        <br />
+        {"-"}
       </StyledTableCellBorderLeft>
       <StyledTableCellBorderLeft align="center">
-        {decimalFormatter(
-          getValues(`paths.${index}.fixture.pressure_drop`),
-          3
-        ) || "-"}
+        {decimalFormatter(getValues(`paths.${index}.fixture.pressure_drop`), 4) || "-"}
         <br />
-        {decimalFormatter(
-          getValues(`paths.${index}.fixture.hose_pressure_drop`),
-          3
-        )}
+        {decimalFormatter(getValues(`paths.${index}.fixture.hose_pressure_drop`), 4) || "-"}
+        <br />
+        {decimalFormatter(getValues(`paths.${index}.fixture.nozzle_pressure_drop`), 4) || "-"}
       </StyledTableCellBorderLeft>
       <StyledTableCellBorderLeft align="center">
-        {decimalFormatter(
-          getValues(`paths.${index}.fixture.end_pressure`),
-          3
-        ) || "-"}
+        {decimalFormatter(getValues(`paths.${index}.fixture.end_pressure`), 4) || "-"}
       </StyledTableCellBorderLeft>
     </StyledTableRow>
   );

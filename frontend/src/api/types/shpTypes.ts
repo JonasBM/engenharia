@@ -98,11 +98,7 @@ export const fixtureType = {
   MANGOTINHO: { value: "MA", name: "Mangotinho" },
 };
 
-export const fixtureTypes = [
-  fixtureType.TRONCO_CONICO,
-  fixtureType.REGULAVEL,
-  fixtureType.MANGOTINHO,
-];
+export const fixtureTypes = [fixtureType.TRONCO_CONICO, fixtureType.REGULAVEL, fixtureType.MANGOTINHO];
 
 export interface FileInfoSerializer {
   type: string;
@@ -131,6 +127,7 @@ export interface SHPCalcFixtureSerializer {
   middle_pressure?: number | null;
   end_pressure?: number | null;
   hose_pressure_drop?: number | null;
+  nozzle_pressure_drop?: number | null;
   unit_hose_pressure_drop?: number | null;
   pressure_drop?: number | null;
   unit_pressure_drop?: number | null;
@@ -161,7 +158,7 @@ export interface SHPCalcPathSerializer {
 
 export interface SHPCalcPumpSerializer {
   node?: string | null;
-  head_height?: number | null;
+  head_lift?: number | null;
   flow?: number | null;
   NPSHd?: number | null;
 }
