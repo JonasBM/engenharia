@@ -162,18 +162,28 @@ const Fixture = ({ index, isDragging }: { index: number; isDragging: boolean }) 
         </Popover>
       </StyledTableCellBorderLeft>
       <StyledTableCellBorderLeft align="center">
-        {decimalFormatter(getValues(`paths.${index}.fixture.unit_pressure_drop`), 6) || "-"}
+        <span title="Perda de carga unitária no hidrante">
+          {decimalFormatter(getValues(`paths.${index}.fixture.unit_pressure_drop`), 6) || "-"}
+        </span>
         <br />
-        {decimalFormatter(getValues(`paths.${index}.fixture.unit_hose_pressure_drop`), 6) || "-"}
+        <span title="Perda de carga unitária na mangueira">
+          {decimalFormatter(getValues(`paths.${index}.fixture.unit_hose_pressure_drop`), 6) || "-"}
+        </span>
         <br />
         {"-"}
       </StyledTableCellBorderLeft>
       <StyledTableCellBorderLeft align="center">
-        {decimalFormatter(getValues(`paths.${index}.fixture.pressure_drop`), 4) || "-"}
+        <span title="Perda de carga no hidrante">
+          {decimalFormatter(getValues(`paths.${index}.fixture.pressure_drop`), 4) || "-"}
+        </span>
         <br />
-        {decimalFormatter(getValues(`paths.${index}.fixture.hose_pressure_drop`), 4) || "-"}
+        <span title="Perda de carga na mangueira">
+          {decimalFormatter(getValues(`paths.${index}.fixture.hose_pressure_drop`), 4) || "-"}
+        </span>
         <br />
-        {decimalFormatter(getValues(`paths.${index}.fixture.nozzle_pressure_drop`), 4) || "-"}
+        <span title="Perda de carga no esguicho">
+          {decimalFormatter(getValues(`paths.${index}.fixture.nozzle_pressure_drop`), 4) || "-"}
+        </span>
       </StyledTableCellBorderLeft>
       <StyledTableCellBorderLeft align="center">
         {decimalFormatter(getValues(`paths.${index}.fixture.end_pressure`), 4) || "-"}
