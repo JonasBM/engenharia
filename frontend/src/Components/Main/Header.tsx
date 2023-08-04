@@ -22,7 +22,7 @@ import { useAppSelector } from "redux/utils";
 
 const pages = [
   { path: "/shp/", title: "SHP" },
-  // { path: "/igc/", title: "IGC" },
+  { path: "/igc/", title: "IGC" },
   // { path: "/spda/", title: "SPDA" },
   { path: "/admin/", title: "Administração" },
 ];

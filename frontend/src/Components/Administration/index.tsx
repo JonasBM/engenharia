@@ -1,9 +1,8 @@
 import { Box, Container, Tab, Tabs } from "@mui/material";
 import React, { useEffect } from "react";
 
-import IGC from "Components/IGC";
 import SHPAdmin from "../SHP/Admin";
-import SPDA from "Components/SPDA";
+import IGCAdmin from "../IGC/Admin";
 import { documentTitles } from "myConstants";
 
 interface TabPanelProps {
@@ -29,7 +28,7 @@ function TabPanel(props: TabPanelProps) {
 }
 
 const Administration = () => {
-  const [value, setValue] = React.useState(0);
+  const [value, setValue] = React.useState(1);
 
   useEffect(() => {
     document.title = documentTitles.ADMIN;
@@ -47,19 +46,19 @@ const Administration = () => {
       <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
         <Tabs value={value} onChange={handleChange} centered>
           <Tab label="SHP" />
-          {/* <Tab label="IGC" />
-          <Tab label="SPDA" /> */}
+          <Tab label="IGC" />
+          {/* <Tab label="SPDA" /> */}
         </Tabs>
       </Box>
       <TabPanel value={value} index={0}>
         <SHPAdmin />
       </TabPanel>
       <TabPanel value={value} index={1}>
-        <IGC />
+        <IGCAdmin />
       </TabPanel>
-      <TabPanel value={value} index={2}>
+      {/* <TabPanel value={value} index={2}>
         <SPDA />
-      </TabPanel>
+      </TabPanel> */}
     </Container>
   );
 };

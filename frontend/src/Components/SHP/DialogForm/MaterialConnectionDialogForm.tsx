@@ -23,7 +23,7 @@ const _newMaterialConnection: MaterialConnectionSerializer = {
   outlet_diameter: null,
 };
 
-const _dialogName = "MODAL_MATERIALCONNECTION";
+const _dialogName = "MODAL_SHP_MATERIALCONNECTION";
 
 export const showMaterialConnectionDialog = (
   _dialogObject?: Partial<MaterialConnectionSerializer>

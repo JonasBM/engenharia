@@ -1,31 +1,12 @@
-import {
-  Collapse,
-  CssBaseline,
-  ThemeProvider,
-  createTheme,
-} from "@mui/material";
+import { Collapse, CssBaseline, ThemeProvider, createTheme } from "@mui/material";
 import React, { useEffect } from "react";
-import {
-  blue,
-  green,
-  indigo,
-  lightBlue,
-  orange,
-  red,
-} from "@mui/material/colors";
+import { blue, green, indigo, lightBlue, orange, red } from "@mui/material/colors";
 
 import Alerts from "./Components/Alerts/Alerts";
 import AppRoutes from "./AppRoutes";
-import CalcDialogForm from "Components/SHP/DialogForm/CalcDialogForm";
 import { Container } from "@mui/system";
-import DiameterDialogForm from "Components/SHP/DialogForm/DiameterDialogForm";
-import FittingDialogForm from "Components/SHP/DialogForm/FittingDialogForm";
-import FixtureDialogForm from "Components/SHP/DialogForm/FixtureDialogForm";
 import Header from "./Components/Main/Header";
 import { LoadingIndicator } from "redux-simplified";
-import MaterialConnectionDialogForm from "Components/SHP/DialogForm/MaterialConnectionDialogForm";
-import MaterialDialogForm from "./Components/SHP/DialogForm/MaterialDialogForm";
-import ReductionDialogForm from "Components/SHP/DialogForm/ReductionDialogForm";
 import SnackbarCloseButton from "./Components/Alerts/SnackbarCloseButton";
 import { SnackbarProvider } from "notistack";
 import { documentTitles } from "myConstants";
@@ -33,6 +14,26 @@ import { ptBR as muiPtBR } from "@mui/material/locale";
 import { useAppSelector } from "redux/utils";
 import { ptBR as yupPtBR } from "./yupLocale";
 import { setLocale as yupSetLocale } from "yup";
+
+import {
+  SHPCalcDialogForm,
+  SHPDiameterDialogForm,
+  SHPFittingDialogForm,
+  SHPFixtureDialogForm,
+  SHPMaterialConnectionDialogForm,
+  SHPMaterialDialogForm,
+  SHPReductionDialogForm,
+} from "./Components/SHP/DialogForm";
+
+import {
+  IGCCalcDialogForm,
+  IGCDiameterDialogForm,
+  IGCFittingDialogForm,
+  IGCGASDialogForm,
+  IGCMaterialConnectionDialogForm,
+  IGCMaterialDialogForm,
+  IGCReductionDialogForm,
+} from "./Components/IGC/DialogForm";
 
 yupSetLocale(yupPtBR);
 
@@ -88,13 +89,23 @@ function App() {
       <ThemeProvider theme={theme}>
         <Header />
         <Alerts />
-        <MaterialDialogForm />
-        <DiameterDialogForm />
-        <FittingDialogForm />
-        <ReductionDialogForm />
-        <MaterialConnectionDialogForm />
-        <FixtureDialogForm />
-        <CalcDialogForm />
+
+        <SHPCalcDialogForm />
+        <SHPDiameterDialogForm />
+        <SHPFittingDialogForm />
+        <SHPFixtureDialogForm />
+        <SHPMaterialConnectionDialogForm />
+        <SHPMaterialDialogForm />
+        <SHPReductionDialogForm />
+
+        <IGCCalcDialogForm />
+        <IGCDiameterDialogForm />
+        <IGCFittingDialogForm />
+        <IGCGASDialogForm />
+        <IGCMaterialConnectionDialogForm />
+        <IGCMaterialDialogForm />
+        <IGCReductionDialogForm />
+
         <LoadingIndicator fetching={fetching} />
         <Container maxWidth={false} sx={{ marginTop: 3, marginBottom: 5 }}>
           <AppRoutes />

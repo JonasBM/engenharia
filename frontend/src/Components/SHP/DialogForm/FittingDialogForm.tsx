@@ -18,7 +18,7 @@ const _newFitting: FittingSerializer = {
   name: "",
 };
 
-const _dialogName = "MODAL_FITTING";
+const _dialogName = "MODAL_SHP_FITTING";
 
 export const showFittingDialog = (
   _dialogObject?: Partial<FittingSerializer>

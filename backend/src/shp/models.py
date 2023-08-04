@@ -1,8 +1,9 @@
+import math
 from typing import Union
-from .constants import GRAVITY
+
 from django.db import models
 
-import math
+from .constants import GRAVITY
 
 
 class Config(models.Model):

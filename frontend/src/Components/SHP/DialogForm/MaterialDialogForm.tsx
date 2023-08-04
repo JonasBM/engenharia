@@ -23,7 +23,7 @@ const _newMaterial: MaterialSerializer = {
   default_diameter: null,
 };
 
-const _dialogName = "MODAL_MATERIAL";
+const _dialogName = "MODAL_SHP_MATERIAL";
 
 export const showMaterialDialog = (
   _dialogObject?: Partial<MaterialSerializer>

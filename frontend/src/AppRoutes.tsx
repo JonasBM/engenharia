@@ -1,13 +1,13 @@
 import { Navigate, Route, Routes } from "react-router-dom";
 
 import Administration from "Components/Administration";
-import IGC from "./Components/IGC";
 import Login from "./Components/Accounts/Login";
 import Logout from "./Components/Accounts/Logout";
 import NotFound from "./Components/Common/NotFound";
 import PrivateRoute from "./Components/Common/PrivateRoute";
 import Profile from "Components/Accounts/Profile";
 import SHP from "./Components/SHP/System";
+import IGC from "./Components/IGC/System";
 import SPDA from "Components/SPDA";
 
 const AppRoutes = () => {

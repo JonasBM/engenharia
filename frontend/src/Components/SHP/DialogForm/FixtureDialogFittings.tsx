@@ -40,7 +40,7 @@ import store from "redux/store";
 import { useAppSelector } from "redux/utils";
 import { useFormContext } from "react-hook-form";
 
-const _dialogName = "DIALOG_FITTINGSFIXTURE";
+const _dialogName = "DIALOG_SHP_FITTINGSFIXTURE";
 
 export const showDialogFixtureFittings = () => {
   store.dispatch(

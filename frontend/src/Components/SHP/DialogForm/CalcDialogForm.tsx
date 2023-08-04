@@ -14,7 +14,7 @@ import { addServerErrors } from "utils";
 import store from "redux/store";
 import { yupResolver } from "@hookform/resolvers/yup";
 
-const _dialogName = "DIALOG_SHPCALC";
+const _dialogName = "DIALOG_SHP_CALC";
 
 export interface SHPCalcCreator {
   material: number | null;

@@ -22,7 +22,7 @@ const _newReduction: ReductionSerializer = {
   outlet_diameter: null,
 };
 
-const _dialogName = "MODAL_REDUCTION";
+const _dialogName = "MODAL_SHP_REDUCTION";
 
 export const showReductionDialog = (
   _dialogObject?: Partial<ReductionSerializer>

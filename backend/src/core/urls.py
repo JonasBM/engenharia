@@ -10,6 +10,7 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path('accounts/', include('accounts.urls')),
     path('shp/', include('shp.urls')),
+    path('igc/', include('igc.urls')),
 ]
 
 if settings.ENVIRONMENT != 'production' and settings.DEBUG:

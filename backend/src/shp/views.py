@@ -288,7 +288,7 @@ class Calculate(views.APIView):
             return Response({'detail': 'Problemas ao calcular os dados enviados'}, status=status.HTTP_400_BAD_REQUEST)
 
 
-def teste(request):
+def test(request):
     from django.shortcuts import render
 
     serializer = SHPCalcSerializer(data=calc)

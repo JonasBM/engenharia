@@ -38,10 +38,6 @@ export const saveSHPCalc = (data: SHPCalcSerializer) => {
   return data;
 };
 
-export const printSHPCalc = (data: SHPCalcSerializer) => {
-  console.log(data);
-};
-
 export const saveSHPMaterial = (_material_id: number) => {
   const shpState = store.getState().shp;
 

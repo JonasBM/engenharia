@@ -1,1 +1,4 @@
 .venv
+*.pyc
+*/__pycache__/*
+backend/src/core/__pycache__/settings.cpython-310.pyc

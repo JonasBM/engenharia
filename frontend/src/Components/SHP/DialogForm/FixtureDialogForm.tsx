@@ -54,7 +54,7 @@ const _newFixture: FixtureSerializer = {
   fittings_ids: [],
 };
 
-const _dialogName = "DIALOG_FIXTURE";
+const _dialogName = "DIALOG_SHP_FIXTURE";
 
 export const showFixtureDialog = (
   _dialogObject?: Partial<FixtureSerializer>

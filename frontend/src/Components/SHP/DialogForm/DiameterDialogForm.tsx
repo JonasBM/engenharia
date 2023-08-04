@@ -20,7 +20,7 @@ const _newDiameter: DiameterSerializer = {
   material: null,
 };
 
-const _dialogName = "MODAL_DIAMETER";
+const _dialogName = "MODAL_SHP_DIAMETER";
 
 export const showDiameterDialog = (
   _dialogObject?: Partial<DiameterSerializer>

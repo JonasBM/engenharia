@@ -38,6 +38,7 @@ CORS_EXPOSE_HEADERS = (
 LOCAL_INSTALLED_APPS = [
     'accounts',
     'shp',
+    'igc',
 ]
 ADITIONAL_APPS = env.list('ADITIONAL_APPS', default=[])
 INSTALLED_APPS = LOCAL_INSTALLED_APPS + ADITIONAL_APPS + [
