@@ -3,27 +3,6 @@ from typing import Union
 
 from .models import Diameter, Reduction
 
-
-def sortByEndPressure(path_with_fixture):
-    return path_with_fixture.fixture.end_pressure
-
-
-def get_unit_pressure_drop(flow: float, coefficient: int, diameter: float) -> float:
-    '''
-    returns unit pressure drop in m/m
-    args={
-        flow: flow in m³/s
-        coefficient: Hazen-Williams coefficient
-        diameter: internal diameter in mm
-    }
-    '''
-    if (flow and coefficient and diameter):
-        numerator = 10.641*math.pow(float(flow), 1.85)
-        denominator = math.pow(float(coefficient), 1.85)*math.pow(float(diameter)/float(1000), 4.87)
-        return numerator/denominator
-    return 0
-
-
 def format_decimal(number: Union[int, float], decimals=2):
     if number:
         return '{:.{decimals}f}'.format(number, decimals=decimals).replace('.', ',')
@@ -74,7 +53,7 @@ def get_best_reduction(inlet_diameter_id: int, outlet_diameter_id: int) -> list[
 def kcal_p_min_to_kcal_p_h(power_rating: float):
     if power_rating:
         return power_rating * 60
-    return None
+    return 0
 
 
 def kpa_to_kgf_p_cm2(pressure):
@@ -84,7 +63,7 @@ def kpa_to_kgf_p_cm2(pressure):
 
 def calculate_concurrency_factor(power_rating: float):
     _power_rating = kcal_p_min_to_kcal_p_h(power_rating)
-    if _power_rating < 21000:
+    if not _power_rating or _power_rating < 21000:
         return 1
     if _power_rating < 576720:
         return 1 / (1 + 0.001 * math.pow((_power_rating/60) - 349, 0.8712))
@@ -93,7 +72,5 @@ def calculate_concurrency_factor(power_rating: float):
     return 0.23
 
 
-def flow_to_l_p_min(flow: float) -> float:
-    if isinstance(flow, float):
-        return flow * 60000
-    return None
+def rgb2hex(r, g, b):
+    return "#{:02x}{:02x}{:02x}".format(r, g, b)

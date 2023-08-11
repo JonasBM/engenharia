@@ -282,7 +282,6 @@ class Calculate(views.APIView):
                     return Response({'detail': error}, status=status.HTTP_400_BAD_REQUEST)
                 else:
                     return Response(serializer.data)
-            print(serializer.errors)
             return Response({'detail': 'Problemas ao calcular os dados enviados'}, status=status.HTTP_400_BAD_REQUEST)
 
 

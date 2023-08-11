@@ -57,9 +57,6 @@ export const getNewPath = (state: IGCCalcSerializer): IGCCalcPathSerializer => {
     material_id: state.material_id,
     diameter_id: state.diameter_id,
     power_rating_added: 0,
-    power_rating_accumulated: 0,
-    power_rating_adopted: 0,
-    concurrency_factor: 0,
     length: 0,
     length_up: 0,
     length_down: 0,
@@ -74,7 +71,7 @@ export const getNewFileInfo = (): FileInfoSerializer => {
     "yyyy-MM-dd HH:mm:ssXXX"
   );
   return {
-    type: "igc_calc",
+    type: "igc_secondary_calc",
     version: "1.0.0",
     created: todayString,
     updated: todayString,
@@ -87,6 +84,7 @@ export const getIGCCalc = () => {
 export const initialState = {
   fileinfo: getNewFileInfo(),
   name: "",
+  calc_type: "SC",
   material_id: null,
   diameter_id: null,
   gas_id: null,
@@ -94,7 +92,7 @@ export const initialState = {
 } as IGCCalcSerializer;
 
 const igcCalcSlice = createSlice({
-  name: "igccalc",
+  name: "igcSecondarycalc",
   initialState,
   reducers: {
     setCalc(state, action: PayloadAction<IGCCalcSerializer>) {

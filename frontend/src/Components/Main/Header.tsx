@@ -22,7 +22,8 @@ import { useAppSelector } from "redux/utils";
 
 const pages = [
   { path: "/shp/", title: "SHP" },
-  { path: "/igc/", title: "IGC" },
+  { path: "/igcprimary/", title: "IGC Primária" },
+  { path: "/igcsecondary/", title: "IGC Secundária" },
   // { path: "/spda/", title: "SPDA" },
   { path: "/admin/", title: "Administração" },
 ];

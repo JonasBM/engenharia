@@ -1,17 +1,16 @@
 import {
   FileInfoSerializer,
-  SHPCalcFixtureSerializer,
-  SHPCalcPathSerializer,
-  SHPCalcSerializer,
-} from "api/types/shpTypes";
+  IGCCalcPathSerializer,
+  IGCCalcSerializer,
+} from "api/types/igcTypes";
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 
 import { formatInTimeZone } from "date-fns-tz";
 
 export const checkLetter = (letter: string): boolean => {
-  const check = letter === "RES";
+  const check = letter === "CG";
   if (check) {
-    alert('"RES" está designado para o reservatório');
+    alert('"CG" está designado para a Central de Gás');
   }
   return !check;
 };
@@ -31,18 +30,18 @@ const nextString = (str: string): string => {
 };
 
 const getNewStrings = (
-  state: SHPCalcSerializer
+  state: IGCCalcSerializer
 ): { start: string; end: string } => {
   let lastLetter = null;
   const total = state?.paths?.length;
   for (let i = 0; i < total; i++) {
     const path = state.paths[total - i - 1];
-    if (path?.end && !path.has_fixture) {
+    if (path?.end) {
       lastLetter = path.end;
       break;
     }
   }
-  const start = lastLetter ? lastLetter : "RES";
+  const start = lastLetter ? lastLetter : "CG";
   const end = lastLetter ? nextString(lastLetter) : "A";
   return {
     start: start.toUpperCase(),
@@ -50,39 +49,17 @@ const getNewStrings = (
   };
 };
 
-const getNewFixtureString = (state: SHPCalcSerializer): string => {
-  let lastNumber = 0;
-  for (const path of state.paths) {
-    if (path.fixture && path.fixture.end) {
-      const current = parseInt(path.fixture.end.match(/\d+/)?.shift() || "");
-      lastNumber = current > lastNumber ? current : lastNumber;
-    }
-  }
-  return `H${lastNumber + 1}`;
-};
-
-export const getNewFixture = (
-  state: SHPCalcSerializer
-): SHPCalcFixtureSerializer => {
-  return {
-    active: false,
-    end: getNewFixtureString(state),
-    hose_length: 30,
-    level_difference: 0,
-  };
-};
-
-export const getNewPath = (state: SHPCalcSerializer): SHPCalcPathSerializer => {
+export const getNewPath = (state: IGCCalcSerializer): IGCCalcPathSerializer => {
   const { start, end } = getNewStrings(state);
   return {
     start: start,
     end: end,
-    has_fixture: false,
-    fixture: getNewFixture(state),
     material_id: state.material_id,
     diameter_id: state.diameter_id,
+    power_rating_added: 0,
     length: 0,
-    level_difference: 0,
+    length_up: 0,
+    length_down: 0,
     fittings_ids: [],
   };
 };
@@ -94,33 +71,31 @@ export const getNewFileInfo = (): FileInfoSerializer => {
     "yyyy-MM-dd HH:mm:ssXXX"
   );
   return {
-    type: "shp_calc",
+    type: "igc_primary_calc",
     version: "1.0.0",
     created: todayString,
     updated: todayString,
   };
 };
 
-export const getSHPCalc = () => {
+export const getIGCCalc = () => {
   return {};
 };
 export const initialState = {
   fileinfo: getNewFileInfo(),
   name: "",
-  pressure_type: null,
-  calc_type: null,
-  pump: {},
+  calc_type: "PR",
   material_id: null,
   diameter_id: null,
-  fixture_id: null,
+  gas_id: null,
   paths: [],
-} as SHPCalcSerializer;
+} as IGCCalcSerializer;
 
-const shpCalcSlice = createSlice({
-  name: "shpcalc",
+const igcCalcSlice = createSlice({
+  name: "igcPrimarycalc",
   initialState,
   reducers: {
-    setCalc(state, action: PayloadAction<SHPCalcSerializer>) {
+    setCalc(state, action: PayloadAction<IGCCalcSerializer>) {
       return action.payload;
     },
     resetCalc(state) {
@@ -129,5 +104,5 @@ const shpCalcSlice = createSlice({
   },
 });
 
-export const { setCalc, resetCalc } = shpCalcSlice.actions;
-export default shpCalcSlice.reducer;
+export const { setCalc, resetCalc } = igcCalcSlice.actions;
+export default igcCalcSlice.reducer;

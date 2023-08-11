@@ -148,7 +148,11 @@ class IGCCalcPathSerializer(serializers.Serializer):
     start_pressure = serializers.FloatField(default=0, **custom_not_required)
     end_pressure = serializers.FloatField(default=0, **custom_not_required)
     pressure_drop = serializers.FloatField(default=0, **custom_not_required)
+    pressure_drop_color = serializers.CharField(default=None, **custom_not_required)
     pressure_drop_accumulated = serializers.FloatField(default=0, **custom_not_required)
+    pressure_drop_accumulated_color = serializers.CharField(default=None, **custom_not_required)
+    fail = serializers.BooleanField(default=False, **custom_not_required)
+    fail_level = serializers.IntegerField(default=0, **custom_not_required)
 
 
 @ts_interface('igc')
@@ -156,12 +160,14 @@ class IGCCalcSerializer(serializers.Serializer):
 
     fileinfo = FileInfoSerializer(required=True)
     name = serializers.CharField(**custom_not_required_blank)
+    calc_type = serializers.ChoiceField(choices=Config.CalcType, required=True)
     material_id = serializers.IntegerField(required=True)
     diameter_id = serializers.IntegerField(required=True)
     gas_id = serializers.IntegerField(required=True)
     paths = IGCCalcPathSerializer(required=True, many=True)
     error = serializers.CharField(default=None, **custom_not_required_blank)
     calculated_at = serializers.DateTimeField(**custom_not_required)
+    max_fail_level = serializers.IntegerField(default=0, **custom_not_required)
 
 
 # from django_typomatic import generate_ts

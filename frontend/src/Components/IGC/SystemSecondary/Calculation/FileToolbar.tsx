@@ -13,7 +13,7 @@ import React, { useState } from "react";
 
 import { IGCCalcSerializer } from "api/types/igcTypes";
 import { saveFileIGCCalc } from "./utils";
-import { setCalc } from "redux/igc";
+import { setCalc } from "redux/igcSecondary";
 import { useAppDispatch } from "redux/utils";
 import { useFormContext } from "react-hook-form";
 
@@ -34,7 +34,7 @@ const FileToolbar = () => {
         e.target?.result?.toString() || ""
       ) as IGCCalcSerializer;
       if (
-        _calcFile.fileinfo.type === "igc_calc" &&
+        _calcFile.fileinfo.type === "igc_secondary_calc" &&
         _calcFile.fileinfo.version.startsWith("1.0.")
       ) {
         setcalcFile(_calcFile);
@@ -42,7 +42,7 @@ const FileToolbar = () => {
         let newLine = "\r\n";
         let message = "Problemas ao carregar o arquivo";
         message += newLine;
-        message += `filetype: ${_calcFile.fileinfo.type}, expected: igc_calc`;
+        message += `filetype: ${_calcFile.fileinfo.type}, expected: igc_secondary_calc`;
         message += newLine;
         message += `fileversion: ${_calcFile.fileinfo.version}, expected: 1.0.x`;
         alert(message);
@@ -106,7 +106,7 @@ const FileToolbar = () => {
             Carregar Cálculo
             <input
               type="file"
-              accept=".igccalc"
+              accept=".igcsccalc"
               hidden
               onChange={(e) => {
                 if (e.target.files) {

@@ -41,7 +41,8 @@ import {
 import { authSlice } from "api/auth";
 import modalReducer from "./modal";
 import shpCalcReducer from "./shp";
-import igcCalcReducer from "./igc";
+import igcPrimaryCalcReducer from "./igcPrimary";
+import igcSecondaryCalcReducer from "./igcSecondary";
 import storage from "redux-persist/lib/storage";
 
 
@@ -78,14 +79,15 @@ const rootReducer = combineReducers({
   shp: shp,
   shpCalc: shpCalcReducer,
   igc: igc,
-  igcCalc: igcCalcReducer,
+  igcPrimaryCalc: igcPrimaryCalcReducer,
+  igcSecondaryCalc: igcSecondaryCalcReducer,
 });
 
 const persistConfig = {
   key: "root",
   version: 1,
   storage,
-  whitelist: ["shpCalc", "igcCalc"],
+  whitelist: ["shpCalc", "igcPrimaryCalc", "igcSecondaryCalc"],
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

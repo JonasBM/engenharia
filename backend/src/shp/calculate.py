@@ -90,7 +90,7 @@ class SHP():
             self.print_paths(next_path, False)
 
     def __calculate_minimum_height(self):
-        logger.info('Calculating minimum height')
+        logger.debug('Calculating minimum height')
         self.shpCalc.reservoir_path.level_difference = 0
         self.__calculate_required_pressure(self.fixture.minimum_flow_rate_in_m3_p_s)
         self.shpCalc.reservoir_path.level_difference = (
@@ -102,12 +102,12 @@ class SHP():
             self.shpCalc.reservoir_path.equivalent_length +
             abs(self.shpCalc.reservoir_path.level_difference)
         )
-        logger.info(
+        logger.debug(
             f'Finished calculate minimum height. level required: {self.shpCalc.reservoir_path.level_difference} m'
         )
 
     def __calculate_residual_flow(self) -> SHPCalcSerializer:
-        logger.info('Calculating residual flow for gravity system')
+        logger.debug('Calculating residual flow for gravity system')
 
         path_less_pressure, has_flow = self.__get_path_with_less_pressure_and_flow()
         if not has_flow:
@@ -122,7 +122,7 @@ class SHP():
             if self.shpCalc.reservoir_path.start_pressure > 0:
                 break
             else:
-                logger.info(f'Found max flow: {max_flow}, in the {i} iteration')
+                logger.debug(f'Found max flow: {max_flow}, in the {i} iteration')
                 max_flow *= 2
         else:
             message = f'Reservatório alto demais. Maior vazão usada para o calculo: {max_flow}'
@@ -145,11 +145,11 @@ class SHP():
             logger.error(message)
             raise CouldNotFinishCalculate(message)
 
-        logger.info(f'Finished calculate residual flow. minimum non zero flow: {flow} m³s')
+        logger.debug(f'Finished calculate residual flow. minimum non zero flow: {flow} m³s')
 
     def __calculate_pump(self) -> SHPCalcSerializer:
 
-        logger.info('Calculating pump')
+        logger.debug('Calculating pump')
 
         if not self.shpCalc.pump_path:
             raise NoPumpFound()
@@ -162,12 +162,12 @@ class SHP():
         RES_BOM_pressure_drop = self.shpCalc.pump.head_lift - self.shpCalc.pump_path.end_pressure
         self.shpCalc.pump.NPSHd = 10.33 - 0.238 - RES_BOM_pressure_drop
 
-        logger.info(
+        logger.debug(
             f'Finished calculate pump (head_lift: {self.shpCalc.pump.head_lift} m.c.a. | flow: {self.shpCalc.pump.flow}'
         )
 
     def __calculate_pump_residual_flow(self) -> SHPCalcSerializer:
-        logger.info('Calculating residual flow for pump system')
+        logger.debug('Calculating residual flow for pump system')
 
         self.shpCalc.pump_path.head_lift = self.shpCalc.pump.head_lift
 
@@ -455,7 +455,7 @@ class SHP():
 
         assert self.minimum_flow is not None, 'self.minimum_flow is required'
 
-        logger.info(f'Calculating reservoir start pressure for path {str(path_less_pressure)}')
+        logger.debug(f'Calculating reservoir start pressure for path {str(path_less_pressure)}')
         # clean all
         for path in self.shpCalc.paths:
             path.start_pressure = 0
@@ -494,12 +494,12 @@ class SHP():
             path.calculate_pressure_drop(flow)
             path.calculate_start_pressure(path_after.start_pressure)
 
-        logger.info(f'Calculated reservoir start pressure: {path.start_pressure}, for path {str(path_less_pressure)}')
+        logger.debug(f'Calculated reservoir start pressure: {path.start_pressure}, for path {str(path_less_pressure)}')
 
     def __calculate_required_pressure(self,
                                       minimum_flow: float,
                                       paths_with_fixture: List[SHPCalcPath] = None) -> SHPCalcPath:
-        logger.info('Calculating required pressure')
+        logger.debug('Calculating required pressure')
 
         if paths_with_fixture is None:
             paths_with_fixture = self.shpCalc.paths_with_fixture
@@ -507,7 +507,7 @@ class SHP():
             paths_with_fixture = [paths_with_fixture]
 
         self.minimum_flow = minimum_flow
-        logger.info(f'Minimum flow expected: {self.minimum_flow}')
+        logger.debug(f'Minimum flow expected: {self.minimum_flow}')
 
         self.shpCalc.reservoir_path.total_length = (
             self.shpCalc.reservoir_path.length +
@@ -518,7 +518,7 @@ class SHP():
         self.__calculate_paths_pressure(self.shpCalc.reservoir_path)
         paths_with_fixture.sort(key=sortByEndPressure)
         path_less_pressure = paths_with_fixture[0]
-        logger.info(f'Best starting path: {str(path_less_pressure)}')
+        logger.debug(f'Best starting path: {str(path_less_pressure)}')
 
         while paths_with_fixture and path_less_pressure:
             self.shpCalc.reservoir_path.start_pressure = 0
@@ -530,16 +530,16 @@ class SHP():
                 paths_with_fixture = [path for path in paths_with_fixture if path != path_less_pressure]
                 path_less_pressure = paths_with_fixture[0]
 
-        logger.info(f'Path with least pressure: {str(path_less_pressure)}')
+        logger.debug(f'Path with least pressure: {str(path_less_pressure)}')
 
-        logger.info(f'Finished calculate required pressure: {self.shpCalc.reservoir_path.start_pressure} m.c.a.')
+        logger.debug(f'Finished calculate required pressure: {self.shpCalc.reservoir_path.start_pressure} m.c.a.')
 
         return path_less_pressure
 
     def __get_path_with_less_pressure_and_flow(self) -> Tuple[SHPCalcSerializer, bool]:
         minimum_flow = self.fixture.minimum_flow_rate_in_m3_p_s
 
-        logger.info('Finding path with less pressure, with flow')
+        logger.debug('Finding path with less pressure, with flow')
         paths_with_fixture = self.shpCalc.paths_with_fixture
         paths_with_fixture_count = len(paths_with_fixture)
         path_less_pressure = None
@@ -549,7 +549,7 @@ class SHP():
             path_less_pressure = self.__calculate_required_pressure(minimum_flow, paths_with_fixture)
             self.__calculate_required_pressure(0, [path_less_pressure])
             if self.shpCalc.reservoir_path.start_pressure < 0:
-                logger.info(f'Found {str(path_less_pressure)} as path with less pressure')
+                logger.debug(f'Found {str(path_less_pressure)} as path with less pressure')
                 return path_less_pressure, True
         else:
             return path_less_pressure, False
@@ -580,7 +580,7 @@ class SHP():
 
                 if (abs(start_pressure - path.start_pressure) < 0.000001):
                     if CALC_LOGGING_DETAIL:
-                        logger.info(f'Found {str(path)} fixture flow: {path.fixture.flow}, in the {i} iteration')
+                        logger.debug(f'Found {str(path)} fixture flow: {path.fixture.flow}, in the {i} iteration')
                     return flow
                 if start_pressure > path.start_pressure:
                     (min_flow, flow) = (flow, (max_flow + flow) * 0.5)
@@ -608,7 +608,7 @@ class SHP():
                 path.calculate_end_pressure(start_pressure)
                 if (abs(last_flow - path.flow) < 0.000001) and (abs(last_pressure - path.end_pressure) < 0.000001):
                     if CALC_LOGGING_DETAIL:
-                        logger.info(f'Found {str(path)} path flow: {path.flow}, in the {i} iteration')
+                        logger.debug(f'Found {str(path)} path flow: {path.flow}, in the {i} iteration')
                     return path.flow
                 else:
                     last_pressure = path.end_pressure

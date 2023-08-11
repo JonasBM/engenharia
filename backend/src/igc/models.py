@@ -3,6 +3,10 @@ from django.db import models
 
 class Config(models.Model):
 
+    class CalcType(models.TextChoices):
+        PRIMARY = 'PR', 'Primária'
+        SECONDARY = 'SC', 'Secondária'
+
     material = models.ForeignKey('Material', default=None, null=True, blank=True,
                                  on_delete=models.SET_NULL, verbose_name="Material padrão")
     gas = models.ForeignKey('GAS', default=None, null=True, blank=True,
@@ -178,42 +182,3 @@ class GAS(models.Model):
     class Meta:
         verbose_name = "gas"
         verbose_name_plural = "gases"
-
-
-'''
-calc:
-
-Gas:
-    PCI
-    densidade
-    Pressão inicial
-    
-
-Path:
-    trecho
-    potencia que entra (calcula: total, computado, FS, adotada, vazão)
-    L horizontal
-    L sobe
-    L desce
-    L equvalente (conexões)
-    diametro
-    material
-    conexões
-    
-Path calculado:
-    potencia total
-    potencia computada
-    FS
-    potencia adotada
-    vazão
-    velocidade
-    L total
-    Pressão Inicial
-    Pressão Delta
-    Pressão Final
-
-Path result:
-    Perda de carga
-    Perda de carga acumulada?
-
-'''

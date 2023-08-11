@@ -6,13 +6,13 @@ import {
   useWatch,
 } from "react-hook-form";
 import React, { useEffect } from "react";
-import { getNewPath, initialState, setCalc } from "redux/igc";
+import { getNewPath, initialState, setCalc } from "redux/igcSecondary";
 import { useAppDispatch, useAppSelector } from "redux/utils";
 
 import { Add } from "@mui/icons-material";
 import { IGCCalcSerializer } from "api/types/igcTypes";
 import { StyledTextField } from ".";
-import { showIGCCalcDialog } from "Components/IGC/DialogForm/CalcDialogForm";
+import { showIGCCalcDialog } from "Components/IGC/DialogForm/SecondaryCalcDialogForm";
 
 const PathToolbar = ({
   append,

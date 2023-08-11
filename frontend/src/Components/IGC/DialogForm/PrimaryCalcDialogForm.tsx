@@ -4,13 +4,10 @@ import { Controller, useForm, useWatch } from "react-hook-form";
 import { MenuItem, TextField, Typography } from "@mui/material";
 import React, { useEffect } from "react";
 import { closeDialog, openDialog } from "redux/modal";
-import { getNewPath, initialState, setCalc } from "redux/igc";
+import { getNewPath, initialState, setCalc } from "redux/igcPrimary";
 import { useAppDispatch, useAppSelector } from "redux/utils";
 
 import BaseDialogForm from "./BaseDialogForm";
-import { MaterialCRUDAction } from "api/igc";
-import { MaterialSerializer } from "api/types/igcTypes";
-import { addServerErrors } from "utils";
 import store from "redux/store";
 import { yupResolver } from "@hookform/resolvers/yup";
 

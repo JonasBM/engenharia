@@ -1,3 +1,10 @@
+export const CalcType = {
+  PRIMARY: { value: "PR", name: "Primária" },
+  SECONDARY: { value: "SC", name: "Secondária" },
+};
+
+export const CalcTypes = [CalcType.PRIMARY, CalcType.SECONDARY];
+
 export interface ConfigSerializer {
   id: 1;
   material: any;
@@ -104,16 +111,22 @@ export interface IGCCalcPathSerializer {
   start_pressure?: number | null;
   end_pressure?: number | null;
   pressure_drop?: number | null;
+  pressure_drop_color?: string | null;
   pressure_drop_accumulated?: number | null;
+  pressure_drop_accumulated_color?: string | null;
+  fail?: boolean | null;
+  fail_level?: number | null;
 }
 
 export interface IGCCalcSerializer {
   fileinfo: FileInfoSerializer;
   name: string;
+  calc_type: string | null;
   material_id: number | null;
   diameter_id: number | null;
   gas_id: number | null;
   paths: IGCCalcPathSerializer[];
   error?: string | null;
   calculated_at?: string | null;
+  max_fail_level?: number | null;
 }

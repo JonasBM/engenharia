@@ -18,7 +18,7 @@ const IGC = () => {
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    document.title = "Cálculo de IGC";
+    document.title = "Cálculo de IGC Secundária";
     return () => {
       document.title = documentTitles.PORTAL;
     };

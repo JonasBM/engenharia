@@ -26,7 +26,8 @@ import {
 } from "./Components/SHP/DialogForm";
 
 import {
-  IGCCalcDialogForm,
+  IGCPrimaryCalcDialogForm,
+  IGCSecondaryCalcDialogForm,
   IGCDiameterDialogForm,
   IGCFittingDialogForm,
   IGCGASDialogForm,
@@ -98,7 +99,8 @@ function App() {
         <SHPMaterialDialogForm />
         <SHPReductionDialogForm />
 
-        <IGCCalcDialogForm />
+        <IGCPrimaryCalcDialogForm />
+        <IGCSecondaryCalcDialogForm />
         <IGCDiameterDialogForm />
         <IGCFittingDialogForm />
         <IGCGASDialogForm />

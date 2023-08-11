@@ -33,9 +33,9 @@ import { Container } from "@mui/system";
 import FittingDiameter from "./FittingDiameter";
 import { MaterialFileSerializer } from "api/types/igcTypes";
 import Reduction from "./Reduction";
-import { saveIGCMaterial } from "../System/Calculation/utils";
 import { showDiameterDialog } from "Components/IGC/DialogForm/DiameterDialogForm";
 import { showFittingDialog } from "Components/IGC/DialogForm/FittingDialogForm";
+import { saveIGCMaterial } from "./utils";
 
 const Material = () => {
   const dispatch = useAppDispatch();

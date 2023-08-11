@@ -6,13 +6,12 @@ from django.conf import settings
 from django.utils import timezone
 
 from .dataclasses import IGCCalc, IGCCalcPath
-from .exceptions import (CalculeNotImplemented, CouldNotFinishCalculate,
-                         MoreThenOneReservoir, NoGasError, NoInitialDataError,
-                         NoReservoir, PathNotLeadingToReservoir)
+from .exceptions import (MoreThenOneReservoir, NoGasError, NoInitialDataError,
+                         NoReservoir)
 from .models import (GAS, Config, Diameter, Fitting, FittingDiameter, Material,
-                     MaterialConnection, Reduction)
+                     MaterialConnection)
 from .serializers import IGCCalcSerializer
-from .utils import format_decimal, get_best_reduction, sortByEndPressure
+from .utils import format_decimal, get_best_reduction
 
 logger = logging.getLogger(__name__)
 
@@ -87,33 +86,28 @@ class IGC():
             self.print_paths(next_path, False)
 
     def calculate(self) -> IGCCalcSerializer:
-        self.__prepare_calc()
-        self.print_paths(self.igcCalc.reservoir_path)
 
-        # Calculate adopted power rating
+        self.__prepare_calc()
+
+        # Calculate
+        logger.debug('Calculating')
         self.__sum_paths_power_rating_accumulated(self.igcCalc.reservoir_path)
         self.__calculate_paths_power_rating_adopted()
         self.__calculate_paths_flow()
         self.__calculate_paths_pressure_drop()
         self.__calculate_paths_pressure(self.igcCalc.reservoir_path)
 
-
-        self.print_paths(self.igcCalc.reservoir_path)
-        # raise CalculeNotImplemented()
-
-        # self.__sum_paths_flow(self.igcCalc.reservoir_path)
-        
-        
-
-        # self.__calculate_paths_speed()
-
-        self.__calculate_paths_pressure_drop_accumulated()
+        # Finish calculation
+        logger.debug('Finishing calculation')
         self.__calculate_paths_speed()
+        self.__calculate_paths_pressure_drop_accumulated()
+        self.__sum_paths_fail_level(self.igcCalc.reservoir_path)
+        self.__calculate_paths_pressure_drop_color()
+
+        logger.debug('Finished calculate')
 
         self.igcCalc.calculated_at = timezone.now()
         return self.serializer_class(data=asdict(self.igcCalc))
-
-        # calculate speed
 
     def __prepare_calc(self):
         self.igcCalc.gas: GAS = GAS.objects.get(id=self.igcCalc.gas_id)
@@ -122,6 +116,7 @@ class IGC():
         self.igcCalc.reservoir_path = None
         self.igcCalc.error = None
         self.igcCalc.calculated_at = None
+        self.igcCalc.max_fail_level = 0
 
         for path in self.igcCalc.paths:
             path.material = Material.objects.get(id=path.material_id)
@@ -142,7 +137,11 @@ class IGC():
             path.start_pressure = 0
             path.end_pressure = 0
             path.pressure_drop = 0
-            path.pressure_drop_accumulated = 0,
+            path.pressure_drop_color = None
+            path.pressure_drop_accumulated = 0
+            path.pressure_drop_accumulated_color = None
+            path.fail = False
+            path.fail_level = 0
 
             path.connection_names = [
                 f'Comprimento extra: {format_decimal(path.equivalent_length)} m'
@@ -245,7 +244,7 @@ class IGC():
                         f'{fitting_diameter.fitting.name}: {format_decimal(fitting_diameter.equivalent_length)} m'
                     )
 
-            path.total_length = path.equivalent_length + path.length + path.length_up + path.length_down 
+            path.total_length = path.equivalent_length + path.length + path.length_up + path.length_down
 
         if not self.igcCalc.reservoir_path:
             raise NoReservoir()
@@ -259,7 +258,7 @@ class IGC():
 
     def __calculate_paths_power_rating_adopted(self):
         for path in self.igcCalc.paths:
-            path.calculate_power_rating_adopted()
+            path.calculate_power_rating_adopted(self.igcCalc.calc_type)
 
     def __calculate_paths_flow(self):
         for path in self.igcCalc.paths:
@@ -279,18 +278,29 @@ class IGC():
             next_path.start_pressure = path.end_pressure
             self.__calculate_paths_pressure(next_path)
 
-    def __calculate_paths_pressure_drop_accumulated(self):
-        logger.error('FIX __calculate_paths_pressure_drop_accumulated')
-        for path in self.igcCalc.paths:
-            path.pressure_drop_accumulated = 0
-
     def __calculate_paths_speed(self):
-        logger.error('FIX __calculate_paths_speed')
         for path in self.igcCalc.paths:
             path.calculate_speed()
 
+    def __calculate_paths_pressure_drop_accumulated(self):
+        pressure_drop_limit = 0.3
+        if (self.igcCalc.calc_type == Config.CalcType.SECONDARY):
+            pressure_drop_limit = 0.1
+        for path in self.igcCalc.paths:
+            path.calculate_pressure_drop_accumulated(self.igcCalc.gas, pressure_drop_limit)
 
+    def __sum_paths_fail_level(self, path: IGCCalcPath):
+        paths_after: list[IGCCalcPath] = self.get_paths_after(path)
+        path.fail_level = 1 if path.fail else 0
+        for next_path in paths_after:
+            path.fail_level += self.__sum_paths_fail_level(next_path)
+        if path.fail_level > self.igcCalc.max_fail_level:
+            self.igcCalc.max_fail_level = path.fail_level
+        return path.fail_level
     
+    def __calculate_paths_pressure_drop_color(self):
+        for path in self.igcCalc.paths:
+            path.calculate_paths_pressure_drop_color(self.igcCalc.max_fail_level)
 
     def get_path_before(self, actual_path: IGCCalcPath) -> Union[IGCCalcPath, None]:
         for path in self.igcCalc.paths:

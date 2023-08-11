@@ -17,9 +17,8 @@ import React, { useEffect, useState } from "react";
 
 import ConnectionsPopover from "./ConnectionsPopover";
 import { StyledTableCellBorderLeft } from ".";
-import { checkLetter } from "redux/igc";
+import { checkLetter } from "redux/igcSecondary";
 import { decimalFormatter } from "utils";
-import { flow_to_l_p_min } from "./utils";
 import { showDialogCalcFittings } from "./DialogFittings";
 import { useAppSelector } from "redux/utils";
 
@@ -255,12 +254,6 @@ const Path = ({
         <TableCell align="center" sx={{ minWidth: "80px" }}>
           {decimalFormatter(getValues(`paths.${index}.power_rating_accumulated`), 0) || "-"}
         </TableCell>
-        <TableCell align="center" sx={{ minWidth: "80px" }}>
-          {decimalFormatter(getValues(`paths.${index}.concurrency_factor`), 2) || "-"}
-        </TableCell>
-        <TableCell align="center">
-          {decimalFormatter(getValues(`paths.${index}.power_rating_adopted`), 0) || "-"}
-        </TableCell>
 
         <StyledTableCellBorderLeft align="center">
           <TextField
@@ -361,14 +354,23 @@ const Path = ({
         <StyledTableCellBorderLeft align="center" sx={{ minWidth: "60px" }}>
           {decimalFormatter(getValues(`paths.${index}.start_pressure`), 2) || "-"}
         </StyledTableCellBorderLeft>
-        <StyledTableCellBorderLeft align="center" sx={{ minWidth: "60px" }}>
-          {decimalFormatter(getValues(`paths.${index}.pressure_drop`), 4) || "-"}
+        <StyledTableCellBorderLeft
+          align="center"
+          sx={{ minWidth: "60px", color: getValues(`paths.${index}.pressure_drop_color`) || null }}
+          title={getValues(`paths.${index}.fail_level`)?.toString()}
+        >
+          {decimalFormatter(getValues(`paths.${index}.pressure_drop`), 2) || "-"}
         </StyledTableCellBorderLeft>
         <StyledTableCellBorderLeft align="center" sx={{ minWidth: "60px" }}>
           {decimalFormatter(getValues(`paths.${index}.end_pressure`), 2) || "-"}
         </StyledTableCellBorderLeft>
 
-        <StyledTableCellBorderLeft align="center">{"-"}</StyledTableCellBorderLeft>
+        <StyledTableCellBorderLeft
+          align="center"
+          sx={{ minWidth: "60px", color: getValues(`paths.${index}.pressure_drop_accumulated_color`) || null }}
+        >
+          {decimalFormatter((getValues(`paths.${index}.pressure_drop_accumulated`) || 0) * 100, 2) || "-"}
+        </StyledTableCellBorderLeft>
       </TableRow>
     </>
   );

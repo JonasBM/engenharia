@@ -19,7 +19,7 @@ import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 import { FormProvider, useFieldArray, useForm, useWatch } from "react-hook-form";
 import React, { useEffect } from "react";
 import { cleanCalc, saveIGCCalc } from "./utils";
-import { getNewPath, initialState } from "redux/igc";
+import { getNewPath, initialState } from "redux/igcPrimary";
 import { useAppDispatch, useAppSelector } from "redux/utils";
 
 import CalcToolbar from "./CalcToolbar";
@@ -80,7 +80,7 @@ const validationSchema = () =>
 
 const IGC = () => {
   const dispatch = useAppDispatch();
-  const igcCalc = useAppSelector((state) => state.igcCalc);
+  const igcCalc = useAppSelector((state) => state.igcPrimaryCalc);
 
   const formMethods = useForm<IGCCalcSerializer>({
     resolver: yupResolver(validationSchema()),

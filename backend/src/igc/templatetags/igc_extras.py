@@ -1,6 +1,6 @@
 from django import template
 from igc.models import Config, Diameter, GAS, Material
-from igc.utils import flow_to_l_p_min, format_decimal
+from igc.utils import format_decimal
 from django.utils.safestring import mark_safe
 register = template.Library()
 
@@ -59,9 +59,4 @@ def get_diameter_title(diameter_id):
         return diameter_id
 
 
-@register.filter
-def format_flow(value):
-    if isinstance(value, float):
-        return f'{format_decimal(value, 6)} m³/s ({format_decimal(flow_to_l_p_min(value))} l/min)'
-    else:
-        return mark_safe('&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-----&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;')
+

@@ -1,4 +1,5 @@
-export { default as IGCCalcDialogForm } from './CalcDialogForm';
+export { default as IGCPrimaryCalcDialogForm } from './PrimaryCalcDialogForm';
+export { default as IGCSecondaryCalcDialogForm } from './SecondaryCalcDialogForm';
 export { default as IGCDiameterDialogForm } from './DiameterDialogForm';
 export { default as IGCFittingDialogForm } from './FittingDialogForm';
 export { default as IGCGASDialogForm } from './GASDialogForm';

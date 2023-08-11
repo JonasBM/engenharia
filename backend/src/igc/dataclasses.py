@@ -2,10 +2,11 @@
 import math
 from dataclasses import dataclass
 from datetime import datetime
+from .exceptions import CouldNotFinishCalculate
 
-from igc.utils import calculate_concurrency_factor, kcal_p_min_to_kcal_p_h, kpa_to_kgf_p_cm2
+from .utils import calculate_concurrency_factor, kcal_p_min_to_kcal_p_h, kpa_to_kgf_p_cm2, rgb2hex
 
-from .models import Diameter, Fitting, GAS, Material
+from .models import Config, Diameter, Fitting, GAS, Material
 
 
 @dataclass(kw_only=True)
@@ -42,17 +43,25 @@ class IGCCalcPath:
     start_pressure: float = 0
     end_pressure: float = 0
     pressure_drop: float = 0
+    pressure_drop_color: str = None
     pressure_drop_accumulated: float = 0
+    pressure_drop_accumulated_color: str = None
+    fail: bool = False
+    fail_level: int = 0
 
     def __str__(self):
         return f'{self.start} - {self.end or ""}'
 
-    def calculate_power_rating_adopted(self):
+    def calculate_power_rating_adopted(self, calc_type: str):
         assert (self.power_rating_accumulated is not None), (
             'You must call `.__sum_paths_power_rating_accumulated()` before calling `.calculate_power_rating_adopted()`.'
         )
-        self.concurrency_factor = calculate_concurrency_factor(self.power_rating_accumulated)
-        self.power_rating_adopted = self.power_rating_accumulated * self.concurrency_factor
+        if (calc_type == Config.CalcType.SECONDARY):
+            self.concurrency_factor = 1
+            self.power_rating_adopted = self.power_rating_accumulated
+        else:
+            self.concurrency_factor = calculate_concurrency_factor(self.power_rating_accumulated)
+            self.power_rating_adopted = self.power_rating_accumulated * self.concurrency_factor
 
     def calculate_flow(self, gas: GAS):
         assert (self.power_rating_adopted is not None), (
@@ -77,21 +86,50 @@ class IGCCalcPath:
             'You must call `.__calculate_paths_pressure_drop()` before calling `.calculate_end_pressure()`.'
         )
         self.start_pressure = start_pressure
-        self.end_pressure = math.pow(math.pow(self.start_pressure, 2) - self.pressure_drop, 0.5)
+        if self.start_pressure < self.pressure_drop:
+            self.end_pressure = 0
+            # raise CouldNotFinishCalculate(f'Perda de carga muito alta: trecho: {self.start}-{self.end}')
+        else:
+            self.end_pressure = math.pow(math.pow(self.start_pressure, 2) - self.pressure_drop, 0.5)
 
     def calculate_speed(self):
-        # must have pressure
-        assert (self.flow is not None), (
-            'You must call `.__calculate_paths_flow()` before calling `.calculate_speed()`.'
+        assert (self.flow is not None and self.start_pressure is not None), (
+            'You must call `.__calculate_paths_pressure()` before calling `.calculate_speed()`.'
         )
         self.speed = 354 * self.flow * math.pow(kpa_to_kgf_p_cm2(self.start_pressure) +
                                                 1.033, -1) * math.pow(self.diameter.internal_diameter, -2)
+
+    def calculate_pressure_drop_accumulated(self, gas: GAS, pressure_drop_limit: float):
+        assert (self.end_pressure is not None), (
+            'You must call `.__calculate_paths_pressure()` before calling `.calculate_pressure_drop_accumulated()`.'
+        )
+
+        gas_start_pressure = float(gas.start_pressure)
+        self.pressure_drop_accumulated = (gas_start_pressure - self.end_pressure) / gas_start_pressure
+        if self.pressure_drop_accumulated > pressure_drop_limit:
+            self.fail = True
+            self.pressure_drop_accumulated_color = rgb2hex(244, 67, 54)
+        else:
+            self.fail = False
+            self.pressure_drop_accumulated_color = rgb2hex(76, 175, 80)
+
+    def calculate_paths_pressure_drop_color(self, max_fail_level: int):
+        assert (self.fail_level >= 0), (
+            'You must call `.__sum_paths_fail_level()` before calling `.calculate_paths_pressure_drop_color()`.'
+        )
+        if self.fail_level > 0:
+            green = int(200 * ((max_fail_level - self.fail_level) / max_fail_level))
+            green = min(max(green, 0), 200)
+            self.pressure_drop_color = rgb2hex(255, green, 0)
+        else:
+            self.pressure_drop_color = None
 
 
 @dataclass(kw_only=True)
 class IGCCalc:
     fileinfo: IGCCalcFileInfo
     name: str
+    calc_type: str
     material_id: int
     diameter_id: int
     gas_id: int
@@ -100,6 +138,7 @@ class IGCCalc:
     reservoir_path: IGCCalcPath = None
     error: str = None
     calculated_at: datetime
+    max_fail_level: int = 0
 
     def __post_init__(self):
         self.fileinfo = IGCCalcFileInfo(**self.fileinfo)
