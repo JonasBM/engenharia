@@ -70,13 +70,22 @@ class IGCCalcPath:
         _power_rating = kcal_p_min_to_kcal_p_h(self.power_rating_adopted)
         self.flow = _power_rating/gas.pci
 
-    def calculate_pressure_drop(self, gas: GAS):
+    def calculate_pressure_drop(self, gas: GAS, calc_type: str):
         assert (self.flow is not None), (
             'You must call `.__calculate_paths_flow()` before calling `.calculate_pressure_drop()`.'
         )
         _relative_density = float(gas.relative_density)
-        drop_total = (467000 * _relative_density * self.total_length * math.pow(self.flow, 1.82)) / \
-            math.pow(self.diameter.internal_diameter, 4.82)
+
+        if (calc_type == Config.CalcType.SECONDARY):
+            if (gas.name == 'GN'):
+                drop_total = (math.pow(self.flow, 1.8)*math.pow(_relative_density, 0.8)*self.total_length) / \
+                    (0.00049284*math.pow(self.diameter.internal_diameter, 4.8))
+            else:
+                drop_total = (2273 * _relative_density * self.total_length * math.pow(self.flow, 1.82)) / \
+                    math.pow(self.diameter.internal_diameter, 4.82)
+        else:
+            drop_total = (467000 * _relative_density * self.total_length * math.pow(self.flow, 1.82)) / \
+                math.pow(self.diameter.internal_diameter, 4.82)
         drop_up = 0.01318 * self.length_up*(_relative_density-1)
         drop_down = 0.01318 * self.length_down*(_relative_density-1)
         self.pressure_drop = drop_total - drop_up + drop_down

@@ -266,7 +266,7 @@ class IGC():
 
     def __calculate_paths_pressure_drop(self):
         for path in self.igcCalc.paths:
-            path.calculate_pressure_drop(self.igcCalc.gas)
+            path.calculate_pressure_drop(self.igcCalc.gas.relative_density, self.igcCalc.calc_type)
 
     def __calculate_paths_pressure(self, path: IGCCalcPath):
         if path == self.igcCalc.reservoir_path:
@@ -297,7 +297,7 @@ class IGC():
         if path.fail_level > self.igcCalc.max_fail_level:
             self.igcCalc.max_fail_level = path.fail_level
         return path.fail_level
-    
+
     def __calculate_paths_pressure_drop_color(self):
         for path in self.igcCalc.paths:
             path.calculate_paths_pressure_drop_color(self.igcCalc.max_fail_level)
