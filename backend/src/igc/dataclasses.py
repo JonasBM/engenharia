@@ -77,7 +77,7 @@ class IGCCalcPath:
         _relative_density = float(gas.relative_density)
 
         if (calc_type == Config.CalcType.SECONDARY):
-            if (gas.name == 'GN'):
+            if ('GN' in gas.name):
                 drop_total = (math.pow(self.flow, 1.8)*math.pow(_relative_density, 0.8)*self.total_length) / \
                     (0.00049284*math.pow(self.diameter.internal_diameter, 4.8))
             else:
@@ -90,16 +90,18 @@ class IGCCalcPath:
         drop_down = 0.01318 * self.length_down*(_relative_density-1)
         self.pressure_drop = drop_total - drop_up + drop_down
 
-    def calculate_end_pressure(self, start_pressure: float):
+    def calculate_end_pressure(self, start_pressure: float, calc_type: str):
         assert (self.pressure_drop is not None), (
             'You must call `.__calculate_paths_pressure_drop()` before calling `.calculate_end_pressure()`.'
         )
         self.start_pressure = start_pressure
         if self.start_pressure < self.pressure_drop:
             self.end_pressure = 0
-            # raise CouldNotFinishCalculate(f'Perda de carga muito alta: trecho: {self.start}-{self.end}')
         else:
-            self.end_pressure = math.pow(math.pow(self.start_pressure, 2) - self.pressure_drop, 0.5)
+            if (calc_type == Config.CalcType.SECONDARY):
+                self.end_pressure = self.start_pressure - self.pressure_drop
+            else:
+                self.end_pressure = math.pow(math.pow(self.start_pressure, 2) - self.pressure_drop, 0.5)
 
     def calculate_speed(self):
         assert (self.flow is not None and self.start_pressure is not None), (
