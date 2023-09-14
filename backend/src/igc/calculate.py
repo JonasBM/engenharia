@@ -266,13 +266,13 @@ class IGC():
 
     def __calculate_paths_pressure_drop(self):
         for path in self.igcCalc.paths:
-            path.calculate_pressure_drop(self.igcCalc.gas.relative_density, self.igcCalc.calc_type)
+            path.calculate_pressure_drop(self.igcCalc.gas, self.igcCalc.calc_type)
 
     def __calculate_paths_pressure(self, path: IGCCalcPath):
         if path == self.igcCalc.reservoir_path:
-            path.calculate_end_pressure(float(self.igcCalc.gas.start_pressure))
+            path.calculate_end_pressure(float(self.igcCalc.gas.start_pressure), self.igcCalc.calc_type)
         else:
-            path.calculate_end_pressure(path.start_pressure)
+            path.calculate_end_pressure(path.start_pressure, self.igcCalc.calc_type)
         paths_after: list[IGCCalcPath] = self.get_paths_after(path)
         for next_path in paths_after:
             next_path.start_pressure = path.end_pressure
