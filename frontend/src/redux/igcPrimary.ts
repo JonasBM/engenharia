@@ -84,10 +84,13 @@ export const getIGCCalc = () => {
 export const initialState = {
   fileinfo: getNewFileInfo(),
   name: "",
+  observation: "",
   calc_type: "PR",
   material_id: null,
   diameter_id: null,
   gas_id: null,
+  signatory_id: null,
+  start_pressure: null,
   paths: [],
 } as IGCCalcSerializer;
 

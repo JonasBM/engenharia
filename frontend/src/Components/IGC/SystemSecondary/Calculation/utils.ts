@@ -21,8 +21,8 @@ export const saveFileIGCCalc = (data: IGCCalcSerializer) => {
 
   data = saveIGCCalc(data);
   const jsonData = JSON.stringify(data);
-  let fileName = sanitizeFilename(data.name);
-  if (!data.name) {
+  let fileName = sanitizeFilename(data.name || "Cálculo de IGC secundária");
+  if (!fileName) {
     fileName = "Cálculo de IGC secundária";
   }
   saveFile(jsonData, `${fileName}.igcsccalc`, "application/json");

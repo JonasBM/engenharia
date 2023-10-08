@@ -16,8 +16,6 @@ import axios, { AxiosRequestConfig } from "axios";
 import { Dispatch } from "@reduxjs/toolkit";
 import { RootState } from "redux/store";
 import { sanitizeFilename } from "utils";
-// import { RootState } from "redux/store";
-// import store from "redux/store";
 
 export const ConfigCRUDAction = new CRUDAction<ConfigSerializer>(
   "igc/configs",

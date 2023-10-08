@@ -107,12 +107,14 @@ export const getSHPCalc = () => {
 export const initialState = {
   fileinfo: getNewFileInfo(),
   name: "",
+  observation: "",
   pressure_type: null,
   calc_type: null,
   pump: {},
   material_id: null,
   diameter_id: null,
   fixture_id: null,
+  signatory_id: null,
   paths: [],
 } as SHPCalcSerializer;
 

@@ -21,8 +21,8 @@ export const saveFileSHPCalc = (data: SHPCalcSerializer) => {
 
   data = saveSHPCalc(data);
   const jsonData = JSON.stringify(data);
-  let fileName = sanitizeFilename(data.name);
-  if (!data.name) {
+  let fileName = sanitizeFilename(data.name || "Cálculo de SHP");
+  if (!fileName) {
     fileName = "Cálculo de SHP";
   }
   saveFile(jsonData, `${fileName}.shpcalc`, "application/json");
