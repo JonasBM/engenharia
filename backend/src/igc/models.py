@@ -177,7 +177,6 @@ class GAS(models.Model):
     description = models.CharField(max_length=255, default=None, null=True, blank=True, verbose_name="descrição")
     pci = models.IntegerField(verbose_name="poder calorifico inferior")
     relative_density = models.DecimalField(max_digits=5, decimal_places=2, verbose_name="densidade relativa")
-    start_pressure = models.DecimalField(max_digits=9, decimal_places=2, verbose_name="pressão inicial")
 
     class Meta:
         verbose_name = "gas"

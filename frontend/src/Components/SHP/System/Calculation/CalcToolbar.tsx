@@ -9,7 +9,6 @@ import { Controller, useFormContext, useWatch } from "react-hook-form";
 import React, { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "redux/utils";
 
-// import { MyDocument } from "Components/SHP/Print";
 import { StyledTextField } from ".";
 import { downloadPDFAction } from "api/shp";
 import { saveSHPCalc } from "./utils";
@@ -17,6 +16,7 @@ import { saveSHPCalc } from "./utils";
 const CalcToolbar = () => {
   const dispatch = useAppDispatch();
   const fixtures = useAppSelector((state) => state.shp.fixtures);
+  const signatories = useAppSelector((state) => state.core.signatories);
   const config = useAppSelector((state) => state.shp.configs[0]);
 
   const {
@@ -24,7 +24,7 @@ const CalcToolbar = () => {
     reset,
     setValue,
     getValues,
-    formState: { isDirty },
+    formState: { isDirty, errors },
   } = useFormContext<SHPCalcSerializer>();
 
   const calc_type = useWatch({
@@ -91,6 +91,8 @@ const CalcToolbar = () => {
               onChange={(event) => {
                 onChange(event.target.value);
               }}
+              error={errors.calc_type ? true : false}
+              helperText={errors.calc_type?.message}
             >
               {CalcTypes.map((_calcType) => (
                 <MenuItem key={_calcType.value} value={_calcType.value}>
@@ -113,6 +115,8 @@ const CalcToolbar = () => {
                 onChange={(event) => {
                   onChange(event.target.value);
                 }}
+                error={errors.fixture_id ? true : false}
+                helperText={errors.fixture_id?.message}
               >
                 {fixtures.map((_fixture) => (
                   <MenuItem key={_fixture.id} value={_fixture.id}>
@@ -135,6 +139,8 @@ const CalcToolbar = () => {
               onChange={(event) => {
                 onChange(event.target.value);
               }}
+              error={errors.pressure_type ? true : false}
+              helperText={errors.pressure_type?.message}
             >
               {PressureTypes.map((_shpPressureType) => (
                 <MenuItem
@@ -147,6 +153,32 @@ const CalcToolbar = () => {
             </StyledTextField>
           )}
         />
+        {signatories.length > 0 && (
+          <Controller
+            control={control}
+            name="signatory_id"
+            render={({ field: { value, onChange } }) => (
+              <StyledTextField
+                label="Signatário"
+                sx={{ width: 200 }}
+                select
+                value={value || ""}
+                onChange={(event) => {
+                  onChange(event.target.value);
+                }}
+                error={errors.signatory_id ? true : false}
+                helperText={errors.signatory_id?.message}
+              >
+                <MenuItem value={0}>-------</MenuItem>
+                {signatories.map((_signatory) => (
+                  <MenuItem key={_signatory.id} value={_signatory.id}>
+                    {_signatory.name}
+                  </MenuItem>
+                ))}
+              </StyledTextField>
+            )}
+          />
+        )}
         <Box sx={{ flexGrow: 1 }} />
         <Button
           startIcon={<Save />}

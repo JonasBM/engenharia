@@ -1,5 +1,5 @@
 import math
-from typing import Union
+from typing import Union, List
 
 from .models import Diameter, Reduction
 
@@ -30,7 +30,7 @@ def format_decimal(number: Union[int, float], decimals=2):
     return '0,00'
 
 
-def get_reduction_path(inlet_diameter: Diameter, final_diameter_id: int, reduce: bool) -> list[list[Reduction]]:
+def get_reduction_path(inlet_diameter: Diameter, final_diameter_id: int, reduce: bool) -> List[List[Reduction]]:
     reduction_paths = []
     queryset = inlet_diameter.inlet_reductions
     if reduce:
@@ -48,7 +48,7 @@ def get_reduction_path(inlet_diameter: Diameter, final_diameter_id: int, reduce:
     return reduction_paths
 
 
-def get_best_reduction(inlet_diameter_id: int, outlet_diameter_id: int) -> list[Reduction]:
+def get_best_reduction(inlet_diameter_id: int, outlet_diameter_id: int) -> List[Reduction]:
     reduction: Reduction = (
         Reduction.objects.filter(
             inlet_diameter=inlet_diameter_id,

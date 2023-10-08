@@ -36,6 +36,7 @@ CORS_EXPOSE_HEADERS = (
 )
 
 LOCAL_INSTALLED_APPS = [
+    'core',
     'accounts',
     'shp',
     'igc',

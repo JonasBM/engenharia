@@ -63,10 +63,13 @@ export const StyledTextField = styled(TextField)(({ theme }) => ({
 const validationSchema = () =>
   yup
     .object({
-      name: yup.string().max(255).notRequired(),
+      name: yup.string().max(255).nullable().notRequired(),
+      observation: yup.string().nullable().notRequired(),
       material_id: yup.number().integer().min(1).required(),
       diameter_id: yup.number().integer().min(1).required(),
       gas_id: yup.number().integer().min(1).required(),
+      signatory_id: yup.number().integer().nullable().notRequired(),
+      start_pressure: yup.number().min(0).required(),
       paths: yup.array().of(
         yup.object().shape({
           start: yup.string().max(255).required(),

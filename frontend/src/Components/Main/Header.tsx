@@ -73,17 +73,18 @@ const Header = () => {
     <AppBar position="static">
       <Container maxWidth="xl">
         <Toolbar disableGutters>
-          <Box
-            component="img"
-            sx={{
-              height: 60,
-              mr: 2,
-              display: { xs: "none", md: "flex" },
-            }}
-            alt=""
-            src={"/brand.png"}
-          />
-
+          <Link to='/'>
+            <Box
+              component="img"
+              sx={{
+                height: 60,
+                mr: 2,
+                display: { xs: "none", md: "flex" },
+              }}
+              alt=""
+              src={"/brand.png"}
+            />
+          </Link>
           <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}>
             <IconButton
               size="large"
@@ -114,12 +115,7 @@ const Header = () => {
               }}
             >
               {pages.map((page) => (
-                <MenuItem
-                  key={page.title}
-                  component={Link}
-                  to={page.path}
-                  onClick={handleCloseNavMenu}
-                >
+                <MenuItem key={page.title} component={Link} to={page.path} onClick={handleCloseNavMenu}>
                   <Typography textAlign="center">{page.title}</Typography>
                 </MenuItem>
               ))}
@@ -142,34 +138,18 @@ const Header = () => {
             />
           </Box>
           <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
-            <Stack
-              direction="row"
-              justifyContent="center"
-              alignItems="center"
-              spacing={1}
-            >
+            <Stack direction="row" justifyContent="center" alignItems="center" spacing={1}>
               {pages.map((page) => (
                 <Button
                   key={page.title}
                   component={Link}
                   to={page.path}
                   onClick={handleCloseNavMenu}
-                  color={
-                    location.pathname.includes(page.path)
-                      ? "secondary"
-                      : "primary"
-                  }
-                  variant={
-                    location.pathname.includes(page.path) ? "contained" : "text"
-                  }
+                  color={location.pathname.includes(page.path) ? "secondary" : "primary"}
+                  variant={location.pathname.includes(page.path) ? "contained" : "text"}
                   sx={{ my: 2, color: "white", display: "block" }}
                 >
-                  <Typography
-                    variant="h6"
-                    noWrap
-                    minWidth={"100px"}
-                    textAlign="center"
-                  >
+                  <Typography variant="h6" noWrap minWidth={"100px"} textAlign="center">
                     {page.title}
                   </Typography>
                 </Button>
@@ -181,10 +161,7 @@ const Header = () => {
             <Box sx={{ flexGrow: 0 }}>
               <Tooltip title={getUserFullName(auth.user)}>
                 <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                  <Avatar
-                    alt={getUserFullName(auth.user)}
-                    sx={{ backgroundColor: "success.main" }}
-                  >
+                  <Avatar alt={getUserFullName(auth.user)} sx={{ backgroundColor: "success.main" }}>
                     {getUserInitials(auth.user)}
                   </Avatar>
                 </IconButton>
@@ -206,29 +183,15 @@ const Header = () => {
                 onClose={handleCloseUserMenu}
               >
                 {settings.map((setting) => (
-                  <MenuItem
-                    key={setting.title}
-                    component={Link}
-                    to={setting.path}
-                    onClick={handleCloseUserMenu}
-                  >
+                  <MenuItem key={setting.title} component={Link} to={setting.path} onClick={handleCloseUserMenu}>
                     <Typography textAlign="center">{setting.title}</Typography>
                   </MenuItem>
                 ))}
               </Menu>
             </Box>
           ) : (
-            <Button
-              component={Link}
-              to="/login"
-              sx={{ my: 2, color: "white", display: "block" }}
-            >
-              <Typography
-                variant="h6"
-                noWrap
-                minWidth={"100px"}
-                textAlign="center"
-              >
+            <Button component={Link} to="/login" sx={{ my: 2, color: "white", display: "block" }}>
+              <Typography variant="h6" noWrap minWidth={"100px"} textAlign="center">
                 Entrar
               </Typography>
             </Button>

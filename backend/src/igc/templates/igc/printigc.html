@@ -1,8 +1,9 @@
-{% load shp_extras %}
+{% load igc_extras %}
 {% load static %}
 <html>
   <head>
     <link rel="stylesheet" href="{% static 'css/printshp.css' %}">
+    <meta charset="UTF-8">
   </head>
   <body>
     <header>
@@ -18,193 +19,133 @@
     </footer>
     <div>
       <h2 class="title">
-        MEMORIAL DE CÁLCULO DO <br/>
-        SISTEMA HIDRÁULICO PREVENTIVO
+        MEMORIAL DE CÁLCULO DO SISTEMA<br/>
+        DE INSTALAÇÃO DE GÁS COMBUSTÍVEL
       </h2>
       <br/>
+      <h2 class="title">
+        Rede {{ calc.calc_type|get_calc_type }}
+      </h2>
+      <br/>
+      
       <h3 class="nomargin">Informações do Cálculo:</h3>
       <lu>
         <li class="ml-5">Nome: {{ calc.name|format_calc_name }}</li>
-        <li class="ml-5">Tipo de cálculo: {{ calc.calc_type|get_calc_type }}</li>
-        <li class="ml-5">Tipo de pressurização: {{calc.pressure_type|get_perssure_type }}</li>
-        <li class="ml-5">Vazão minima: {{ fixture.minimum_flow_rate }} L/min</li>
+        <li class="ml-5">Gás: {{ gas.name }}</li>
+        <li class="ml-5">PCI: {{ gas.pci }}</li>
+        <li class="ml-5">Densidade relativa: {{ gas.relative_density }}</li>
+        <li class="ml-5">Pressão Inicial: {{ calc.start_pressure }} KPa</li>
       </lu>
-      <br/>
-      <br/>
-      <h3 class="nomargin">Informações do Hidrante:</h3>
-      <lu>
-        <li class="ml-5">Tipo de esguicho: {{ fixture.nozzle_type|get_nozzle_type }}</li>
-        {% if fixture.k_factor %}
-          <li class="ml-5">Fator de vazão K: {{fixture.k_factor}} l/min/&#8730;m.c.a.</li>
-          {% if fixture.k_factor_includes_hose %}
-            <em class="ml-5">Obs.: O Fator de vazão já inclue a perda de carga na mangueira</em>
-          {% endif %}
-        {% endif %}
-        {% if fixture.outlet_diameter %}
-          <li class="ml-5">Diâmetro de saída do esguicho: {{ fixture.outlet_diameter }} mm</li>
-        {% endif %}
-        {% if fixture.k_nozzle %}
-          <li class="ml-5">Coeficiente tipico do esguicho: {{ fixture.k_nozzle }} </li>
-        {% endif %}
-        <li class="ml-5">Diâmetro da mangueira: {{ fixture.hose_internal_diameter }} mm</li>
-        <li class="ml-5">Coeficiente de hazen-williams da mangueira: {{ fixture.hose_hazen_williams_coefficient }}</li>
-      </lu>
-      <br/>
-      <br/>
-      {% if calc.pressure_type|is_pump %}
+      {% if calc.observation %}
+        <br/>
         <div class="observation-box">
-          <h4 class="nomargin">Informações da Bomba:</h4>
-          <lu>
-            <li class="ml-5">Ponto da Bomba: {{ calc.pump.node }}</li>
-            {% if calc.calc_type|is_residual %}
-              <li class="ml-5">Altura Manométrica existente: {{ calc.pump.head_lift }} m.c.a.</li>
-            {% else %}
-              <li class="ml-5 alert">Altura Manométrica calculada: {{ calc.pump.head_lift }} m.c.a.</li>
-            {% endif %}
-            <li class="ml-5 alert">Vazão: {{ calc.pump.flow|format_flow }}</li>
-            <li class="ml-5">NPSH disponível p/ 1 atm e 20°C: {{ calc.pump.NPSHd|floatformat:2 }} m.c.a.</li>
-          </lu>
+          <h4 class="nomargin">Observações:</h4>
+          <div class="paragraph-100">{{calc.observation|linebreaks}}</div>
         </div>
-      {% else %}
-        {% if reservoir_path %}
-        <div class="observation-box">
-          <h4 class="nomargin">Informações do reservatório:</h4>
-          <lu>
-            {% if calc.calc_type|is_residual %}
-              <li class="ml-5">Altura existente: {{ reservoir_path.level_difference|format_reservoir_level }}</li>
-            {% else %}
-              <li class="ml-5 alert">Altura calculada: {{ reservoir_path.level_difference|format_reservoir_level }}</li>
-            {% endif %}
-            <li class="ml-5">Material da tubulação: {{ reservoir_path.material_id|get_material_title }}</li>
-            <li class="ml-5">Diâmetro da tubulação: {{ reservoir_path.diameter_id|get_diameter_title }}</li>
-          </lu>
-        </div>
-        {% endif %}
       {% endif %}
       <br/>
       <br/>
-      <div class="observation-box">
-        <h4 class="nomargin">Informações do hidrante mais desfavorável:</h4>
-          <lu>
-            <li class="ml-5">Hidrante: {{ less_favorable_path_fixture.fixture.end }}</li>
-            {% if calc.calc_type|is_residual %}
-              <li class="ml-5 alert">Vazão residual: {{ less_favorable_path_fixture.fixture.flow|format_flow }}</li>
-            {% else %}
-              <li class="ml-5">Vazão: {{ less_favorable_path_fixture.fixture.flow|format_flow }}</li>
-            {% endif %}
-          </lu>
-      </div>
-      <br/>
-      <br/>
 
-      <h3 class="nomargin break-before">Trechos calculados:</h3>
+      <h4 class="m-5">Potências:</h4>
+      <table>
+        <thead>
+            <tr>
+                <td><strong>TRECHO</strong></td>
+                <td colspan="2"><strong>POTÊNCIA COMPUTADA</strong><br/>(kcal/min)</td>
+                <td><strong>F.S</strong><br/>(%)</td>
+                <td><strong>POTÊNCIA ADOTADA</strong><br/>(kcal/min)</td>
+                <td><strong>VAZÃO DO GLP</strong><br/>(m³/h)</td>
+            </tr>
+        </thead>
+        <tbody>
+            {% for path in calc.paths %}
+            <tr>
+                <td class="bgemphasis">{{ path.start }} - {{ path.end }}</td>
+                <td class="bgemphasis">{{ path.power_rating_added|floatformat:0 }}</td>
+                <td class="bgemphasis">{{ path.power_rating_accumulated|floatformat:0 }}</td>
+                <td>{{ path.concurrency_factor|multiply:100|floatformat:2 }}</td>
+                <td>{{ path.power_rating_adopted|floatformat:0 }}</td>
+                <td>{{ path.flow|floatformat:2 }}</td>
+                
+            </tr>
+            {% endfor %}
+        </tbody>
+      </table>
       <br/>
-      {% for path in calc.paths %}
-      <div>
-        {% if not path.has_fixture %}
-          <div class="nobreak">
-            <h4 class="nomargin">Trecho {{ path.start }} - {{ path.end }}:</h4>
-            <lu>
-              <li class="ml-5">Material: {{ path.material_id|get_material_title }}</li>
-              <li class="ml-5">Diâmetro: {{ path.diameter_id|get_diameter_title }}</li>
-              <li class="ml-5">Desnivel: {{ path.level_difference|floatformat:2 }} m</li>
-              <li class="ml-5">Comprimento real da tubulação: {{ path.length|floatformat:2 }} m</li>
-              <li class="ml-5"> Comprimento equivalente:
-                <ol class="nomargin">
-                {% for con in path.connection_names %}
-                  <li>{{ con }}</li>
-                {% endfor %}
-                </ol>
-              </li>
-              <li class="ml-5">Comprimento total da tubulação: {{ path.total_length|floatformat:2 }} m</li>
-              {% if calc.pressure_type|is_pump and path.head_lift %}
-                <li class="ml-5">Pressão adicional (Bomba): {{ path.head_lift|floatformat:3 }} m.c.a.</li>
-              {% endif %}
-              <li class="ml-5"> Cálculado:
-                <ol class="nomargin">
-                  <li>Vazão: {{ path.flow|format_flow }}</li>
-                  <li>Perda de carga unitária da tubulação: {{ path.unit_pressure_drop|floatformat:6 }} m.c.a./m</li>
-                  <li>Variação da perda de carga da tubulação: {{ path.pressure_drop|floatformat:4 }} m.c.a.</li>
-                  <li>Pressão inicial: {{ path.start_pressure|floatformat:3 }} m.c.a.</li>
-                  <li>Pressão final: {{ path.end_pressure|floatformat:3 }} m.c.a.</li>
-                </ol>
-              </li>
-            </lu>
-          </div>
-          
-        {% else %}
-          <h4 class="nomargin">Trecho {{ path.start }} - {{ path.fixture.end }}:</h4>
-          <lu>
-            <li class="ml-5">Material: {{ path.material_id|get_material_title }}</li>
-            <li class="ml-5">Diâmetro: {{ path.diameter_id|get_diameter_title }}</li>
-          </lu>
-          <div class="ml-5 mt-2 nobreak">
-            <h4 class="nomargin">Tubulação:</h4>
-            <lu>
-              <li class="ml-5">Desnivel: {{ path.level_difference|floatformat:2 }} m</li>
-              <li class="ml-5">Comprimento real: {{ path.length|floatformat:2 }} m</li>
-              <li class="ml-5"> Comprimento equivalente:
-                <ol class="nomargin">
-                {% for con in path.connection_names %}
-                  <li>{{ con }}</li>
-                {% endfor %}
-                </ol>
-              </li>
-              <li class="ml-5">Comprimento total: {{ path.total_length|floatformat:2 }} m</li>
-              <li class="ml-5"> Cálculado:
-                <ol class="nomargin">
-                  <li>Vazão: {{ path.flow|format_flow }}</li>
-                  <li>Perda de carga unitária: {{ path.unit_pressure_drop|floatformat:6 }} m.c.a./m</li>
-                  <li>Variação da perda de carga: {{ path.pressure_drop|floatformat:4 }} m.c.a.</li>
-                  <li>Pressão inicial: {{ path.start_pressure|floatformat:3 }} m.c.a.</li>
-                  <li>Pressão final: {{ path.end_pressure|floatformat:3 }} m.c.a.</li>
-                </ol>
-              </li>
-            </lu>
-          </div>
-          <div class="ml-5 mt-2 nobreak">
-            <h4 class="nomargin">Hidrante:</h4>
-            <lu>
-              <li class="ml-5"> Comprimento equivalente:
-                <ol class="nomargin">
-                {% for con in path.fixture.connection_names %}
-                  <li>{{ con }}</li>
-                {% endfor %}
-                </ol>
-              </li>
-              <li class="ml-5">Comprimento total: {{ path.fixture.total_length|floatformat:2 }} m</li>
-              <li class="ml-5"> Cálculado:
-                <ol class="nomargin">
-                  <li>Vazão: {{ path.fixture.flow|format_flow }}</li>
-                  <li>Perda de carga unitária: {{ path.fixture.unit_pressure_drop|floatformat:6 }} m.c.a./m</li>
-                  <li>Variação da perda de carga: {{ path.fixture.pressure_drop|floatformat:4 }} m.c.a.</li>
-                  <li>Pressão na entrada do Hidrante: {{ path.fixture.start_pressure|floatformat:3 }} m.c.a.</li>
-                  <li>Pressão na entrada da mangueira: {{ path.fixture.middle_pressure|floatformat:3 }} m.c.a.</li>
-                </ol>
-              </li>
-            </lu>
-          </div>
-          <div class="ml-5 mt-2 nobreak">
-            <h4 class="nomargin">Magueira e Esguicho:</h4>
-            <lu>
-              <li class="ml-5">Comprimento da mangueira: {{ path.fixture.hose_length|floatformat:2 }} m</li>
-              <li class="ml-5">Desnivel: {{ path.fixture.level_difference|floatformat:2 }} m</li>
-              <li class="ml-5"> Cálculado:
-                <ol class="nomargin">
-                  <li>Vazão: {{ path.fixture.flow|format_flow }}</li>
-                  <li>Perda de carga unitária: {{ path.fixture.unit_hose_pressure_drop|floatformat:6 }} m.c.a./m</li>
-                  <li>Variação da perda de carga na mangueira: {{ path.fixture.hose_pressure_drop|floatformat:4 }} m.c.a.</li>
-                  <li>Variação da perda de carga no esguicho: {{ path.fixture.nozzle_pressure_drop|floatformat:4 }} m.c.a.</li>
-                  <li>Pressão na entrada da mangueira: {{ path.fixture.middle_pressure|floatformat:3 }} m.c.a.</li>
-                  <li>Pressão na saída do esguicho: {{ path.fixture.end_pressure|floatformat:3 }} m.c.a.</li>
-                </ol>
-              </li>
-            </lu>
-          </div>
-        {% endif %}
+      <h4 class="m-5">Comprimentos e pressões:</h4>
+      <table>
+        <thead>
+            <tr>
+                <td><strong>TRECHO</strong></td>
+                <td><strong>Vel.</strong><br/>(m/s)</td>
+                <td><strong>L HORIZ.</strong><br/>(m)</td>
+                <td><strong>L SOBE</strong><br/>(m)</td>
+                <td><strong>L DESCE</strong><br/>(m)</td>
+                <td><strong>Leq</strong><br/>(m)</td>
+                <td><strong>L TOTAL</strong><br/>(m)</td>
+                <td><strong>Pressão Inicial</strong><br/>(kPa)</td>
+                <td><strong>ΔP</strong></td>
+                <td><strong>Pressão Final</strong><br/>(KPa)</td>
+            </tr>
+        </thead>
+        <tbody>
+            {% for path in calc.paths %}
+            <tr>
+                <td class="bgemphasis">{{ path.start }} - {{ path.end }}</td>
+                <td>{{ path.speed|floatformat:2 }}</td>
+                <td class="bgemphasis">{{ path.length|floatformat:2 }}</td>
+                <td class="bgemphasis">{{ path.length_up|floatformat:2 }}</td>
+                <td class="bgemphasis">{{ path.length_down|floatformat:2 }}</td>
+                <td class="bgemphasis">{{ path.equivalent_length|floatformat:2 }}</td>
+                <td>{{ path.total_length|floatformat:2 }}</td>
+                <td>{{ path.start_pressure|floatformat:2 }}</td>
+                <td>{{ path.pressure_drop|floatformat:2 }}</td>
+                <td class="bgemphasis">{{ path.end_pressure|floatformat:2 }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+      </table>
+      <br/>
+      <h4 class="m-5">Resultado:</h4>
+      <table>
+        <thead>
+            <tr>
+                <td><strong>TRECHO</strong></td>
+                <td><strong>P. DE<br/>CARGA</strong><br/>(kPa)</td>
+                <td><strong>PERDA<br/>ACUMULADA</strong><br/>(%)</td>
+                <td><strong>Diâmetro<br/>Nominal</strong></td>
+                <td><strong>Diâmetro<br/>Interno</strong><br/>(mm)</td>
+                <td><strong>Material</strong></td>
+                <td><strong>OBSERVAÇÕES</strong></td>
+            </tr>
+        </thead>
+        <tbody>
+            {% for path in calc.paths %}
+            <tr>
+                <td class="bgemphasis">{{ path.start }} - {{ path.end }}</td>
+                <td>{{ path.start_pressure|subtract:path.end_pressure|floatformat:2 }}</td>
+                <td>{{ path.pressure_drop_accumulated|multiply:100|floatformat:2 }}</td>
+                <td class="bgemphasis">{{ path.diameter_id|get_diameter_name }}</td>
+                <td class="bgemphasis">{{ path.diameter_id|get_diameter_internal_diameter }}</td>
+                <td>{{ path.material_id|get_material_title }}</td>
+                {% if path.fail %}
+                  <td class="bgred">NÃO ATENDE</td>
+                {% else %}
+                  <td class="bggreen">ATENDE</td>
+                {% endif %}
+            </tr>
+            {% endfor %}
+        </tbody>
+      </table>
+      {% if signatory %}
         <br/>
-      </div>
-      {% endfor %}
-    </div:>
+        <br/>
+        <div class="signature nobreak">
+          <div>_______________________________________________</div>
+          <div>{{signatory.title}}</div>
+          <div>{{signatory.document}}</div>
+        </div>
+      {% endif %}
+    </div>
   </body>
 </html>

@@ -35,6 +35,7 @@ import {
   IGCMaterialDialogForm,
   IGCReductionDialogForm,
 } from "./Components/IGC/DialogForm";
+import SignatoryDialogForm from "Components/Main/Admin/DialogForm/SignatoryDialogForm";
 
 yupSetLocale(yupPtBR);
 
@@ -90,6 +91,8 @@ function App() {
       <ThemeProvider theme={theme}>
         <Header />
         <Alerts />
+
+        <SignatoryDialogForm />
 
         <SHPCalcDialogForm />
         <SHPDiameterDialogForm />

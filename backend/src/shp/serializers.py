@@ -190,12 +190,14 @@ class SHPCalcSerializer(serializers.Serializer):
 
     fileinfo = FileInfoSerializer(required=True)
     name = serializers.CharField(**custom_not_required_blank)
+    observation = serializers.CharField(**custom_not_required_blank)
     pressure_type = serializers.ChoiceField(choices=Config.PressureType, required=True)
     calc_type = serializers.ChoiceField(choices=Config.CalcType, required=True)
     pump = SHPCalcPumpSerializer()
     material_id = serializers.IntegerField(required=True)
     diameter_id = serializers.IntegerField(required=True)
     fixture_id = serializers.IntegerField(required=True)
+    signatory_id = serializers.IntegerField(**custom_not_required)
     paths = SHPCalcPathSerializer(required=True, many=True)
     error = serializers.CharField(default=None, **custom_not_required_blank)
     less_favorable_path_fixture_index = serializers.IntegerField(**custom_not_required)
@@ -213,5 +215,5 @@ class SHPCalcSerializer(serializers.Serializer):
             )
         return super().validate(data)
 
-# from django_typomatic import generate_ts
-# generate_ts('./shpTypes.ts', 'shp')
+from django_typomatic import generate_ts
+generate_ts('./shpTypes.ts', 'shp')

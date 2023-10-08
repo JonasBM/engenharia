@@ -256,7 +256,7 @@ const Path = ({
           {decimalFormatter(getValues(`paths.${index}.power_rating_accumulated`), 0) || "-"}
         </TableCell>
         <TableCell align="center" sx={{ minWidth: "80px" }}>
-          {decimalFormatter(getValues(`paths.${index}.concurrency_factor`), 2) || "-"}
+          {decimalFormatter((getValues(`paths.${index}.concurrency_factor`) || 0) * 100, 2) || "-"}
         </TableCell>
         <TableCell align="center">
           {decimalFormatter(getValues(`paths.${index}.power_rating_adopted`), 0) || "-"}

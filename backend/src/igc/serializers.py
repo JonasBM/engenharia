@@ -160,15 +160,18 @@ class IGCCalcSerializer(serializers.Serializer):
 
     fileinfo = FileInfoSerializer(required=True)
     name = serializers.CharField(**custom_not_required_blank)
+    observation = serializers.CharField(**custom_not_required_blank)
     calc_type = serializers.ChoiceField(choices=Config.CalcType, required=True)
     material_id = serializers.IntegerField(required=True)
     diameter_id = serializers.IntegerField(required=True)
     gas_id = serializers.IntegerField(required=True)
+    signatory_id = serializers.IntegerField(**custom_not_required)
+    start_pressure = serializers.FloatField(required=True)
     paths = IGCCalcPathSerializer(required=True, many=True)
     error = serializers.CharField(default=None, **custom_not_required_blank)
     calculated_at = serializers.DateTimeField(**custom_not_required)
     max_fail_level = serializers.IntegerField(default=0, **custom_not_required)
 
 
-# from django_typomatic import generate_ts
-# generate_ts('./igcTypes.ts', 'igc')
+from django_typomatic import generate_ts
+generate_ts('./igcTypes.ts', 'igc')

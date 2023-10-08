@@ -13,6 +13,7 @@ import React, { useEffect } from "react";
 import System from "./Calculation";
 import { documentTitles } from "myConstants";
 import { useAppDispatch } from "redux/utils";
+import { SignatoryCRUDAction } from "api/core";
 
 const SHP = () => {
   const dispatch = useAppDispatch();
@@ -25,6 +26,7 @@ const SHP = () => {
   }, []);
 
   useEffect(() => {
+    dispatch(SignatoryCRUDAction.list());
     dispatch(ConfigCRUDAction.list());
     dispatch(MaterialCRUDAction.list());
     dispatch(DiameterCRUDAction.list());

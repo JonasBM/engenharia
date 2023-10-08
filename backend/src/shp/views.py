@@ -10,6 +10,8 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from weasyprint import CSS, HTML
 
+from core.models import Signatory
+
 from .calculate import SHP
 from .models import (Config, Diameter, Fitting, FittingDiameter, Fixture,
                      Material, MaterialConnection, Reduction)
@@ -251,6 +253,7 @@ class Calculate(views.APIView):
                     'calculated_at': parse_datetime(calculated_at),
                     'calc': serializer.data,
                     'fixture': Fixture.objects.get(id=serializer.data.get('fixture_id')),
+                    'signatory': Signatory.objects.filter(id=serializer.data.get('signatory_id')).first(),
                     'reservoir_path': next(
                         filter(lambda path: path.get('start') == 'RES', serializer.data.get('paths')), None
                     ),
@@ -273,7 +276,7 @@ class Calculate(views.APIView):
                 response['Content-Disposition'] = f'attachment; filename={filename}'
                 return response
             except Exception as e:
-                logger.error(e)
+                logger.exception(e)
                 return Response(
                     {'detail': 'Problemas ao imprimir o cálculo enviado'},
                     status=status.HTTP_400_BAD_REQUEST)
@@ -298,7 +301,8 @@ def test(request):
     context = {
         'calculated_at': parse_datetime(calculated_at),
         'calc': serializer.data,
-        'fixture': Fixture.objects.get(id=serializer.data.get('fixture_id'))
+        'fixture': Fixture.objects.get(id=serializer.data.get('fixture_id')),
+        'signatory': Signatory.objects.filter(id=serializer.data.get('signatory_id')).first(),
     }
     return render(request, 'shp/printshp.html', context)
 

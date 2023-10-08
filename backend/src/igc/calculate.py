@@ -5,6 +5,8 @@ from typing import List, Tuple, Union
 from django.conf import settings
 from django.utils import timezone
 
+from core.models import Signatory
+
 from .dataclasses import IGCCalc, IGCCalcPath
 from .exceptions import (MoreThenOneReservoir, NoGasError, NoInitialDataError,
                          NoReservoir)
@@ -113,6 +115,11 @@ class IGC():
         self.igcCalc.gas: GAS = GAS.objects.get(id=self.igcCalc.gas_id)
         if not self.igcCalc.gas:
             raise NoGasError()
+        if self.igcCalc.signatory_id and self.igcCalc.signatory_id > 0:
+            self.igcCalc.signatory: Signatory = Signatory.objects.get(id=self.igcCalc.signatory_id)
+        else:
+            self.igcCalc.signatory = None
+
         self.igcCalc.reservoir_path = None
         self.igcCalc.error = None
         self.igcCalc.calculated_at = None
@@ -270,7 +277,7 @@ class IGC():
 
     def __calculate_paths_pressure(self, path: IGCCalcPath):
         if path == self.igcCalc.reservoir_path:
-            path.calculate_end_pressure(float(self.igcCalc.gas.start_pressure), self.igcCalc.calc_type)
+            path.calculate_end_pressure(float(self.igcCalc.start_pressure), self.igcCalc.calc_type)
         else:
             path.calculate_end_pressure(path.start_pressure, self.igcCalc.calc_type)
         paths_after: list[IGCCalcPath] = self.get_paths_after(path)
@@ -287,7 +294,7 @@ class IGC():
         if (self.igcCalc.calc_type == Config.CalcType.SECONDARY):
             pressure_drop_limit = 0.1
         for path in self.igcCalc.paths:
-            path.calculate_pressure_drop_accumulated(self.igcCalc.gas, pressure_drop_limit)
+            path.calculate_pressure_drop_accumulated(self.igcCalc.start_pressure, pressure_drop_limit)
 
     def __sum_paths_fail_level(self, path: IGCCalcPath):
         paths_after: list[IGCCalcPath] = self.get_paths_after(path)

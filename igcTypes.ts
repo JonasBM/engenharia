@@ -1,23 +1,23 @@
 export interface ConfigSerializer {
     id?: number;
-    material?: any | null;
-    gas?: any | null;
+    material?: 4 | 3 | 6 | 5 | null;
+    gas?: 1 | 2 | null;
 }
 
 export interface MaterialSerializer {
     id?: number;
     name: string;
-    one_outlet_connection?: any | null;
-    two_outlet_connection?: any | null;
-    three_outlet_connection?: any | null;
-    default_diameter?: any | null;
+    one_outlet_connection?: 3 | 4 | null;
+    two_outlet_connection?: 3 | 4 | null;
+    three_outlet_connection?: 3 | 4 | null;
+    default_diameter?: 13 | 14 | 15 | 16 | 17 | 7 | 8 | 9 | 10 | 11 | 12 | 22 | 23 | 24 | 25 | 18 | 19 | 20 | 21 | null;
 }
 
 export interface DiameterSerializer {
     id?: number;
     name: string;
     internal_diameter: number;
-    material: any;
+    material: 4 | 3 | 6 | 5;
 }
 
 export interface FittingSerializer {
@@ -29,8 +29,8 @@ export interface FittingDiameterSerializer {
     id?: number;
     material?: number;
     equivalent_length: number;
-    fitting: any;
-    diameter: any;
+    fitting: 3 | 4;
+    diameter: 13 | 14 | 15 | 16 | 17 | 7 | 8 | 9 | 10 | 11 | 12 | 22 | 23 | 24 | 25 | 18 | 19 | 20 | 21;
 }
 
 export interface FittingDiameterResponseSerializer {
@@ -43,27 +43,26 @@ export interface ReductionSerializer {
     material?: number;
     name: string;
     equivalent_length: number;
-    inlet_diameter: any;
-    outlet_diameter: any;
+    inlet_diameter: 13 | 14 | 15 | 16 | 17 | 7 | 8 | 9 | 10 | 11 | 12 | 22 | 23 | 24 | 25 | 18 | 19 | 20 | 21;
+    outlet_diameter: 13 | 14 | 15 | 16 | 17 | 7 | 8 | 9 | 10 | 11 | 12 | 22 | 23 | 24 | 25 | 18 | 19 | 20 | 21;
 }
 
 export interface MaterialConnectionSerializer {
     id?: number;
     name: string;
     equivalent_length: number;
-    inlet_material: any;
-    outlet_material: any;
-    inlet_diameter: any;
-    outlet_diameter: any;
+    inlet_material: 4 | 3 | 6 | 5;
+    outlet_material: 4 | 3 | 6 | 5;
+    inlet_diameter: 13 | 14 | 15 | 16 | 17 | 7 | 8 | 9 | 10 | 11 | 12 | 22 | 23 | 24 | 25 | 18 | 19 | 20 | 21;
+    outlet_diameter: 13 | 14 | 15 | 16 | 17 | 7 | 8 | 9 | 10 | 11 | 12 | 22 | 23 | 24 | 25 | 18 | 19 | 20 | 21;
 }
 
 export interface GASSerializer {
     id?: number;
     name: string;
-    description: string;
+    description?: string | null;
     pci: number;
     relative_density: number;
-    start_pressure: number;
 }
 
 export interface FileInfoSerializer {
@@ -104,17 +103,26 @@ export interface IGCCalcPathSerializer {
     start_pressure?: number | null;
     end_pressure?: number | null;
     pressure_drop?: number | null;
+    pressure_drop_color?: string | null;
     pressure_drop_accumulated?: number | null;
+    pressure_drop_accumulated_color?: string | null;
+    fail?: boolean | null;
+    fail_level?: number | null;
 }
 
 export interface IGCCalcSerializer {
     fileinfo: FileInfoSerializer;
     name?: string | null;
+    observation?: string | null;
+    calc_type: PR | SC;
     material_id: number;
     diameter_id: number;
     gas_id: number;
+    signatory_id?: number | null;
+    start_pressure: number;
     paths: IGCCalcPathSerializer[];
     error?: string | null;
     calculated_at?: string | null;
+    max_fail_level?: number | null;
 }
 

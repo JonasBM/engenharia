@@ -165,13 +165,15 @@ export interface SHPCalcPumpSerializer {
 
 export interface SHPCalcSerializer {
   fileinfo: FileInfoSerializer;
-  name: string;
+  name: string | null;
+  observation: string | null;
   calc_type: string | null;
   pressure_type: string | null;
   pump: SHPCalcPumpSerializer;
   material_id: number | null;
   diameter_id: number | null;
   fixture_id: number | null;
+  signatory_id: number | null;
   paths: SHPCalcPathSerializer[];
   error?: string | null;
   less_favorable_path_fixture_index?: number | null;

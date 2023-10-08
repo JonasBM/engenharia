@@ -70,7 +70,6 @@ export interface GASSerializer {
   description: string | null;
   pci: number | null;
   relative_density: number | null;
-  start_pressure: number | null;
 }
 
 export interface FileInfoSerializer {
@@ -120,11 +119,14 @@ export interface IGCCalcPathSerializer {
 
 export interface IGCCalcSerializer {
   fileinfo: FileInfoSerializer;
-  name: string;
+  name: string | null;
+  observation: string | null;
   calc_type: string | null;
   material_id: number | null;
   diameter_id: number | null;
   gas_id: number | null;
+  start_pressure: number | null;
+  signatory_id: number | null;
   paths: IGCCalcPathSerializer[];
   error?: string | null;
   calculated_at?: string | null;

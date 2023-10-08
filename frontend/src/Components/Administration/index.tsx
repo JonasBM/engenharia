@@ -3,6 +3,7 @@ import React, { useEffect } from "react";
 
 import SHPAdmin from "../SHP/Admin";
 import IGCAdmin from "../IGC/Admin";
+import CoreAdmin from "../Main/Admin";
 import { documentTitles } from "myConstants";
 
 interface TabPanelProps {
@@ -28,7 +29,7 @@ function TabPanel(props: TabPanelProps) {
 }
 
 const Administration = () => {
-  const [value, setValue] = React.useState(1);
+  const [value, setValue] = React.useState(0);
 
   useEffect(() => {
     document.title = documentTitles.ADMIN;
@@ -45,18 +46,22 @@ const Administration = () => {
     <Container>
       <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
         <Tabs value={value} onChange={handleChange} centered>
+          <Tab label="Geral" />
           <Tab label="SHP" />
           <Tab label="IGC" />
           {/* <Tab label="SPDA" /> */}
         </Tabs>
       </Box>
       <TabPanel value={value} index={0}>
-        <SHPAdmin />
+        <CoreAdmin />
       </TabPanel>
       <TabPanel value={value} index={1}>
+        <SHPAdmin />
+      </TabPanel>
+      <TabPanel value={value} index={2}>
         <IGCAdmin />
       </TabPanel>
-      {/* <TabPanel value={value} index={2}>
+      {/* <TabPanel value={value} index={3}>
         <SPDA />
       </TabPanel> */}
     </Container>

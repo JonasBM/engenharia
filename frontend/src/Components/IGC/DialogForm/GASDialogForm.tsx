@@ -32,7 +32,6 @@ const _newGAS: GASSerializer = {
   description: "",
   pci: null,
   relative_density: null,
-  start_pressure: null,
 };
 
 const _dialogName = "DIALOG_IGC_GAS";
@@ -71,7 +70,6 @@ const validationSchema = () =>
       description: yup.string().max(255).notRequired().nullable(),
       pci: yup.number().min(0).required(),
       relative_density: yup.number().min(0).required(),
-      start_pressure: yup.number().min(0).required(),
     })
     .required();
 
@@ -185,14 +183,6 @@ const GASDialogForm = () => {
         {...register("relative_density")}
       />
 
-      <TextField
-        type="number"
-        inputProps={{ step: "0.01" }}
-        label="Pressão inicial (kPa)"
-        error={errors.start_pressure ? true : false}
-        helperText={errors.start_pressure?.message}
-        {...register("start_pressure")}
-      />
     </BaseDialogForm>
   );
 };

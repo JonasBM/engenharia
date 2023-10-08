@@ -62,6 +62,15 @@ const FileToolbar = () => {
           helperText={errors.name?.message}
           {...register("name")}
         />
+        <TextField
+          label="Observação (multilinha)"
+          multiline
+          sx={{ width: 400 }}
+          InputLabelProps={{ shrink: true }}
+          error={errors.observation ? true : false}
+          helperText={errors.observation?.message}
+          {...register("observation")}
+        />
         <Box sx={{ flexGrow: 1 }} />
 
         {calcFile ? (

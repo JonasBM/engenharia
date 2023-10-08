@@ -64,12 +64,14 @@ export const StyledTextField = styled(TextField)(({ theme }) => ({
 const validationSchema = () =>
   yup
     .object({
-      name: yup.string().max(255).notRequired(),
+      name: yup.string().max(255).nullable().notRequired(),
+      observation: yup.string().nullable().notRequired(),
       pressure_type: yup.string().max(255).required(),
       calc_type: yup.string().max(255).required(),
       material_id: yup.number().integer().min(1).required(),
       diameter_id: yup.number().integer().min(1).required(),
       fixture_id: yup.number().integer().min(1).required(),
+      signatory_id: yup.number().integer().nullable().notRequired(),
       paths: yup.array().of(
         yup.object().shape({
           start: yup.string().max(255).required(),

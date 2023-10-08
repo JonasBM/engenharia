@@ -3,8 +3,13 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path, re_path
 from rest_framework import permissions
+from rest_framework import routers
+from .views import SignatoryViewSet
 
 app_name = 'core'
+
+router = routers.SimpleRouter()
+router.register(r'signatories', SignatoryViewSet, 'signatories')
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -12,6 +17,8 @@ urlpatterns = [
     path('shp/', include('shp.urls')),
     path('igc/', include('igc.urls')),
 ]
+
+urlpatterns += router.urls
 
 if settings.ENVIRONMENT != 'production' and settings.DEBUG:
     from drf_yasg import openapi

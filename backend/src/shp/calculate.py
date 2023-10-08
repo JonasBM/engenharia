@@ -5,6 +5,8 @@ from typing import List, Tuple, Union
 from django.conf import settings
 from django.utils import timezone
 
+from core.models import Signatory
+
 from .dataclasses import SHPCalc, SHPCalcPath
 from .exceptions import (BifurcationBeforePump, CalculeNotImplemented, CouldNotFinishCalculate,
                          MoreThenOnePump, MoreThenOneReservoir,
@@ -221,6 +223,11 @@ class SHP():
         self.fixture: Fixture = Fixture.objects.get(id=self.shpCalc.fixture_id)
         if not self.fixture:
             raise NoFixtureError()
+        if self.shpCalc.signatory_id and self.shpCalc.signatory_id > 0:
+            self.shpCalc.signatory: Signatory = Signatory.objects.get(id=self.shpCalc.signatory_id)
+        else:
+            self.shpCalc.signatory = None
+
         self.shpCalc.paths_with_fixture = []
         self.shpCalc.reservoir_path = None
         self.shpCalc.error = None

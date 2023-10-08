@@ -10,11 +10,12 @@ import SHP from "./Components/SHP/System";
 import IGCPrimary from "./Components/IGC/SystemPrimary";
 import IGCSecondary from "./Components/IGC/SystemSecondary";
 import SPDA from "Components/SPDA";
+import Home from "Components/Main/Home";
 
 const AppRoutes = () => {
   return (
     <Routes>
-      <Route path="/" element={<Navigate to="/shp" />} />
+      <Route path="/" element={<Home />} />
       <Route path="/shp" element={<PrivateRoute children={<SHP />} />} />
       <Route path="/igcprimary" element={<PrivateRoute children={<IGCPrimary />} />} />
       <Route path="/igcsecondary" element={<PrivateRoute children={<IGCSecondary />} />} />

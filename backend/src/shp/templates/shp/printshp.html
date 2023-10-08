@@ -3,6 +3,7 @@
 <html>
   <head>
     <link rel="stylesheet" href="{% static 'css/printshp.css' %}">
+    <meta charset="UTF-8">
   </head>
   <body>
     <header>
@@ -29,6 +30,13 @@
         <li class="ml-5">Tipo de pressurização: {{calc.pressure_type|get_perssure_type }}</li>
         <li class="ml-5">Vazão minima: {{ fixture.minimum_flow_rate }} L/min</li>
       </lu>
+      {% if calc.observation %}
+        <br/>
+        <div class="observation-box">
+          <h4 class="nomargin">Observações:</h4>
+          <div class="paragraph-100">{{calc.observation|linebreaks}}</div>
+        </div>
+      {% endif %}
       <br/>
       <br/>
       <h3 class="nomargin">Informações do Hidrante:</h3>
@@ -205,6 +213,15 @@
         <br/>
       </div>
       {% endfor %}
-    </div:>
+      {% if signatory %}
+        <br/>
+        <br/>
+        <div class="signature nobreak">
+          <div>_______________________________________________</div>
+          <div>{{signatory.title}}</div>
+          <div>{{signatory.document}}</div>
+        </div>
+      {% endif %}
+    </div>
   </body>
 </html>

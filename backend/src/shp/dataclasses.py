@@ -2,6 +2,7 @@
 import math
 from dataclasses import dataclass
 from datetime import datetime
+from core.models import Signatory
 
 from shp.utils import get_unit_pressure_drop
 
@@ -170,11 +171,14 @@ class SHPCalcPump:
 class SHPCalc:
     fileinfo: SHPCalcFileInfo
     name: str
+    observation: str = None
     pressure_type: str
     calc_type: str
     material_id: int
     diameter_id: int
     fixture_id: int
+    signatory_id: int
+    signatory: Signatory = None
     paths: list[SHPCalcPath]
     paths_with_fixture: list[SHPCalcPath] = None
     less_favorable_path_fixture_index: int = None

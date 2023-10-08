@@ -44,6 +44,7 @@ import shpCalcReducer from "./shp";
 import igcPrimaryCalcReducer from "./igcPrimary";
 import igcSecondaryCalcReducer from "./igcSecondary";
 import storage from "redux-persist/lib/storage";
+import { SignatoryCRUDAction } from "api/core";
 
 
 const shp = combineReducers({
@@ -68,6 +69,11 @@ const igc = combineReducers({
   gases: IGCGASCRUDAction.reducer,
 });
 
+const core = combineReducers({
+  signatories: SignatoryCRUDAction.reducer,
+});
+
+
 const rootReducer = combineReducers({
   messages: messageReducer,
   errors: errorReducer,
@@ -79,6 +85,7 @@ const rootReducer = combineReducers({
   shp: shp,
   shpCalc: shpCalcReducer,
   igc: igc,
+  core: core,
   igcPrimaryCalc: igcPrimaryCalcReducer,
   igcSecondaryCalc: igcSecondaryCalcReducer,
 });

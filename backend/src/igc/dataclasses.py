@@ -2,6 +2,8 @@
 import math
 from dataclasses import dataclass
 from datetime import datetime
+
+from core.models import Signatory
 from .exceptions import CouldNotFinishCalculate
 
 from .utils import calculate_concurrency_factor, kcal_p_min_to_kcal_p_h, kpa_to_kgf_p_cm2, rgb2hex
@@ -110,13 +112,12 @@ class IGCCalcPath:
         self.speed = 354 * self.flow * math.pow(kpa_to_kgf_p_cm2(self.start_pressure) +
                                                 1.033, -1) * math.pow(self.diameter.internal_diameter, -2)
 
-    def calculate_pressure_drop_accumulated(self, gas: GAS, pressure_drop_limit: float):
+    def calculate_pressure_drop_accumulated(self, calc_start_pressure, pressure_drop_limit: float):
         assert (self.end_pressure is not None), (
             'You must call `.__calculate_paths_pressure()` before calling `.calculate_pressure_drop_accumulated()`.'
         )
 
-        gas_start_pressure = float(gas.start_pressure)
-        self.pressure_drop_accumulated = (gas_start_pressure - self.end_pressure) / gas_start_pressure
+        self.pressure_drop_accumulated = (calc_start_pressure - self.end_pressure) / calc_start_pressure
         if self.pressure_drop_accumulated > pressure_drop_limit:
             self.fail = True
             self.pressure_drop_accumulated_color = rgb2hex(244, 67, 54)
@@ -139,12 +140,16 @@ class IGCCalcPath:
 @dataclass(kw_only=True)
 class IGCCalc:
     fileinfo: IGCCalcFileInfo
-    name: str
+    name: str = None
+    observation: str = None
     calc_type: str
     material_id: int
     diameter_id: int
     gas_id: int
     gas: GAS = None
+    signatory_id: int
+    signatory: Signatory = None
+    start_pressure: float = 0
     paths: list[IGCCalcPath]
     reservoir_path: IGCCalcPath = None
     error: str = None
