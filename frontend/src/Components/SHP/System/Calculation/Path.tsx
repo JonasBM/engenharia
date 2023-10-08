@@ -242,7 +242,7 @@ const Path = ({
                   onChange={(event) => {
                     onChange(event.target.value);
                   }}
-                  disabled={has_fixture || false}
+                  // disabled={has_fixture || false}
                 >
                   {materials.map((_material) => (
                     <MenuItem key={_material.id} value={_material.id}>
@@ -268,7 +268,7 @@ const Path = ({
                   onChange={(event) => {
                     onChange(event.target.value);
                   }}
-                  disabled={has_fixture || false}
+                  // disabled={has_fixture || false}
                 >
                   {diameters.map((_diameter) => (
                     <MenuItem
