@@ -15,7 +15,6 @@ Docker to host the api, with access to the database.
 Webserver to host the frontend build and api staticfiles.
 
 TODO:
-tabela igc quebrando em nova pagina
 calculadora igc
 calculo de medidor igc
 fluxograma com informação igc e shp
