@@ -1,3 +1,4 @@
+from django_typomatic import generate_ts
 from django_typomatic import ts_interface
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
@@ -215,5 +216,5 @@ class SHPCalcSerializer(serializers.Serializer):
             )
         return super().validate(data)
 
-from django_typomatic import generate_ts
-generate_ts('./shpTypes.ts', 'shp')
+
+# generate_ts('./shpTypes.ts', 'shp')

@@ -187,4 +187,4 @@ class IGCCalcSerializer(serializers.Serializer):
     max_fail_level = serializers.IntegerField(default=0, **custom_not_required)
 
 
-generate_ts('./igcTypes.ts', 'igc')
+# generate_ts('./igcTypes.ts', 'igc')

@@ -426,3 +426,5 @@ const CalculatorDialogForm = () => {
     </Dialog>
   );
 };
+
+export default CalculatorDialogForm;

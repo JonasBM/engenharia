@@ -1,3 +1,4 @@
+from django_typomatic import generate_ts
 from django_typomatic import generate_ts, ts_interface
 from rest_framework import serializers
 
@@ -11,5 +12,4 @@ class SignatorySerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-from django_typomatic import generate_ts
-generate_ts('./coreTypes.ts', 'core')
+# generate_ts('./coreTypes.ts', 'core')
