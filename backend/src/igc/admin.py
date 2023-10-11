@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import (FittingDiameter, Material, Diameter, Fitting, Reduction, MaterialConnection, GAS)
+from .models import (Cilinder, FittingDiameter, Material, Diameter, Fitting, Meter, Reduction, MaterialConnection, GAS)
 
 
 @admin.register(Material)
@@ -48,5 +48,18 @@ class MaterialConnectionAdmin(admin.ModelAdmin):
 @admin.register(GAS)
 class GASAdmin(admin.ModelAdmin):
     model = GAS
-    list_display = ['id', 'name', 'pci', 'relative_density']
-    search_fields = ['id', 'name', 'pci']
+    list_display = ['id', 'name', 'pci', 'pck', 'relative_density']
+    search_fields = ['id', 'name']
+
+@admin.register(Cilinder)
+class CilinderAdmin(admin.ModelAdmin):
+    model = Cilinder
+    list_display = ['id', 'name', 'vaporization_rate']
+    search_fields = ['id', 'name']
+
+
+@admin.register(Meter)
+class MeterAdmin(admin.ModelAdmin):
+    model = Meter
+    list_display = ['id', 'name', 'gas', 'max_flow']
+    search_fields = ['id', 'name']

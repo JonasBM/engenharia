@@ -13,9 +13,3 @@ Postgresql database.
 Docker to host the api, with access to the database.
 
 Webserver to host the frontend build and api staticfiles.
-
-TODO:
-calculadora igc
-calculo de medidor igc
-fluxograma com informação igc e shp
-verificar se é possivel colocar a assinatura mais pra baixo se tiver espaço

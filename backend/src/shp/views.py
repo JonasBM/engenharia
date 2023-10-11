@@ -167,7 +167,7 @@ class LoadMaterialBackup(views.APIView):
         fitting_diameter_array = serializer.data.get('fittingdiameters', {}).get('fitting_diameter_array')
         reductions = serializer.data.get('reductions')
 
-        if fileinfo.get('type') != "shp_material" or not str(fileinfo.get('version')).startswith('1.0.'):
+        if fileinfo.get('type') != 'shp_material' or not str(fileinfo.get('version')).startswith('1.0.'):
             return Response({'detail': 'Problema com o arquivo enviado'}, status=status.HTTP_400_BAD_REQUEST)
 
         try:

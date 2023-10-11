@@ -62,7 +62,21 @@ export interface GASSerializer {
     name: string;
     description?: string | null;
     pci: number;
+    pck: number;
     relative_density: number;
+}
+
+export interface CilinderSerializer {
+    id?: number;
+    name: string;
+    vaporization_rate: number;
+}
+
+export interface MeterSerializer {
+    id?: number;
+    name: string;
+    max_flow: number;
+    gas: 1 | 2;
 }
 
 export interface FileInfoSerializer {

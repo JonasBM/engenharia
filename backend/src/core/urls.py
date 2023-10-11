@@ -12,7 +12,7 @@ router = routers.SimpleRouter()
 router.register(r'signatories', SignatoryViewSet, 'signatories')
 
 urlpatterns = [
-    path("admin/", admin.site.urls),
+    path('admin/', admin.site.urls),
     path('accounts/', include('accounts.urls')),
     path('shp/', include('shp.urls')),
     path('igc/', include('igc.urls')),
@@ -25,11 +25,11 @@ if settings.ENVIRONMENT != 'production' and settings.DEBUG:
     from drf_yasg.views import get_schema_view
     schema_view = get_schema_view(
         openapi.Info(
-            title="Engenharia API",
+            title='Engenharia API',
             default_version='v1',
-            description="API para gerenciamento do programa Engenharia",
-            contact=openapi.Contact(email="contact@snippets.local"),
-            license=openapi.License(name="BSD License"),
+            description='API para gerenciamento do programa Engenharia',
+            contact=openapi.Contact(email='contact@snippets.local'),
+            license=openapi.License(name='BSD License'),
         ),
         public=True,
         permission_classes=[permissions.AllowAny],

@@ -31,6 +31,7 @@ const _newGAS: GASSerializer = {
   name: "",
   description: "",
   pci: null,
+  pck: null,
   relative_density: null,
 };
 
@@ -69,6 +70,7 @@ const validationSchema = () =>
       name: yup.string().max(25).required(),
       description: yup.string().max(255).notRequired().nullable(),
       pci: yup.number().min(0).required(),
+      pck: yup.number().min(0).required(),
       relative_density: yup.number().min(0).required(),
     })
     .required();
@@ -172,6 +174,15 @@ const GASDialogForm = () => {
         error={errors.pci ? true : false}
         helperText={errors.pci?.message}
         {...register("pci")}
+      />
+
+      <TextField
+        type="number"
+        inputProps={{ step: "0.01" }}
+        label="Poder calorifico (kcal/Kg)"
+        error={errors.pck ? true : false}
+        helperText={errors.pck?.message}
+        {...register("pck")}
       />
 
       <TextField

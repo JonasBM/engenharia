@@ -69,7 +69,7 @@ class SHP():
         if value is None:
             return empty
         if isinstance(value, float):
-            return "{:.6f}".format(value)
+            return '{:.6f}'.format(value)
         return value
 
     def print_paths(self, p: SHPCalcPath, print_header=True):

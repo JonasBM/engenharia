@@ -13,13 +13,13 @@ from weasyprint import CSS, HTML
 from core.models import Signatory
 
 from .calculate import IGC
-from .models import (Config, Diameter, Fitting, FittingDiameter, GAS,
-                     Material, MaterialConnection, Reduction)
-from .serializers import (ConfigSerializer, DiameterSerializer,
+from .models import (Cilinder, Config, Diameter, Fitting, FittingDiameter, GAS,
+                     Material, MaterialConnection, Meter, Reduction)
+from .serializers import (CilinderSerializer, ConfigSerializer, DiameterSerializer,
                           FittingDiameterResponseSerializer,
                           FittingDiameterSerializer, FittingSerializer,
                           GASSerializer, MaterialConnectionSerializer,
-                          MaterialFileSerializer, MaterialSerializer,
+                          MaterialFileSerializer, MaterialSerializer, MeterSerializer,
                           ReductionSerializer, IGCCalcSerializer)
 
 '''
@@ -150,6 +150,19 @@ class GASViewSet(viewsets.ModelViewSet):
     serializer_class = GASSerializer
     queryset = GAS.objects.all()
 
+class CilinderViewSet(viewsets.ModelViewSet):
+    permission_classes = [
+        permissions.IsAdminUser,
+    ]
+    serializer_class = CilinderSerializer
+    queryset = Cilinder.objects.all()
+
+class MeterViewSet(viewsets.ModelViewSet):
+    permission_classes = [
+        permissions.IsAdminUser,
+    ]
+    serializer_class = MeterSerializer
+    queryset = Meter.objects.all()
 
 class LoadMaterialBackup(views.APIView):
 
@@ -167,7 +180,7 @@ class LoadMaterialBackup(views.APIView):
         fitting_diameter_array = serializer.data.get('fittingdiameters', {}).get('fitting_diameter_array')
         reductions = serializer.data.get('reductions')
 
-        if fileinfo.get('type') != "igc_material" or not str(fileinfo.get('version')).startswith('1.0.'):
+        if fileinfo.get('type') != 'igc_material' or not str(fileinfo.get('version')).startswith('1.0.'):
             return Response({'detail': 'Problema com o arquivo enviado'}, status=status.HTTP_400_BAD_REQUEST)
 
         try:

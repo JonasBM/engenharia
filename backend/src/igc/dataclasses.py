@@ -97,11 +97,14 @@ class IGCCalcPath:
             'You must call `.__calculate_paths_pressure_drop()` before calling `.calculate_end_pressure()`.'
         )
         self.start_pressure = start_pressure
-        if self.start_pressure < self.pressure_drop:
-            self.end_pressure = 0
-        else:
-            if (calc_type == Config.CalcType.SECONDARY):
+        if (calc_type == Config.CalcType.SECONDARY):
+            if self.start_pressure < self.pressure_drop:
+                self.end_pressure = 0
+            else:
                 self.end_pressure = self.start_pressure - self.pressure_drop
+        else:
+            if math.pow(self.start_pressure, 2) < self.pressure_drop:
+                self.end_pressure = 0
             else:
                 self.end_pressure = math.pow(math.pow(self.start_pressure, 2) - self.pressure_drop, 0.5)
 

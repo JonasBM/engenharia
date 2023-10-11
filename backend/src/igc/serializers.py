@@ -3,8 +3,8 @@ from django_typomatic import ts_interface
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
-from .models import (Config, Diameter, Fitting, FittingDiameter, GAS,
-                     Material, MaterialConnection, Reduction)
+from .models import (Cilinder, Config, Diameter, Fitting, FittingDiameter, GAS,
+                     Material, MaterialConnection, Meter, Reduction)
 
 
 @ts_interface('igc')
@@ -62,12 +62,12 @@ class ReductionSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def validate_material(self, data):
-        """Check if the inlet_diameter and outlet_diameter has the same material"""
+        '''Check if the inlet_diameter and outlet_diameter has the same material'''
 
         # inlet_diameter = Diameter.objects.get(id=data.get('inlet_diameter'))
         # outlet_diameter = Diameter.objects.get(id=data.get('outlet_diameter'))
         if data.get('inlet_diameter').material != data.get('outlet_diameter').material:
-            raise serializers.ValidationError("Os diâmetros devem ter o mesmo material")
+            raise serializers.ValidationError('Os diâmetros devem ter o mesmo material')
 
     def validate(self, data):
         self.validate_material(data)
@@ -85,10 +85,10 @@ class MaterialConnectionSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def validate_material(self, data):
-        """Check if the inlet_diameter and outlet_diameter has the same material"""
+        '''Check if the inlet_diameter and outlet_diameter has the same material'''
 
         if data.get('inlet_diameter').material == data.get('outlet_diameter').material:
-            raise serializers.ValidationError("Os diâmetros devem ser de diferente materiais")
+            raise serializers.ValidationError('Os diâmetros devem ser de diferente materiais')
 
     def validate(self, data):
         self.validate_material(data)
@@ -99,6 +99,20 @@ class MaterialConnectionSerializer(serializers.ModelSerializer):
 class GASSerializer(serializers.ModelSerializer):
     class Meta:
         model = GAS
+        fields = '__all__'
+
+
+@ts_interface('igc')
+class CilinderSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Cilinder
+        fields = '__all__'
+
+
+@ts_interface('igc')
+class MeterSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Meter
         fields = '__all__'
 
 
@@ -173,5 +187,4 @@ class IGCCalcSerializer(serializers.Serializer):
     max_fail_level = serializers.IntegerField(default=0, **custom_not_required)
 
 
-from django_typomatic import generate_ts
 generate_ts('./igcTypes.ts', 'igc')

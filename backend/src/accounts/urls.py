@@ -6,13 +6,13 @@ from .views import LoginView, LogoutView, LogoutAllView, UserProfileViewSet, Use
 app_name = 'accounts'
 
 router = routers.SimpleRouter()
-router.register(r"users", UserViewSet, "users")
-router.register(r"userprofiles", UserProfileViewSet, "userprofiles")
+router.register(r'users', UserViewSet, 'users')
+router.register(r'userprofiles', UserProfileViewSet, 'userprofiles')
 
 urlpatterns = [
-    path("auth/login/", LoginView.as_view(), name='knox_login'),
-    path("auth/logout/", LogoutView.as_view(), name='knox_logout'),
-    path("auth/logoutall/", LogoutAllView.as_view(), name='knox_logoutall'),
+    path('auth/login/', LoginView.as_view(), name='knox_login'),
+    path('auth/logout/', LogoutView.as_view(), name='knox_logout'),
+    path('auth/logoutall/', LogoutAllView.as_view(), name='knox_logoutall'),
 ]
 
 

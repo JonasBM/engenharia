@@ -3,6 +3,9 @@ export { default as IGCSecondaryCalcDialogForm } from './SecondaryCalcDialogForm
 export { default as IGCDiameterDialogForm } from './DiameterDialogForm';
 export { default as IGCFittingDialogForm } from './FittingDialogForm';
 export { default as IGCGASDialogForm } from './GASDialogForm';
+export { default as IGCCilinderDialogForm } from './CilinderDialogForm';
+export { default as IGCMeterDialogForm } from './MeterDialogForm';
 export { default as IGCMaterialConnectionDialogForm } from './MaterialConnectionDialogForm';
 export { default as IGCMaterialDialogForm } from './MaterialDialogForm';
 export { default as IGCReductionDialogForm } from './ReductionDialogForm';
+export { default as IGCCalculatorDialogForm } from './CalculatorDialogForm';

@@ -61,7 +61,7 @@ class IGC():
         if value is None:
             return empty
         if isinstance(value, float):
-            return "{:.6f}".format(value)
+            return '{:.6f}'.format(value)
         return value
 
     def __trunk_string(self, value, max_length, empty='-'):

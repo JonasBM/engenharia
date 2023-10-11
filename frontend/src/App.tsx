@@ -31,9 +31,12 @@ import {
   IGCDiameterDialogForm,
   IGCFittingDialogForm,
   IGCGASDialogForm,
+  IGCCilinderDialogForm,
+  IGCMeterDialogForm,
   IGCMaterialConnectionDialogForm,
   IGCMaterialDialogForm,
   IGCReductionDialogForm,
+  IGCCalculatorDialogForm,
 } from "./Components/IGC/DialogForm";
 import SignatoryDialogForm from "Components/Main/Admin/DialogForm/SignatoryDialogForm";
 
@@ -107,9 +110,12 @@ function App() {
         <IGCDiameterDialogForm />
         <IGCFittingDialogForm />
         <IGCGASDialogForm />
+        <IGCCilinderDialogForm />
+        <IGCMeterDialogForm />
         <IGCMaterialConnectionDialogForm />
         <IGCMaterialDialogForm />
         <IGCReductionDialogForm />
+        <IGCCalculatorDialogForm />
 
         <LoadingIndicator fetching={fetching} />
         <Container maxWidth={false} sx={{ marginTop: 3, marginBottom: 5 }}>

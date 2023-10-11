@@ -10,6 +10,8 @@ import {
   MaterialSerializer,
   ReductionSerializer,
   IGCCalcSerializer,
+  CilinderSerializer,
+  MeterSerializer,
 } from "./types/igcTypes";
 import axios, { AxiosRequestConfig } from "axios";
 
@@ -59,6 +61,16 @@ export const MaterialConnectionCRUDAction = new CRUDAction<MaterialConnectionSer
 export const GASCRUDAction = new CRUDAction<GASSerializer>(
   "igc/gas",
   new URL("/igc/gas/", import.meta.env.VITE_APP_API_URL).href
+);
+
+export const CilinderCRUDAction = new CRUDAction<CilinderSerializer>(
+  "igc/cilinders",
+  new URL("/igc/cilinders/", import.meta.env.VITE_APP_API_URL).href
+);
+
+export const MeterCRUDAction = new CRUDAction<MeterSerializer>(
+  "igc/meters",
+  new URL("/igc/meters/", import.meta.env.VITE_APP_API_URL).href
 );
 
 export const loadMaterialBackup = (object: MaterialFileSerializer) => {

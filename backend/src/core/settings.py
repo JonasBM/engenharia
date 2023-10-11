@@ -25,9 +25,9 @@ CORS_ALLOW_ALL_ORIGINS = True
 # CORS_ORIGIN_ALLOW_ALL = env.bool('CORS_ORIGIN_ALLOW_ALL', default=True)
 # CORS_ALLOWED_ORIGINS = env.list('CORS_ALLOWED_ORIGINS', default=['*'])
 # CORS_ALLOWED_ORIGINS = []
-# CORS_ALLOWED_ORIGINS_ENV = os.environ.get("CORS_ALLOWED_ORIGINS", "*")
+# CORS_ALLOWED_ORIGINS_ENV = os.environ.get('CORS_ALLOWED_ORIGINS', '*')
 # if CORS_ALLOWED_ORIGINS_ENV:
-#     CORS_ALLOWED_ORIGINS.extend(CORS_ALLOWED_ORIGINS_ENV.split(","))
+#     CORS_ALLOWED_ORIGINS.extend(CORS_ALLOWED_ORIGINS_ENV.split(','))
 
 CORS_EXPOSE_HEADERS = (
     'content-length',
@@ -136,16 +136,16 @@ DATABASES = {
 }
 
 
-AUTH_USER_MODEL = "accounts.CustomUser"
+AUTH_USER_MODEL = 'accounts.CustomUser'
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
-        "OPTIONS": {
-            "min_length": 6,
+        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        'OPTIONS': {
+            'min_length': 6,
         },
     },
 ]
@@ -157,7 +157,7 @@ AUTH_PASSWORD_VALIDATORS = [
 LANGUAGE_CODE = 'pt-BR'
 
 LANGUAGES = [
-    ("pt-BR", "Português"),
+    ('pt-BR', 'Português'),
 ]
 
 TIME_ZONE = 'UTC'
@@ -170,11 +170,11 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
 
-STATIC_URL = "static/"
-MEDIA_URL = "media/"
+STATIC_URL = 'static/'
+MEDIA_URL = 'media/'
 
-# STATIC_ROOT = "backend/src/static/"
-# MEDIA_ROOT = "backend/src/media/"
+# STATIC_ROOT = 'backend/src/static/'
+# MEDIA_ROOT = 'backend/src/media/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 

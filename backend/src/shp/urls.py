@@ -4,7 +4,7 @@ from rest_framework import routers
 from .views import (Calculate, ConfigViewSet, DiameterViewSet,
                     FittingDiameterViewSet, FittingViewSet, FixtureViewSet,
                     LoadMaterialBackup, MaterialConnectionViewSet,
-                    MaterialViewSet, ReductionViewSet, test)
+                    MaterialViewSet, ReductionViewSet)
 
 app_name = 'shp'
 
@@ -21,7 +21,6 @@ router.register(r'fixtures', FixtureViewSet, 'fixtures')
 urlpatterns = [
     path(r'loadmaterialbackup/', LoadMaterialBackup.as_view(), name='loadmaterialbackup'),
     path(r'calculate/', Calculate.as_view(), name='calculate'),
-    path('test/', test)
 ]
 
 urlpatterns += router.urls

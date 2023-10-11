@@ -13,6 +13,7 @@ import { Add } from "@mui/icons-material";
 import { IGCCalcSerializer } from "api/types/igcTypes";
 import { StyledTextField } from ".";
 import { showIGCCalcDialog } from "Components/IGC/DialogForm/PrimaryCalcDialogForm";
+import { showCalculatorDialog } from "Components/IGC/DialogForm/CalculatorDialogForm";
 
 const PathToolbar = ({
   append,
@@ -147,6 +148,14 @@ const PathToolbar = ({
             Limpar
           </Button>
           <Box sx={{ flexGrow: 1 }} />
+          <Button
+            color="warning"
+            onClick={() => {
+              showCalculatorDialog();
+            }}
+          >
+            Calculadora
+          </Button>
           <Button
             color="success"
             onClick={() => {

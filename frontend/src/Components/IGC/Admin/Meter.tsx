@@ -8,12 +8,12 @@ import {
   GridToolbarContainer,
   GridValueGetterParams,
 } from "@mui/x-data-grid";
-import { GASSerializer } from "api/types/igcTypes";
+import { GASSerializer, MeterSerializer } from "api/types/igcTypes";
 import { Grid, Stack, Typography } from "@mui/material";
 import {
-  destroyGAS,
-  showGASDialog,
-} from "Components/IGC/DialogForm/GASDialogForm";
+  destroyMeter,
+  showMeterDialog,
+} from "Components/IGC/DialogForm/MeterDialogForm";
 
 import AddIcon from "@mui/icons-material/Add";
 import Box from "@mui/material/Box";
@@ -34,18 +34,18 @@ function EditToolbar() {
       >
         <Grid item xs={1} />
         <Grid item xs>
-          <Typography variant="h6">Tabela de Gases</Typography>
+          <Typography variant="h6">Tabela de medidores</Typography>
         </Grid>
         <Grid item xs={4}>
           <Button
             startIcon={<AddIcon />}
             onClick={() => {
-              showGASDialog();
+              showMeterDialog();
             }}
             sx={{ margin: 1 }}
-            title="Adicionar gás"
+            title="Adicionar medidor"
           >
-            GÁS
+            medidor
           </Button>
         </Grid>
       </Grid>
@@ -56,28 +56,38 @@ function EditToolbar() {
 const CustomNoRowsOverlay = () => {
   return (
     <Stack height="100%" alignItems="center" justifyContent="center">
-      <Typography>Sem gás cadastrado.</Typography>
+      <Typography>Sem medidor cadastrado.</Typography>
     </Stack>
   );
 };
 
-const GAS = () => {
+const Meter = () => {
+  const meters = useAppSelector((state) => state.igc.meters);
   const gases = useAppSelector((state) => state.igc.gases);
 
   const handleEditClick = (id: GridRowId) => {
     if (id) {
-      const gas = gases.find((row) => row.id === id);
-      showGASDialog(gas);
+      const meter = meters.find((row) => row.id === id);
+      showMeterDialog(meter);
     }
   };
 
   const handleDeleteClick = (id: GridRowId) => {
     if (id) {
-      const gas = gases.find((row) => row.id === id);
-      if (gas) destroyGAS(gas);
+      const meter = meters.find((row) => row.id === id);
+      if (meter) destroyMeter(meter);
     }
   };
 
+  const getGASName = (
+    params: GridValueGetterParams<number, GASSerializer>
+  ): string => {
+    const gas = gases.find((g) => g.id === params.value);
+    if (gas) {
+      return gas.name;
+    }
+    return params.value?.toString() || "";
+  };
 
   const CommonFieldAttributes: GridColDef = {
     field: "",
@@ -97,19 +107,17 @@ const GAS = () => {
     },
     {
       ...CommonFieldAttributes,
-      field: "pci",
-      headerName: "PCI (kcal/m³)",
+      field: "max_flow",
+      headerName: "Vazão máxima (m³/h)",
     },
+
     {
       ...CommonFieldAttributes,
-      field: "pck",
-      headerName: "PC (kcal/Kg)",
+      field: "gas",
+      headerName: "Gás",
+      valueGetter: getGASName,
     },
-    {
-      ...CommonFieldAttributes,
-      field: "relative_density",
-      headerName: "Densidade relativa",
-    },
+    
     {
       field: "actions",
       type: "actions",
@@ -126,7 +134,7 @@ const GAS = () => {
               handleEditClick(id);
             }}
             color="warning"
-            title="Editar gás"
+            title="Editar medidor"
           />,
           <GridActionsCellItem
             icon={<DeleteIcon />}
@@ -135,7 +143,7 @@ const GAS = () => {
               handleDeleteClick(id);
             }}
             color="error"
-            title="Remover gás"
+            title="Remover medidor"
           />,
         ];
       },
@@ -146,7 +154,7 @@ const GAS = () => {
     <Box width="100%">
       <DataGrid
         autoHeight
-        rows={gases}
+        rows={meters}
         columns={columns}
         components={{
           Toolbar: EditToolbar,
@@ -161,4 +169,4 @@ const GAS = () => {
     </Box>
   );
 };
-export default GAS;
+export default Meter;

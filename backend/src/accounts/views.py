@@ -67,7 +67,7 @@ class UserProfileViewSet(viewsets.ModelViewSet):
     serializer_class = UserProfileSerializer
     queryset = CustomUser.objects.all()
 
-    @action(detail=False, methods=['get'], url_path="my-profile")
+    @action(detail=False, methods=['get'], url_path='my-profile')
     def my_profile(self, request):
         serializer = self.get_serializer(request.user)
         return Response(serializer.data)
@@ -76,15 +76,15 @@ class UserProfileViewSet(viewsets.ModelViewSet):
     #     request_body=PasswordSerializer,
     #     responses={204: openapi.Response('')},
     # )
-    @action(detail=False, methods=['post'], url_path="set-password")
+    @action(detail=False, methods=['post'], url_path='set-password')
     def set_password(self, request, pk=None):
         serializer = PasswordSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        if not request.user.check_password(serializer.data.get("old_password")):
-            return Response({"old_password": ["Senha incorreta."]}, status=status.HTTP_400_BAD_REQUEST,)
-        request.user.set_password(serializer.data.get("new_password"))
+        if not request.user.check_password(serializer.data.get('old_password')):
+            return Response({'old_password': ['Senha incorreta.']}, status=status.HTTP_400_BAD_REQUEST,)
+        request.user.set_password(serializer.data.get('new_password'))
         request.user.save()
-        return Response({"Senha alterada com sucesso!"}, status=status.HTTP_200_OK,)
+        return Response({'Senha alterada com sucesso!'}, status=status.HTTP_200_OK,)
 
 
 class UserViewSet(viewsets.ReadOnlyModelViewSet):

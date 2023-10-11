@@ -1,4 +1,5 @@
 import {
+  CilinderCRUDAction,
   ConfigCRUDAction,
   DiameterCRUDAction,
   FittingCRUDAction,
@@ -6,6 +7,7 @@ import {
   GASCRUDAction,
   MaterialCRUDAction,
   MaterialConnectionCRUDAction,
+  MeterCRUDAction,
   ReductionCRUDAction,
 } from "api/igc";
 import React, { useEffect } from "react";
@@ -35,6 +37,8 @@ const IGC = () => {
     dispatch(ReductionCRUDAction.list());
     dispatch(MaterialConnectionCRUDAction.list());
     dispatch(GASCRUDAction.list());
+    dispatch(CilinderCRUDAction.list());
+    dispatch(MeterCRUDAction.list());
   }, [dispatch]);
 
   return <System />;

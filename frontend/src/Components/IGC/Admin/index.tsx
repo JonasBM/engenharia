@@ -1,4 +1,5 @@
 import {
+  CilinderCRUDAction,
   ConfigCRUDAction,
   DiameterCRUDAction,
   FittingCRUDAction,
@@ -6,6 +7,7 @@ import {
   GASCRUDAction,
   MaterialCRUDAction,
   MaterialConnectionCRUDAction,
+  MeterCRUDAction,
   ReductionCRUDAction,
 } from "api/igc";
 import React, { useEffect } from "react";
@@ -16,6 +18,8 @@ import Material from "./Material";
 import MaterialConnection from "./MaterialConnection";
 import { Stack } from "@mui/material";
 import { useAppDispatch } from "redux/utils";
+import Cilinder from "./Cilinder";
+import Meter from "./Meter";
 
 const IGCAdmin = () => {
   const dispatch = useAppDispatch();
@@ -29,6 +33,8 @@ const IGCAdmin = () => {
     dispatch(ReductionCRUDAction.list());
     dispatch(MaterialConnectionCRUDAction.list());
     dispatch(GASCRUDAction.list());
+    dispatch(CilinderCRUDAction.list());
+    dispatch(MeterCRUDAction.list());
   }, [dispatch]);
 
   return (
@@ -37,6 +43,8 @@ const IGCAdmin = () => {
       <Material />
       <MaterialConnection />
       <GAS />
+      <Cilinder />
+      <Meter />
     </Stack>
   );
 };

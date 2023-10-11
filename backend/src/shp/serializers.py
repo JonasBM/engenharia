@@ -61,12 +61,12 @@ class ReductionSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def validate_material(self, data):
-        """Check if the inlet_diameter and outlet_diameter has the same material"""
+        '''Check if the inlet_diameter and outlet_diameter has the same material'''
 
         # inlet_diameter = Diameter.objects.get(id=data.get('inlet_diameter'))
         # outlet_diameter = Diameter.objects.get(id=data.get('outlet_diameter'))
         if data.get('inlet_diameter').material != data.get('outlet_diameter').material:
-            raise serializers.ValidationError("Os diâmetros devem ter o mesmo material")
+            raise serializers.ValidationError('Os diâmetros devem ter o mesmo material')
 
     def validate(self, data):
         self.validate_material(data)
@@ -84,10 +84,10 @@ class MaterialConnectionSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def validate_material(self, data):
-        """Check if the inlet_diameter and outlet_diameter has the same material"""
+        '''Check if the inlet_diameter and outlet_diameter has the same material'''
 
         if data.get('inlet_diameter').material == data.get('outlet_diameter').material:
-            raise serializers.ValidationError("Os diâmetros devem ser de diferente materiais")
+            raise serializers.ValidationError('Os diâmetros devem ser de diferente materiais')
 
     def validate(self, data):
         self.validate_material(data)

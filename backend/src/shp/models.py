@@ -17,17 +17,17 @@ class Config(models.Model):
         BOMBA = 'BO', 'Bomba'
 
     material = models.ForeignKey('Material', default=None, null=True, blank=True,
-                                 on_delete=models.SET_NULL, verbose_name="Material padrão")
+                                 on_delete=models.SET_NULL, verbose_name='Material padrão')
     fixture = models.ForeignKey('Fixture', default=None, null=True, blank=True,
-                                on_delete=models.SET_NULL, verbose_name="Hidrante padrão")
+                                on_delete=models.SET_NULL, verbose_name='Hidrante padrão')
     calc_type = models.CharField(max_length=2, default=CalcType.VAZAO_MINIMA,
-                                 choices=CalcType.choices, verbose_name="tipo de cálculo")
+                                 choices=CalcType.choices, verbose_name='tipo de cálculo')
     pressure_type = models.CharField(max_length=2, default=PressureType.GRAVITACIONAL,
-                                     choices=PressureType.choices, verbose_name="tipo de pressurização")
+                                     choices=PressureType.choices, verbose_name='tipo de pressurização')
 
     class Meta:
-        verbose_name = "configuração"
-        verbose_name_plural = "configurações"
+        verbose_name = 'configuração'
+        verbose_name_plural = 'configurações'
 
     def save(self, *args, **kwargs):
         self.id = 1
@@ -44,24 +44,24 @@ class Config(models.Model):
 
 class Material(models.Model):
 
-    name = models.CharField(max_length=255, unique=True, verbose_name="nome")
-    hazen_williams_coefficient = models.IntegerField(verbose_name="coeficiente de hazen-williams")
+    name = models.CharField(max_length=255, unique=True, verbose_name='nome')
+    hazen_williams_coefficient = models.IntegerField(verbose_name='coeficiente de hazen-williams')
     one_outlet_connection = models.ForeignKey(
-        'Fitting', default=None, null=True, blank=True, related_name="one_outlet_materials",
-        on_delete=models.SET_NULL, verbose_name="conexão para uma saída")
+        'Fitting', default=None, null=True, blank=True, related_name='one_outlet_materials',
+        on_delete=models.SET_NULL, verbose_name='conexão para uma saída')
     two_outlet_connection = models.ForeignKey(
-        'Fitting', default=None, null=True, blank=True, related_name="two_outlet_materials",
-        on_delete=models.SET_NULL, verbose_name="conexão para duas saídas")
+        'Fitting', default=None, null=True, blank=True, related_name='two_outlet_materials',
+        on_delete=models.SET_NULL, verbose_name='conexão para duas saídas')
     three_outlet_connection = models.ForeignKey(
-        'Fitting', default=None, null=True, blank=True, related_name="three_outlet_materials",
-        on_delete=models.SET_NULL, verbose_name="conexão para três saídas")
+        'Fitting', default=None, null=True, blank=True, related_name='three_outlet_materials',
+        on_delete=models.SET_NULL, verbose_name='conexão para três saídas')
     default_diameter = models.ForeignKey(
-        'Diameter', default=None, null=True, blank=True, related_name="default_diameter_materials",
-        on_delete=models.SET_NULL, verbose_name="Diâmetro padrão")
+        'Diameter', default=None, null=True, blank=True, related_name='default_diameter_materials',
+        on_delete=models.SET_NULL, verbose_name='Diâmetro padrão')
 
     class Meta:
-        verbose_name = "material"
-        verbose_name_plural = "materias"
+        verbose_name = 'material'
+        verbose_name_plural = 'materias'
         ordering = ['name']
         indexes = [
             models.Index(fields=['name']),
@@ -73,13 +73,13 @@ class Material(models.Model):
 
 class Diameter(models.Model):
 
-    material = models.ForeignKey(Material, related_name="diameters", on_delete=models.CASCADE, verbose_name="material")
-    name = models.CharField(max_length=255, verbose_name="nome")
-    internal_diameter = models.IntegerField(verbose_name="diâmetro interno")
+    material = models.ForeignKey(Material, related_name='diameters', on_delete=models.CASCADE, verbose_name='material')
+    name = models.CharField(max_length=255, verbose_name='nome')
+    internal_diameter = models.IntegerField(verbose_name='diâmetro interno')
 
     class Meta:
-        verbose_name = "diâmetro"
-        verbose_name_plural = "diâmetros"
+        verbose_name = 'diâmetro'
+        verbose_name_plural = 'diâmetros'
         ordering = ['material', 'internal_diameter']
         indexes = [
             models.Index(fields=['material']),
@@ -92,11 +92,11 @@ class Diameter(models.Model):
 
 class Fitting(models.Model):
 
-    name = models.CharField(max_length=255, unique=True, verbose_name="nome")
+    name = models.CharField(max_length=255, unique=True, verbose_name='nome')
 
     class Meta:
-        verbose_name = "conexão"
-        verbose_name_plural = "conexões"
+        verbose_name = 'conexão'
+        verbose_name_plural = 'conexões'
         ordering = ['name']
 
     def __str__(self):
@@ -105,15 +105,15 @@ class Fitting(models.Model):
 
 class FittingDiameter(models.Model):
 
-    fitting = models.ForeignKey(Fitting, related_name="equivalent_lengths",
-                                on_delete=models.CASCADE, verbose_name="conexão")
-    diameter = models.ForeignKey(Diameter, related_name="equivalent_lengths",
-                                 on_delete=models.CASCADE, verbose_name="diâmetro")
-    equivalent_length = models.DecimalField(max_digits=9, decimal_places=2, verbose_name="comprimento equivalente")
+    fitting = models.ForeignKey(Fitting, related_name='equivalent_lengths',
+                                on_delete=models.CASCADE, verbose_name='conexão')
+    diameter = models.ForeignKey(Diameter, related_name='equivalent_lengths',
+                                 on_delete=models.CASCADE, verbose_name='diâmetro')
+    equivalent_length = models.DecimalField(max_digits=9, decimal_places=2, verbose_name='comprimento equivalente')
 
     class Meta:
-        verbose_name = "conexão-diâmetro"
-        verbose_name_plural = "conexões-diâmetros"
+        verbose_name = 'conexão-diâmetro'
+        verbose_name_plural = 'conexões-diâmetros'
         ordering = ['fitting', 'diameter', 'equivalent_length']
         indexes = [
             models.Index(fields=['fitting']),
@@ -127,16 +127,16 @@ class FittingDiameter(models.Model):
 
 class Reduction(models.Model):
 
-    inlet_diameter = models.ForeignKey(Diameter, related_name="inlet_reductions",
-                                       on_delete=models.CASCADE, verbose_name="diâmetro de Entrada")
-    outlet_diameter = models.ForeignKey(Diameter, related_name="outlet_reductions",
-                                        on_delete=models.CASCADE, verbose_name="diâmetro de Saída")
-    name = models.CharField(max_length=255, verbose_name="nome")
-    equivalent_length = models.DecimalField(max_digits=9, decimal_places=2, verbose_name="comprimento equivalente")
+    inlet_diameter = models.ForeignKey(Diameter, related_name='inlet_reductions',
+                                       on_delete=models.CASCADE, verbose_name='diâmetro de Entrada')
+    outlet_diameter = models.ForeignKey(Diameter, related_name='outlet_reductions',
+                                        on_delete=models.CASCADE, verbose_name='diâmetro de Saída')
+    name = models.CharField(max_length=255, verbose_name='nome')
+    equivalent_length = models.DecimalField(max_digits=9, decimal_places=2, verbose_name='comprimento equivalente')
 
     class Meta:
-        verbose_name = "redução"
-        verbose_name_plural = "reduções"
+        verbose_name = 'redução'
+        verbose_name_plural = 'reduções'
         ordering = ['name', 'equivalent_length']
         indexes = [
             models.Index(fields=['inlet_diameter']),
@@ -154,21 +154,21 @@ class Reduction(models.Model):
 class MaterialConnection(models.Model):
 
     inlet_material = models.ForeignKey(
-        Material, related_name="inlet_material_connections", on_delete=models.CASCADE,
-        verbose_name="Material de Entrada")
+        Material, related_name='inlet_material_connections', on_delete=models.CASCADE,
+        verbose_name='Material de Entrada')
     outlet_material = models.ForeignKey(
-        Material, related_name="outlet_material_connections", on_delete=models.CASCADE,
-        verbose_name="Material de Saída")
-    inlet_diameter = models.ForeignKey(Diameter, related_name="inlet_diameter_connections",
-                                       on_delete=models.CASCADE, verbose_name="diâmetro do material de Entrada")
-    outlet_diameter = models.ForeignKey(Diameter, related_name="outlet_diameter_connections",
-                                        on_delete=models.CASCADE, verbose_name="diâmetro do material de Saída")
-    name = models.CharField(max_length=255, verbose_name="nome")
-    equivalent_length = models.DecimalField(max_digits=9, decimal_places=2, verbose_name="Comprimento equivalente")
+        Material, related_name='outlet_material_connections', on_delete=models.CASCADE,
+        verbose_name='Material de Saída')
+    inlet_diameter = models.ForeignKey(Diameter, related_name='inlet_diameter_connections',
+                                       on_delete=models.CASCADE, verbose_name='diâmetro do material de Entrada')
+    outlet_diameter = models.ForeignKey(Diameter, related_name='outlet_diameter_connections',
+                                        on_delete=models.CASCADE, verbose_name='diâmetro do material de Saída')
+    name = models.CharField(max_length=255, verbose_name='nome')
+    equivalent_length = models.DecimalField(max_digits=9, decimal_places=2, verbose_name='Comprimento equivalente')
 
     class Meta:
-        verbose_name = "conexão entre materiais"
-        verbose_name_plural = "conexões entre materiais"
+        verbose_name = 'conexão entre materiais'
+        verbose_name_plural = 'conexões entre materiais'
         ordering = ['name', 'equivalent_length']
         indexes = [
             models.Index(fields=['inlet_material']),
@@ -192,30 +192,30 @@ class Fixture(models.Model):
         REGULAVEL = 'RE', 'regulável'
         MANGOTINHO = 'MA', 'mangotinho'
 
-    name = models.CharField(max_length=255, verbose_name="nome")
-    nozzle_type = models.CharField(max_length=2, choices=FixtureType.choices, verbose_name="tipo do hidrante")
+    name = models.CharField(max_length=255, verbose_name='nome')
+    nozzle_type = models.CharField(max_length=2, choices=FixtureType.choices, verbose_name='tipo do hidrante')
     material = models.ForeignKey(Material, default=None, null=True, blank=True,
-                                 related_name="fixtures", on_delete=models.CASCADE, verbose_name="material")
-    inlet_diameter = models.ForeignKey(Diameter, default=None, null=True, blank=True, related_name="fixtures",
-                                       on_delete=models.CASCADE, verbose_name="diâmetro de Entrada")
-    reductions_ids = models.JSONField(default=list, verbose_name="reduções")
-    fittings_ids = models.JSONField(default=list, verbose_name="conexões")
+                                 related_name='fixtures', on_delete=models.CASCADE, verbose_name='material')
+    inlet_diameter = models.ForeignKey(Diameter, default=None, null=True, blank=True, related_name='fixtures',
+                                       on_delete=models.CASCADE, verbose_name='diâmetro de Entrada')
+    reductions_ids = models.JSONField(default=list, verbose_name='reduções')
+    fittings_ids = models.JSONField(default=list, verbose_name='conexões')
     extra_equivalent_length = models.DecimalField(
         max_digits=9, decimal_places=2, default=0, null=True,
-        blank=True, verbose_name="comprimento equivalente extra")
-    hose_hazen_williams_coefficient = models.IntegerField(verbose_name="coeficiente de hazen-williams da mangueira")
-    hose_internal_diameter = models.IntegerField(verbose_name="diâmetro interno da mangueira")
+        blank=True, verbose_name='comprimento equivalente extra')
+    hose_hazen_williams_coefficient = models.IntegerField(verbose_name='coeficiente de hazen-williams da mangueira')
+    hose_internal_diameter = models.IntegerField(verbose_name='diâmetro interno da mangueira')
     k_factor = models.DecimalField(default=None, max_digits=9, decimal_places=2,
-                                   verbose_name="coeficiente de vazão do esguicho")
-    k_factor_includes_hose = models.BooleanField(default=False, verbose_name="coeficiente de vazão inclue a mangueira")
+                                   verbose_name='coeficiente de vazão do esguicho')
+    k_factor_includes_hose = models.BooleanField(default=False, verbose_name='coeficiente de vazão inclue a mangueira')
     k_nozzle = models.DecimalField(default=0, max_digits=9, decimal_places=2,
-                                   verbose_name="coeficiente próprio do esguicho")
-    outlet_diameter = models.DecimalField(max_digits=9, decimal_places=2, verbose_name="diâmetro da saída")
-    minimum_flow_rate = models.DecimalField(max_digits=9, decimal_places=2, verbose_name="vazão mínima no esguicho")
+                                   verbose_name='coeficiente próprio do esguicho')
+    outlet_diameter = models.DecimalField(max_digits=9, decimal_places=2, verbose_name='diâmetro da saída')
+    minimum_flow_rate = models.DecimalField(max_digits=9, decimal_places=2, verbose_name='vazão mínima no esguicho')
 
     class Meta:
-        verbose_name = "hidrante"
-        verbose_name_plural = "hidrantes"
+        verbose_name = 'hidrante'
+        verbose_name_plural = 'hidrantes'
         ordering = ['name', 'inlet_diameter', 'outlet_diameter']
 
     def __str__(self):

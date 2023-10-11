@@ -15,6 +15,8 @@ import {
   FittingCRUDAction as IGCFittingCRUDAction,
   FittingDiameterCRUDAction as IGCFittingDiameterCRUDAction,
   GASCRUDAction as IGCGASCRUDAction,
+  CilinderCRUDAction as IGCCilinderCRUDAction,
+  MeterCRUDAction as IGCMeterCRUDAction,
   MaterialCRUDAction as IGCMaterialCRUDAction,
   MaterialConnectionCRUDAction as IGCMaterialConnectionCRUDAction,
   ReductionCRUDAction as IGCReductionCRUDAction,
@@ -67,6 +69,8 @@ const igc = combineReducers({
   reductions: IGCReductionCRUDAction.reducer,
   materialConnections: IGCMaterialConnectionCRUDAction.reducer,
   gases: IGCGASCRUDAction.reducer,
+  cilinders: IGCCilinderCRUDAction.reducer,
+  meters: IGCMeterCRUDAction.reducer,
 });
 
 const core = combineReducers({

@@ -1,10 +1,10 @@
 from django.urls import path
 from rest_framework import routers
 
-from .views import (Calculate, ConfigViewSet, DiameterViewSet,
+from .views import (Calculate, CilinderViewSet, ConfigViewSet, DiameterViewSet,
                     FittingDiameterViewSet, FittingViewSet, GASViewSet,
                     LoadMaterialBackup, MaterialConnectionViewSet,
-                    MaterialViewSet, ReductionViewSet, test)
+                    MaterialViewSet, MeterViewSet, ReductionViewSet)
 
 app_name = 'igc'
 
@@ -17,11 +17,12 @@ router.register(r'fittingdiameter', FittingDiameterViewSet, 'fittingdiameter')
 router.register(r'reductions', ReductionViewSet, 'reductions')
 router.register(r'materialconnections', MaterialConnectionViewSet, 'materialconnections')
 router.register(r'gas', GASViewSet, 'gas')
+router.register(r'cilinders', CilinderViewSet, 'cilinders')
+router.register(r'meters', MeterViewSet, 'meters')
 
 urlpatterns = [
     path(r'loadmaterialbackup/', LoadMaterialBackup.as_view(), name='loadmaterialbackup'),
     path(r'calculate/', Calculate.as_view(), name='calculate'),
-    path('test/', test)
 ]
 
 urlpatterns += router.urls
