@@ -43,7 +43,9 @@ export interface ICalculator {
   outputUnit: UnitTypes;
   cilinder?: CilinderSerializer;
   concurrencyFactor?: number;
+  dirtyConcurrencyFactor: boolean;
   reductionFactor?: number;
+  dirtyReductionFactor: boolean;
 }
 
 export type ResultType = [number | null, string | MeterSerializer | CilinderSerializer | null];
@@ -56,7 +58,9 @@ const _newObject: Partial<ICalculator> = {
   outputUnit: UnitTypes.Kcalh,
   cilinder: undefined,
   concurrencyFactor: undefined,
+  dirtyConcurrencyFactor: false,
   reductionFactor: 0,
+  dirtyReductionFactor: false,
 };
 
 const _dialogName = "MODAL_IGC_CALCULATOR";
@@ -144,11 +148,13 @@ const CalculatorDialogForm = () => {
       setResult([_result, data.outputUnit]);
     } else if (data.type == CalculatorTypes.CILINDERS) {
       if (!data.cilinder) return;
-      if (!data.concurrencyFactor) {
+      if (!data.dirtyConcurrencyFactor || !data.concurrencyFactor) {
         data.concurrencyFactor = calculateConcurrencyFactor(data.input, data.gas, data.inputUnit) * 100;
+        data.dirtyConcurrencyFactor = false;
       }
-      if (!data.reductionFactor) {
+      if (!data.dirtyReductionFactor || !data.reductionFactor) {
         data.reductionFactor = 0;
+        data.dirtyReductionFactor = false;
       }
       const _cilinderNumber = calculateCilinder(
         _result,
@@ -327,7 +333,10 @@ const CalculatorDialogForm = () => {
                     error={errors.concurrencyFactor ? true : false}
                     helperText={errors.concurrencyFactor?.message}
                     value={value === null || value === undefined ? "" : value}
-                    onChange={onChange}
+                    onChange={(value) => {
+                      onChange(value);
+                      setValue("dirtyConcurrencyFactor", true)
+                    }}
                   />
                 )}
               />
@@ -344,7 +353,10 @@ const CalculatorDialogForm = () => {
                     error={errors.reductionFactor ? true : false}
                     helperText={errors.reductionFactor?.message}
                     value={value === null || value === undefined ? "" : value}
-                    onChange={onChange}
+                    onChange={(value) => {
+                      onChange(value);
+                      setValue("dirtyReductionFactor", true)
+                    }}
                   />
                 )}
               />

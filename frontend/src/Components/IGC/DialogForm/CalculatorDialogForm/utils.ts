@@ -43,15 +43,15 @@ export const findMeter = (flow: number, meters: MeterSerializer[]): MeterSeriali
 }
 
 export const calculateConcurrencyFactor = (powerRating: number, gas: GASSerializer, inputUnit: UnitTypes): number => {
-    powerRating = convert(powerRating, gas, inputUnit, UnitTypes.Kcalmin)
+    powerRating = convert(powerRating, gas, inputUnit, UnitTypes.Kcalh)
     if (!powerRating || powerRating < 21000) {
         return 1
     }
     if (powerRating < 576720) {
-        return 1 / (1 + 0.001 * Math.pow((powerRating) - 349, 0.8712))
+        return 1 / (1 + 0.001 * Math.pow((powerRating/60) - 349, 0.8712))
     }
     if (powerRating < 1200000) {
-        return 1 / (1 + 0.4705 * Math.pow((powerRating) - 1055, 0.19931))
+        return 1 / (1 + 0.4705 * Math.pow((powerRating/60) - 1055, 0.19931))
     }
     return 0.23
 }
