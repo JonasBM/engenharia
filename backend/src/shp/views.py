@@ -22,10 +22,6 @@ from .serializers import (ConfigSerializer, DiameterSerializer,
                           MaterialFileSerializer, MaterialSerializer,
                           ReductionSerializer, SHPCalcSerializer)
 
-'''
-TODO:
-create extras on diameters and fittings creation
-'''
 
 logger = logging.getLogger(__name__)
 

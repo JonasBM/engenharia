@@ -4,7 +4,7 @@ from rest_framework import routers
 from .views import (Calculate, CilinderViewSet, ConfigViewSet, DiameterViewSet,
                     FittingDiameterViewSet, FittingViewSet, GASViewSet,
                     LoadMaterialBackup, MaterialConnectionViewSet,
-                    MaterialViewSet, MeterViewSet, ReductionViewSet)
+                    MaterialViewSet, MeterViewSet, ReductionViewSet, test)
 
 app_name = 'igc'
 
@@ -23,6 +23,7 @@ router.register(r'meters', MeterViewSet, 'meters')
 urlpatterns = [
     path(r'loadmaterialbackup/', LoadMaterialBackup.as_view(), name='loadmaterialbackup'),
     path(r'calculate/', Calculate.as_view(), name='calculate'),
+    # path(r'test/', test, name='test'),
 ]
 
 urlpatterns += router.urls

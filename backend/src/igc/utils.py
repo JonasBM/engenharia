@@ -1,7 +1,8 @@
 import math
 from typing import Union
 
-from .models import Diameter, Reduction
+from .models import Config, Diameter, Reduction
+
 
 def format_decimal(number: Union[int, float], decimals=2):
     if number:
@@ -74,3 +75,41 @@ def calculate_concurrency_factor(power_rating: float):
 
 def rgb2hex(r, g, b):
     return '#{:02x}{:02x}{:02x}'.format(r, g, b)
+
+
+def get_result(data):
+    calculated_end_pressure = float('inf')
+    calculated_speed = 0
+    for path in data.get('paths'):
+        end_pressure = path.get('end_pressure', float('inf'))
+        if end_pressure < calculated_end_pressure:
+            calculated_end_pressure = end_pressure
+        speed = path.get('speed', 0)
+        if speed > calculated_speed:
+            calculated_speed = speed
+
+    start_pressure = data.get('start_pressure')
+    allowed_percentagem = 10 if data.get('calc_type') == Config.CalcType.SECONDARY else 30
+    allowed_pressure_drop = start_pressure * allowed_percentagem / 100
+    calculated_pressure_drop = start_pressure - calculated_end_pressure
+    allowed_end_pressure = start_pressure - allowed_pressure_drop
+    allowed_speed = 20
+
+    return {
+        'pressure_drop': {
+            'allowed_percentagem': allowed_percentagem,
+            'allowed': format_decimal(allowed_pressure_drop),
+            'calculated': format_decimal(calculated_pressure_drop),
+            'accepted': (allowed_pressure_drop > calculated_pressure_drop),
+        },
+        'end_pressure': {
+            'allowed': format_decimal(allowed_end_pressure),
+            'calculated': format_decimal(calculated_end_pressure),
+            'accepted': (allowed_end_pressure < calculated_end_pressure),
+        },
+        'speed': {
+            'allowed': format_decimal(allowed_speed),
+            'calculated': format_decimal(calculated_speed),
+            'accepted': (allowed_speed > calculated_speed),
+        },
+    }

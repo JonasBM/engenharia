@@ -20,7 +20,8 @@
     <div>
       <h2 class="title">
         MEMORIAL DE CÁLCULO DO SISTEMA<br/>
-        DE INSTALAÇÃO DE GÁS COMBUSTÍVEL
+        DE INSTALAÇÃO DE GÁS COMBUSTÍVEL<br/>
+        NBR 15526
       </h2>
       <br/>
       <h2 class="title">
@@ -142,10 +143,34 @@
           </tbody>
         </table>
       </div>
+      <br/>
+      <br/>
+      <div class="nobreak">
+        <h3>Verificações:</h3>
+        <p>
+          <strong>1 - Perda de Carga máxima:</strong><br/>
+          <span>Admissível: {{result.pressure_drop.allowed}} KPa ({{result.pressure_drop.allowed_percentagem}}% da Pressão inicial)</span><br/>
+          <span>Calculado: {{result.pressure_drop.calculated}} KPa ({% if result.pressure_drop.accepted %}Atende{% else %}Não Atende{% endif %})</span>
+        </p>
+        <p>
+          <strong>2 - Pressão final mínima no ponto mais desfavorável:</strong><br/>
+          <span>Admissível: {{result.end_pressure.allowed}} KPa</span><br/>
+          <span>Calculado: {{result.end_pressure.calculated}} KPa ({% if result.end_pressure.accepted %}Atende{% else %}Não Atende{% endif %})</span>
+        </p>
+        <p>
+          <strong>3 - Velocidade máxima:</strong><br/>
+          <span>Admissível: {{result.speed.allowed}} m/s</span><br/>
+          <span>Calculado: {{result.speed.calculated}} m/s ({% if result.speed.accepted %}Atende{% else %}Não Atende{% endif %})</span>
+        </p>
+      </div>
       {% if signatory %}
         <br/>
         <br/>
         <div class="signature nobreak">
+          <div>Responsável técnico:</div>
+          <br/>
+          <br/>
+          <br/>
           <div>_______________________________________________</div>
           <div>{{signatory.title}}</div>
           <div>{{signatory.document}}</div>
