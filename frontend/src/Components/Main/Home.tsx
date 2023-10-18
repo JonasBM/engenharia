@@ -22,7 +22,7 @@ const Home = () => {
     >
       <Paper sx={{ padding: 5 }}>
         <Typography component="h1" variant="h6">
-          Bem vinto ao portal de cálculo da Trichês Engenharia.
+          Bem vindo ao portal de cálculo da Trichês Engenharia.
         </Typography>
       </Paper>
     </Box>

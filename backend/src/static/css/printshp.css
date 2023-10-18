@@ -122,10 +122,12 @@ th, td {
   border: 1px solid #000000;
   padding: 3px;
   text-align: center;
+  white-space: nowrap;
 }
 td.left {
   text-align: left;
 }
+
 thead {
   background-color: #A6A6A6;
 }

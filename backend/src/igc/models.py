@@ -5,7 +5,7 @@ class Config(models.Model):
 
     class CalcType(models.TextChoices):
         PRIMARY = 'PR', 'Primária'
-        SECONDARY = 'SC', 'Secondária'
+        SECONDARY = 'SC', 'Secundária'
 
     material = models.ForeignKey('Material', default=None, null=True, blank=True,
                                  on_delete=models.SET_NULL, verbose_name='Material padrão')

@@ -1,6 +1,6 @@
 export const CalcType = {
   PRIMARY: { value: "PR", name: "Primária" },
-  SECONDARY: { value: "SC", name: "Secondária" },
+  SECONDARY: { value: "SC", name: "Secundária" },
 };
 
 export const CalcTypes = [CalcType.PRIMARY, CalcType.SECONDARY];
