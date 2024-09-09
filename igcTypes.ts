@@ -129,6 +129,7 @@ export interface IGCCalcSerializer {
     name?: string | null;
     observation?: string | null;
     calc_type: PR | SC;
+    concurrency_factor_type?: string | null;
     material_id: number;
     diameter_id: number;
     gas_id: number;
