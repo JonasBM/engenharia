@@ -16,6 +16,16 @@ export const flow_to_l_p_min = (flow?: number | null): number | undefined => {
   return undefined;
 };
 
+export const flow_to_m3_p_hour = (flow?: number | null): number | undefined => {
+  if (flow) {
+    if (typeof flow === "number") {
+      return flow * 3600;
+    }
+    return flow;
+  }
+  return undefined;
+};
+
 export const saveFileSHPCalc = (data: SHPCalcSerializer) => {
   data["fileinfo"] = getNewFileInfo();
 

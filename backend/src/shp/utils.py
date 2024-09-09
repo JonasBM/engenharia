@@ -76,6 +76,10 @@ def flow_to_l_p_min(flow: float) -> float:
         return flow * 60000
     return None
 
+def flow_to_m3_p_hour(flow: float) -> float:
+    if isinstance(flow, float):
+        return flow * 3600
+    return None
 
 def calculate_k_factor(flow: float, pressure: float):
     # 𝑄 = 𝐾. √𝑃

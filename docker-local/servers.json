@@ -1,0 +1,15 @@
+{
+    "Servers": {
+      "1": {
+        "Name": "PostgreSQL 12 Server",
+        "Group": "Servers",
+        "Host": "postgres",
+        "Port": 5432,
+        "MaintenanceDB": "engenharia",
+        "Username": "postgres",
+        "Password": "password",
+        "SSLMode": "prefer",
+        "ConnectNow": true
+      }
+    }
+  }

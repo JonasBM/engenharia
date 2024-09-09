@@ -176,6 +176,7 @@ class IGCCalcSerializer(serializers.Serializer):
     name = serializers.CharField(**custom_not_required_blank)
     observation = serializers.CharField(**custom_not_required_blank)
     calc_type = serializers.ChoiceField(choices=Config.CalcType, required=True)
+    concurrency_factor_type = serializers.CharField(**custom_not_required_blank)
     material_id = serializers.IntegerField(required=True)
     diameter_id = serializers.IntegerField(required=True)
     gas_id = serializers.IntegerField(required=True)

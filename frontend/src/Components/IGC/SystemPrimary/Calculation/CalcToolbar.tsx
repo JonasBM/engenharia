@@ -1,5 +1,5 @@
 import { Box, Button, MenuItem, Stack, TextField, Toolbar } from "@mui/material";
-import { IGCCalcSerializer } from "api/types/igcTypes";
+import { concurrencyFactorTypes, IGCCalcSerializer } from "api/types/igcTypes";
 import { Calculate, Print, Save } from "@mui/icons-material";
 import { Controller, useFormContext, useWatch } from "react-hook-form";
 import React, { useEffect } from "react";
@@ -106,6 +106,32 @@ const CalcToolbar = () => {
             )}
           />
         )}
+        <Controller
+          control={control}
+          name="concurrency_factor_type"
+          render={({ field: { value, onChange } }) => (
+            <StyledTextField
+              label="Tipo de Fator de Simultaneidade"
+              sx={{ width: 150, margin: 0 }}
+              select
+              value={value || ""}
+              onChange={(event) => {
+                onChange(event.target.value);
+              }}
+              error={errors.concurrency_factor_type ? true : false}
+              helperText={errors.concurrency_factor_type?.message}
+            >
+              {concurrencyFactorTypes.map((_concurrencyFactorType) => (
+                <MenuItem
+                  key={_concurrencyFactorType.value}
+                  value={_concurrencyFactorType.value}
+                >
+                  {_concurrencyFactorType.name}
+                </MenuItem>
+              ))}
+            </StyledTextField>
+          )}
+        />
         <Box sx={{ flexGrow: 1 }} />
         <Button
           startIcon={<Save />}

@@ -1,6 +1,6 @@
 from django import template
 from shp.models import Config, Diameter, Fixture, Material
-from shp.utils import flow_to_l_p_min, format_decimal
+from shp.utils import flow_to_l_p_min, flow_to_m3_p_hour, format_decimal
 from django.utils.safestring import mark_safe
 register = template.Library()
 
@@ -69,7 +69,7 @@ def format_reservoir_level(value):
 @register.filter
 def format_flow(value):
     if isinstance(value, float):
-        return f'{format_decimal(value, 6)} m³/s ({format_decimal(flow_to_l_p_min(value))} l/min)'
+        return f'{format_decimal(flow_to_m3_p_hour(value))} m³/h ({format_decimal(flow_to_l_p_min(value))} l/min)'
     else:
         return mark_safe('&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-----&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;')
 

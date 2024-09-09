@@ -54,11 +54,11 @@ class IGCCalcPath:
     def __str__(self):
         return f'{self.start} - {self.end or ""}'
 
-    def calculate_power_rating_adopted(self, calc_type: str):
+    def calculate_power_rating_adopted(self, calc_type: str, concurrency_factor_type: str | None = None):
         assert (self.power_rating_accumulated is not None), (
             'You must call `.__sum_paths_power_rating_accumulated()` before calling `.calculate_power_rating_adopted()`.'
         )
-        if (calc_type == Config.CalcType.SECONDARY):
+        if (calc_type == Config.CalcType.SECONDARY) or (concurrency_factor_type == "NOCF"):
             self.concurrency_factor = 1
             self.power_rating_adopted = self.power_rating_accumulated
         else:
@@ -146,6 +146,7 @@ class IGCCalc:
     name: str = None
     observation: str = None
     calc_type: str
+    concurrency_factor_type: str = None
     material_id: int
     diameter_id: int
     gas_id: int

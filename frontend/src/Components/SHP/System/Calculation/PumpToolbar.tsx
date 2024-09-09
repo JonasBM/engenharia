@@ -3,7 +3,7 @@ import { CalcType, CalcTypes, PressureType, PressureTypes, SHPCalcSerializer } f
 import { Calculate, Save } from "@mui/icons-material";
 import { Controller, useFormContext, useWatch } from "react-hook-form";
 import React, { useEffect } from "react";
-import { flow_to_l_p_min, saveSHPCalc } from "./utils";
+import { flow_to_l_p_min, flow_to_m3_p_hour, saveSHPCalc } from "./utils";
 
 import { StyledTextField } from ".";
 import { decimalFormatter } from "utils";
@@ -72,10 +72,10 @@ const CalcToolbar = () => {
         <TextField
           disabled
           sx={{ width: 100 }}
-          label="Vazão (m³/s)"
+          label="Vazão (m³/h)"
           InputLabelProps={{ shrink: true }}
           fullWidth={false}
-          value={decimalFormatter(flow, 6) || "0,00"}
+          value={decimalFormatter(flow_to_m3_p_hour(flow), 2) || "0,00"}
         />
         <TextField
           disabled

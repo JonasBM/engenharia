@@ -5,6 +5,13 @@ export const CalcType = {
 
 export const CalcTypes = [CalcType.PRIMARY, CalcType.SECONDARY];
 
+export const concurrencyFactorType = {
+  CALC: { value: "CALC", name: "Calculado" },
+  NOCF: { value: "NOCF", name: "100%" },
+};
+
+export const concurrencyFactorTypes = [concurrencyFactorType.CALC, concurrencyFactorType.NOCF];
+
 export interface ConfigSerializer {
   id: 1;
   material: any;
@@ -136,6 +143,7 @@ export interface IGCCalcSerializer {
   name: string | null;
   observation: string | null;
   calc_type: string | null;
+  concurrency_factor_type: string | null;
   material_id: number | null;
   diameter_id: number | null;
   gas_id: number | null;

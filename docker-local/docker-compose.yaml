@@ -1,0 +1,34 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:12
+    container_name: postgres12
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: engenharia
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+      PGADMIN_CONFIG_SERVER_MODE: "False"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+      - ./servers.json:/pgadmin4/servers.json
+    ports:
+      - "5050:80"
+    depends_on:
+      - postgres
+    entrypoint: /bin/sh -c "mkdir -p /var/lib/pgadmin/pgadmin4 && cp /pgadmin4/servers.json /var/lib/pgadmin/pgadmin4/servers.json && /entrypoint.sh"
+
+volumes:
+  postgres_data:
+  pgadmin_data:

@@ -265,7 +265,7 @@ class IGC():
 
     def __calculate_paths_power_rating_adopted(self):
         for path in self.igcCalc.paths:
-            path.calculate_power_rating_adopted(self.igcCalc.calc_type)
+            path.calculate_power_rating_adopted(self.igcCalc.calc_type, self.igcCalc.concurrency_factor_type)
 
     def __calculate_paths_flow(self):
         for path in self.igcCalc.paths:
