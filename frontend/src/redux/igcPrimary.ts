@@ -1,4 +1,5 @@
 import {
+  concurrencyFactorType,
   FileInfoSerializer,
   IGCCalcPathSerializer,
   IGCCalcSerializer,
@@ -86,6 +87,7 @@ export const initialState = {
   name: "",
   observation: "",
   calc_type: "PR",
+  concurrency_factor_type: "CALC",
   material_id: null,
   diameter_id: null,
   gas_id: null,

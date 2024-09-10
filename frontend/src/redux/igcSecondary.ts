@@ -86,6 +86,7 @@ export const initialState = {
   name: "",
   observation: "",
   calc_type: "SC",
+  concurrency_factor_type: null,
   material_id: null,
   diameter_id: null,
   gas_id: null,
